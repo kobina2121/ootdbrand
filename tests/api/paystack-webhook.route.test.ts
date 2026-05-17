@@ -105,7 +105,7 @@ describe("POST /api/webhooks/paystack", () => {
     expect(mockRecordPaymentEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         reference: "PSK-SUCCESS",
-        eventType: "charge.success",
+        eventType: "webhook.charge.success",
         verified: true,
       }),
     );
@@ -153,7 +153,7 @@ describe("POST /api/webhooks/paystack", () => {
     expect(mockRecordPaymentEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         reference: "PSK-ERR",
-        eventType: "charge.success",
+        eventType: "webhook.charge.success",
         verified: false,
       }),
     );

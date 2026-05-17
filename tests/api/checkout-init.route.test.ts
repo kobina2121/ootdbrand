@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { initializePaystackTransaction } from "@/lib/paystack/client";
-import { createPendingOrder } from "@/lib/services/order-service";
+import { createPendingOrder, failPendingOrderByReference } from "@/lib/services/order-service";
 
 vi.mock("@/lib/auth/guards", () => ({
   requireAuthenticatedUser: vi.fn(),
@@ -10,6 +10,7 @@ vi.mock("@/lib/auth/guards", () => ({
 
 vi.mock("@/lib/services/order-service", () => ({
   createPendingOrder: vi.fn(),
+  failPendingOrderByReference: vi.fn(),
 }));
 
 vi.mock("@/lib/paystack/client", () => ({
@@ -20,6 +21,7 @@ import { POST } from "@/app/api/checkout/init/route";
 
 const mockRequireAuthenticatedUser = vi.mocked(requireAuthenticatedUser);
 const mockCreatePendingOrder = vi.mocked(createPendingOrder);
+const mockFailPendingOrderByReference = vi.mocked(failPendingOrderByReference);
 const mockInitializePaystackTransaction = vi.mocked(initializePaystackTransaction);
 
 const validCheckoutPayload = {
@@ -44,6 +46,7 @@ const validCheckoutPayload = {
 describe("POST /api/checkout/init", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockFailPendingOrderByReference.mockResolvedValue(null);
   });
 
   it("initializes checkout and returns Paystack authorization url", async () => {
@@ -141,5 +144,44 @@ describe("POST /api/checkout/init", () => {
       ok: false,
       message: "Could not initialize payment in time. Please retry.",
     });
+    expect(mockFailPendingOrderByReference).toHaveBeenCalledWith("PSK-TIMEOUT1", "Paystack request timed out.");
+  });
+
+  it("marks pending order failed when Paystack initialization returns status=false", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue(null);
+    mockCreatePendingOrder.mockResolvedValue({
+      id: "order_987",
+      paymentReference: "PSK-FAILED00",
+      amountTotal: 120,
+      amountSubtotal: 110,
+      shippingFee: 10,
+      currency: "GHS",
+      status: "Pending",
+    });
+    mockInitializePaystackTransaction.mockResolvedValue({
+      status: false,
+      message: "Gateway rejected request",
+      data: {
+        authorization_url: "",
+        access_code: "",
+        reference: "PSK-FAILED00",
+      },
+    });
+
+    const request = new Request("http://localhost:3000/api/checkout/init", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(validCheckoutPayload),
+    });
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(502);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "Gateway rejected request",
+    });
+    expect(mockFailPendingOrderByReference).toHaveBeenCalledWith("PSK-FAILED00", "Gateway rejected request");
   });
 });

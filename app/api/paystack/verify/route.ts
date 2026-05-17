@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     if (verification.data.reference !== parsed.data.reference) {
       await recordPaymentEvent({
         reference: parsed.data.reference,
-        eventType: "verify.callback",
+        eventType: "verify.endpoint",
         payload: {
           expectedReference: parsed.data.reference,
           returnedReference: verification.data.reference,
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     await recordPaymentEvent({
       reference: parsed.data.reference,
-      eventType: "verify.callback",
+      eventType: "verify.endpoint",
       payload: verification.data,
       verified: verification.data.status.toLowerCase() === "success",
     });

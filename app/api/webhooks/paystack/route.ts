@@ -32,13 +32,14 @@ export async function POST(request: Request) {
   }
 
   const eventType = payload.event ?? "unknown";
+  const auditEventType = `webhook.${eventType}`;
   const reference = payload.data?.reference;
 
   if (!reference) {
     return NextResponse.json({ ok: true, received: true });
   }
 
-  const eventKey = buildPaymentEventKey(reference, eventType);
+  const eventKey = buildPaymentEventKey(reference, auditEventType);
   const seen = await hasPaymentEvent(eventKey);
 
   if (seen) {
@@ -52,9 +53,10 @@ export async function POST(request: Request) {
       if (verification.data.reference !== reference) {
         await recordPaymentEvent({
           reference,
-          eventType,
+          eventType: auditEventType,
           payload: {
             ...payload,
+            verification: verification.data,
             expectedReference: reference,
             returnedReference: verification.data.reference,
             reason: "reference-mismatch",
@@ -76,14 +78,17 @@ export async function POST(request: Request) {
 
     await recordPaymentEvent({
       reference,
-      eventType,
-      payload,
+      eventType: auditEventType,
+      payload: {
+        ...payload,
+        verification: verification.status ? verification.data : { status: false, message: verification.message },
+      },
       verified: verification.status && verification.data.status.toLowerCase() === "success",
     });
   } catch (error) {
     await recordPaymentEvent({
       reference,
-      eventType,
+      eventType: auditEventType,
       payload: {
         ...payload,
         error: error instanceof Error ? error.message : "unknown-webhook-error",

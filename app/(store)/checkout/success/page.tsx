@@ -37,7 +37,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
         await recordPaymentEvent({
           reference,
-          eventType: "verify.callback",
+          eventType: "verify.success-page",
           payload: verification.data,
           verified: verification.data.status.toLowerCase() === "success",
         });
