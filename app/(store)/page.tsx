@@ -178,7 +178,7 @@ export default function HomePage() {
 
       <section className="animate-fade-up overflow-hidden rounded-3xl border border-black/10 bg-[#f4f3ef] shadow-sm">
         <div className="grid lg:grid-cols-2">
-          <div className="relative flex items-end p-7 sm:p-10 lg:p-14">
+          <div className="relative flex items-center p-7 sm:p-10 lg:p-14">
             <div className="pointer-events-none absolute right-0 top-0 h-28 w-28 rounded-full bg-[#d9ccc0]/45 blur-3xl" />
             <div className="max-w-md space-y-6">
               <p className="text-xs tracking-[0.3em] text-muted-foreground">{editorialShowcase.label}</p>
