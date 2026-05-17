@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import { getAuthSecret, getSessionTokenCookieName } from "@/lib/auth/session-config";
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -11,7 +13,8 @@ export async function proxy(request: NextRequest) {
 
   const token = await getToken({
     req: request,
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: getAuthSecret(),
+    cookieName: getSessionTokenCookieName(),
   });
 
   if (!token || token.role !== "admin") {
