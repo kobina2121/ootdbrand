@@ -16,6 +16,7 @@ export function SignupForm() {
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const [googleStatusChecked, setGoogleStatusChecked] = useState(false);
   const [isGoogleAvailable, setIsGoogleAvailable] = useState(false);
+  const showGoogleOption = isGoogleAvailable;
 
   useEffect(() => {
     let isMounted = true;
@@ -138,7 +139,7 @@ export function SignupForm() {
         <CardTitle className="font-heading text-5xl leading-none">Create Customer Account</CardTitle>
       </CardHeader>
       <CardContent>
-        {isGoogleAvailable ? (
+        {showGoogleOption ? (
           <Button
             type="button"
             variant="outline"
@@ -171,11 +172,13 @@ export function SignupForm() {
             Google sign-up is currently unavailable. Please continue with email and password.
           </p>
         ) : null}
-        <div className="mb-4 flex items-center gap-3">
-          <div className="h-px flex-1 bg-black/10" />
-          <span className="text-xs tracking-[0.2em] text-muted-foreground">OR</span>
-          <div className="h-px flex-1 bg-black/10" />
-        </div>
+        {showGoogleOption ? (
+          <div className="mb-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-black/10" />
+            <span className="text-xs tracking-[0.2em] text-muted-foreground">OR</span>
+            <div className="h-px flex-1 bg-black/10" />
+          </div>
+        ) : null}
         <form className="space-y-4" onSubmit={onSubmit}>
           <div className="space-y-2">
             <label htmlFor="signup-name" className="text-sm font-medium">Full name</label>

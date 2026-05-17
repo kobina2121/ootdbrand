@@ -72,7 +72,7 @@ export default async function ProductListPage({ searchParams }: PageProps) {
           <div className="space-y-2">
             <p className="text-xs tracking-[0.26em] text-muted-foreground">THEOOTD SHOP</p>
             <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">All Products</h1>
-            <p className="max-w-xl text-sm text-[#6e6761] sm:text-base">
+            <p className="section-subtitle max-w-xl">
               Discover signature silhouettes crafted for confidence, comfort, and timeless elegance.
             </p>
           </div>
@@ -94,6 +94,12 @@ export default async function ProductListPage({ searchParams }: PageProps) {
       </section>
 
       <section className="rounded-2xl border border-black/10 bg-white/80 p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-xs tracking-[0.22em] text-muted-foreground uppercase">
+            {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"} available
+          </p>
+          {q ? <Badge variant="secondary" className="rounded-full px-3 py-1">Search: {q}</Badge> : null}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           {categories.map((entry) => (
             <Link key={entry} href={buildProductsHref(entry, sort)}>
@@ -117,7 +123,6 @@ export default async function ProductListPage({ searchParams }: PageProps) {
               Price ↓
             </Button>
           </Link>
-          {q ? <Badge variant="secondary" className="rounded-full px-3 py-1">Search: {q}</Badge> : null}
         </div>
       </section>
 

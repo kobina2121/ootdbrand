@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CreditCard, MapPin } from "lucide-react";
 
 import { useCart } from "@/components/store/cart-provider";
 import { Button } from "@/components/ui/button";
@@ -92,20 +93,24 @@ export default function CheckoutPage() {
     <div className="space-y-6">
       <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-5 shadow-sm sm:p-7">
         <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Checkout</h1>
-        <p className="mt-2 text-sm text-[#6d6660] sm:text-base">Complete your details and continue to secure payment.</p>
+        <p className="section-subtitle mt-2">Complete your details and continue to secure payment.</p>
       </section>
 
       <form className="grid gap-6 lg:grid-cols-[2fr_1fr]" onSubmit={onSubmit}>
         <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
-          <CardHeader>
-            <p className="text-sm font-medium text-[#1f1b18]">Shipping Information</p>
+          <CardHeader className="border-b border-black/10 pb-4">
+            <div className="inline-flex items-center gap-2 text-[#1f1b18]">
+              <MapPin className="size-4" />
+              <p className="form-section-title">Shipping Information</p>
+            </div>
+            <p className="text-sm text-[#6e6761]">Use the same format as your delivery address for fast dispatch.</p>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             <Input name="fullName" placeholder="Full name" required className="rounded-xl border-black/15" />
             <Input name="email" placeholder="Email" type="email" required className="rounded-xl border-black/15" />
             <Input name="phone" placeholder="Phone" required className="rounded-xl border-black/15" />
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-[#1f1b18]">Delivery Address</p>
+            <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
+              <p className="form-section-title">Delivery Address</p>
               <Input
                 name="addressLine"
                 placeholder="Street address / House number"
@@ -122,9 +127,12 @@ export default function CheckoutPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm lg:sticky lg:top-24">
           <CardHeader>
-            <CardTitle>Order Summary</CardTitle>
+            <div className="inline-flex items-center gap-2">
+              <CreditCard className="size-4" />
+              <CardTitle>Order Summary</CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">{items.length} item(s) in cart</p>

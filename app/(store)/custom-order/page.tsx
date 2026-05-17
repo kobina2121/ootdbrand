@@ -157,7 +157,7 @@ export default function CustomOrderPage() {
           <Clock3 className="mt-0.5 size-5 text-[#3f3a35]" />
           <div>
             <p className="text-sm font-medium text-[#1f1b18]">Production timeline</p>
-            <p className="text-sm text-[#6b655f]">Custom order takes 7-14 business working days to complete.</p>
+            <p className="text-sm text-[#6b655f]">Custom orders take 7-14 business days to complete.</p>
             <p className="mt-2 text-sm text-[#1f1b18]">
               Secure custom order slot with a <span className="font-semibold">GHS {customOrderDepositGhs}</span> payment.
             </p>
@@ -167,6 +167,7 @@ export default function CustomOrderPage() {
 
       <Card className="border-black/10 bg-white/90 shadow-sm">
         <CardHeader>
+          <p className="form-section-title">Custom Atelier</p>
           <CardTitle className="font-heading text-3xl text-[#1f1b18]">Custom Order Request</CardTitle>
           <p className="text-sm text-[#6b655f]">
             Select your preferred style details, add delivery address, and proceed to secure payment.
@@ -174,128 +175,150 @@ export default function CustomOrderPage() {
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+              <p className="form-section-title">Customer Details</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Full Name *</p>
+                  <Input
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    placeholder="Your full name"
+                    className="rounded-xl border-black/15"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Email *</p>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="you@example.com"
+                    className="rounded-xl border-black/15"
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium">Full Name *</p>
+                <p className="text-sm font-medium">Telephone Number *</p>
                 <Input
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Your full name"
+                  type="tel"
+                  value={phone}
+                  onChange={(event) => setPhone(event.target.value)}
+                  placeholder="+233 53 647 7207"
+                  className="rounded-xl border-black/15"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+              <p className="form-section-title">Style Details</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Type</p>
+                  <select
+                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                    value={type}
+                    onChange={(event) => setType(event.target.value)}
+                  >
+                    <option value="" disabled>
+                      Select type
+                    </option>
+                    {typeOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Category *</p>
+                  <select
+                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                  >
+                    <option value="" disabled>
+                      Select category
+                    </option>
+                    {categoryOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Size *</p>
+                  <select
+                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                    value={size}
+                    onChange={(event) => setSize(event.target.value)}
+                  >
+                    <option value="" disabled>
+                      Select size
+                    </option>
+                    {sizeOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Color *</p>
+                  <select
+                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                    value={color}
+                    onChange={(event) => setColor(event.target.value)}
+                  >
+                    <option value="" disabled>
+                      Select color
+                    </option>
+                    {colorOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="inline-flex items-center gap-2 text-sm font-medium">
+                  <Ruler className="size-4" />
+                  Measurements *
+                </p>
+                <Textarea
+                  rows={4}
+                  value={measurements}
+                  onChange={(event) => setMeasurements(event.target.value)}
+                  placeholder="Bust: 34in, Waist: 28in, Hips: 40in, Length: 62in"
                   className="rounded-xl border-black/15"
                 />
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium">Email *</p>
+                <p className="inline-flex items-center gap-2 text-sm font-medium">
+                  <ImagePlus className="size-4" />
+                  Upload a Picture
+                </p>
                 <Input
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="you@example.com"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/avif"
+                  onChange={(event) => setPhotoFile(event.target.files?.[0] ?? null)}
                   className="rounded-xl border-black/15"
                 />
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Reference preview"
+                    className="h-48 w-full rounded-xl border border-black/10 object-cover sm:w-72"
+                  />
+                ) : null}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Telephone Number *</p>
-              <Input
-                type="tel"
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                placeholder="+233 53 647 7207"
-                className="rounded-xl border-black/15"
-              />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Type</p>
-                <select
-                  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                  value={type}
-                  onChange={(event) => setType(event.target.value)}
-                >
-                  <option value="" disabled>
-                    Select type
-                  </option>
-                  {typeOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Category *</p>
-                <select
-                  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                  value={category}
-                  onChange={(event) => setCategory(event.target.value)}
-                >
-                  <option value="" disabled>
-                    Select category
-                  </option>
-                  {categoryOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Size *</p>
-                <select
-                  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                  value={size}
-                  onChange={(event) => setSize(event.target.value)}
-                >
-                  <option value="" disabled>
-                    Select size
-                  </option>
-                  {sizeOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Color *</p>
-                <select
-                  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                  value={color}
-                  onChange={(event) => setColor(event.target.value)}
-                >
-                  <option value="" disabled>
-                    Select color
-                  </option>
-                  {colorOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="inline-flex items-center gap-2 text-sm font-medium">
-                <Ruler className="size-4" />
-                Measurements *
-              </p>
-              <Textarea
-                rows={4}
-                value={measurements}
-                onChange={(event) => setMeasurements(event.target.value)}
-                placeholder="Bust: 34in, Waist: 28in, Hips: 40in, Length: 62in"
-                className="rounded-xl border-black/15"
-              />
-            </div>
-
-            <div className="space-y-2">
+            <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
               <p className="inline-flex items-center gap-2 text-sm font-medium">
                 <MapPin className="size-4" />
                 Delivery Address *
@@ -330,26 +353,6 @@ export default function CustomOrderPage() {
                 placeholder="Country"
                 className="rounded-xl border-black/15"
               />
-            </div>
-
-            <div className="space-y-2">
-              <p className="inline-flex items-center gap-2 text-sm font-medium">
-                <ImagePlus className="size-4" />
-                Upload a Picture
-              </p>
-              <Input
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/avif"
-                onChange={(event) => setPhotoFile(event.target.files?.[0] ?? null)}
-                className="rounded-xl border-black/15"
-              />
-              {photoPreview ? (
-                <img
-                  src={photoPreview}
-                  alt="Reference preview"
-                  className="h-48 w-full rounded-xl border border-black/10 object-cover sm:w-72"
-                />
-              ) : null}
             </div>
 
             <div className="space-y-2">

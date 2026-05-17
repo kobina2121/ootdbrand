@@ -45,17 +45,17 @@ export function AppShell({ children, user }: AppShellProps) {
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)]">
       <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur">
-        <div className="page-container flex items-center justify-between py-4">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-[#1f1b18]">
+        <div className="page-container flex items-center justify-between py-3 sm:py-4">
+          <Link href="/" className="text-xl font-semibold tracking-tight text-[#1f1b18]">
             theootd.brand
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-7 md:flex">
             {visibleNavLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-sm transition ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1f1b18] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:bg-[#1f1b18]" : "text-muted-foreground hover:text-foreground"}`}
+                className={`relative text-xs tracking-[0.22em] uppercase transition ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1f1b18] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:bg-[#1f1b18]" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {link.label}
               </Link>
@@ -196,7 +196,7 @@ export function AppShell({ children, user }: AppShellProps) {
                 <div className="space-y-2 text-[#706963]">
                   <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">+233 53 647 7207</a>
                   <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">WhatsApp Us</a>
-                  <a href="https://www.instagram.com/theootd.brand/" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">Instagram DM</a>
+                  <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">Instagram DM</a>
                   <Link href="/orders" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">Track Order</Link>
                 </div>
               </div>
@@ -214,7 +214,7 @@ export function AppShell({ children, user }: AppShellProps) {
               <div className="space-y-4">
                 <p className="text-xs tracking-[0.24em] text-[#5f5954]">FOLLOW US</p>
                 <div className="space-y-2 text-[#706963]">
-                  <a href="https://www.instagram.com/theootd.brand/" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">Instagram →</a>
+                  <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">Instagram →</a>
                   <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">WhatsApp →</a>
                   <a href="https://www.tiktok.com/@theootd.brand" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a]">TikTok @theootd.brand →</a>
                 </div>

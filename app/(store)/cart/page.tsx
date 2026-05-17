@@ -94,73 +94,73 @@ export default function CartPage() {
     <div className="space-y-6">
       <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede6_100%)] p-5 shadow-sm sm:p-7">
         <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Shopping Cart</h1>
-        <p className="mt-2 text-sm text-[#6d6660] sm:text-base">Review your picks and continue to secure checkout.</p>
+        <p className="section-subtitle mt-2">Review your picks and continue to secure checkout.</p>
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-      <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Cart Items</CardTitle>
-          <Button variant="ghost" className="rounded-full" onClick={() => void handleClearCart()}>
-            Clear cart
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {items.map((item) => (
-            <div key={item.sku} className="flex flex-col gap-3 rounded-xl border border-black/10 p-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <img src={item.image} alt={item.name} className="h-16 w-16 rounded-md object-cover" />
-                <div>
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {item.size} · {item.color}
-                  </p>
-                  <p className="text-sm text-muted-foreground">{formatPriceNgn(item.unitPrice)}</p>
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Cart Items</CardTitle>
+            <Button variant="ghost" className="rounded-full" onClick={() => void handleClearCart()}>
+              Clear cart
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {items.map((item) => (
+              <div key={item.sku} className="flex flex-col gap-3 rounded-xl border border-black/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <img src={item.image} alt={item.name} className="h-16 w-16 rounded-md object-cover" />
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {item.size} · {item.color}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{formatPriceNgn(item.unitPrice)}</p>
+                  </div>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={item.quantity}
+                    type="number"
+                    min={1}
+                    className="h-9 w-20 rounded-lg border-black/15"
+                    onChange={(event) => {
+                      const value = Number(event.target.value) || 1;
+                      void handleQuantityUpdate(item.sku, value);
+                    }}
+                  />
+                  <Button variant="outline" className="rounded-full" onClick={() => void handleRemoveItem(item.sku)}>
+                    Remove
+                  </Button>
+                </div>
+                {pendingSku === item.sku ? <span className="text-xs text-muted-foreground">Syncing...</span> : null}
               </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  value={item.quantity}
-                  type="number"
-                  min={1}
-                  className="h-9 w-20 rounded-lg border-black/15"
-                  onChange={(event) => {
-                    const value = Number(event.target.value) || 1;
-                    void handleQuantityUpdate(item.sku, value);
-                  }}
-                />
-                <Button variant="outline" className="rounded-full" onClick={() => void handleRemoveItem(item.sku)}>
-                  Remove
-                </Button>
-              </div>
-              {pendingSku === item.sku ? <span className="text-xs text-muted-foreground">Syncing...</span> : null}
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+            ))}
+          </CardContent>
+        </Card>
 
-      <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
-        <CardHeader>
-          <CardTitle>Summary</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between text-sm">
-            <span>Subtotal</span>
-            <span>{formatPriceNgn(subtotal)}</span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span>Shipping</span>
-            <span>{shipping === 0 ? "Free" : formatPriceNgn(shipping)}</span>
-          </div>
-          <div className="flex items-center justify-between font-semibold">
-            <span>Total</span>
-            <span>{formatPriceNgn(total)}</span>
-          </div>
-          <Link href="/checkout" className="block">
-            <Button className="w-full rounded-full">Proceed to Checkout</Button>
-          </Link>
-        </CardContent>
-      </Card>
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm lg:sticky lg:top-24">
+          <CardHeader>
+            <CardTitle>Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between text-sm">
+              <span>Subtotal</span>
+              <span>{formatPriceNgn(subtotal)}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span>Shipping</span>
+              <span>{shipping === 0 ? "Free" : formatPriceNgn(shipping)}</span>
+            </div>
+            <div className="flex items-center justify-between font-semibold">
+              <span>Total</span>
+              <span>{formatPriceNgn(total)}</span>
+            </div>
+            <Link href="/checkout" className="block">
+              <Button className="w-full rounded-full">Proceed to Checkout</Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
