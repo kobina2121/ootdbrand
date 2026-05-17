@@ -40,6 +40,15 @@ export type ReconcileResult = {
   reason: "already-success" | "verified-success" | "verification-failed" | "amount-mismatch" | "currency-mismatch";
 };
 
+function toValidDate(value?: string | null) {
+  if (!value) {
+    return undefined;
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUser | null) {
   await connectToDatabase();
   const resolvedItems = await resolveOrderItemsFromCart(input.items);
@@ -120,9 +129,17 @@ export async function reconcileOrderAfterVerification(reference: string, verific
   const isGatewaySuccess = verification.status.toLowerCase() === "success";
 
   if (isGatewaySuccess && sameCurrency && sameAmount) {
+    const paidAt = toValidDate(verification.paidAt);
     const update = await OrderModel.findOneAndUpdate(
       { paymentReference: reference, status: { $ne: "Success" } },
-      { $set: { status: "Success" } },
+      {
+        $set: {
+          status: "Success",
+          paymentGatewayStatus: verification.status,
+          paymentGatewayResponse: verification.gatewayResponse ?? "verified-success",
+          ...(paidAt ? { paidAt } : {}),
+        },
+      },
       { new: true },
     ).lean();
 
@@ -142,7 +159,13 @@ export async function reconcileOrderAfterVerification(reference: string, verific
 
   const failed = await OrderModel.findOneAndUpdate(
     { paymentReference: reference, status: "Pending" },
-    { $set: { status: "Failed" } },
+    {
+      $set: {
+        status: "Failed",
+        paymentGatewayStatus: verification.status,
+        paymentGatewayResponse: verification.gatewayResponse ?? reason,
+      },
+    },
     { new: true },
   ).lean();
 
@@ -151,6 +174,32 @@ export async function reconcileOrderAfterVerification(reference: string, verific
     status: failed?.status ?? order.status,
     changed: Boolean(failed),
     reason,
+  };
+}
+
+export async function failPendingOrderByReference(reference: string, reason = "checkout initialization failed") {
+  await connectToDatabase();
+
+  const failed = await OrderModel.findOneAndUpdate(
+    { paymentReference: reference, status: "Pending" },
+    {
+      $set: {
+        status: "Failed",
+        paymentGatewayStatus: "initialize_failed",
+        paymentGatewayResponse: reason,
+      },
+    },
+    { new: true },
+  ).lean();
+
+  if (!failed) {
+    return null;
+  }
+
+  return {
+    id: String(failed._id),
+    paymentReference: failed.paymentReference,
+    status: failed.status,
   };
 }
 

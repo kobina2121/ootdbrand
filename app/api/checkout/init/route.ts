@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { failure, success } from "@/lib/api-response";
 import { initializePaystackTransaction } from "@/lib/paystack/client";
-import { createPendingOrder } from "@/lib/services/order-service";
+import { createPendingOrder, failPendingOrderByReference } from "@/lib/services/order-service";
 import { checkoutInitSchema } from "@/lib/validators/checkout";
 
 function resolveAppBaseUrl(request: Request) {
@@ -18,6 +18,8 @@ function resolveAppBaseUrl(request: Request) {
 }
 
 export async function POST(request: Request) {
+  let createdReference: string | null = null;
+
   try {
     const json = await request.json();
     const parsed = checkoutInitSchema.safeParse(json);
@@ -38,6 +40,7 @@ export async function POST(request: Request) {
           }
         : null,
     );
+    createdReference = order.paymentReference;
 
     const baseUrl = resolveAppBaseUrl(request);
     const callbackUrl = `${baseUrl}/checkout/success?reference=${encodeURIComponent(order.paymentReference)}`;
@@ -55,6 +58,7 @@ export async function POST(request: Request) {
     });
 
     if (!paystackInit.status || !paystackInit.data.authorization_url) {
+      await failPendingOrderByReference(order.paymentReference, paystackInit.message || "paystack initialization failed");
       return NextResponse.json(failure(paystackInit.message || "Could not initialize Paystack checkout"), { status: 502 });
     }
 
@@ -68,6 +72,10 @@ export async function POST(request: Request) {
       }),
     );
   } catch (error) {
+    if (createdReference && error instanceof Error) {
+      await failPendingOrderByReference(createdReference, error.message).catch(() => null);
+    }
+
     if (error instanceof Error) {
       if (error.message.startsWith("Variant not found") || error.message.startsWith("Insufficient stock")) {
         return NextResponse.json(failure(error.message), { status: 409 });

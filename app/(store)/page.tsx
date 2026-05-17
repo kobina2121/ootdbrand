@@ -109,9 +109,6 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/45 lg:from-black/10 lg:to-black/30" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.26),transparent_36%)]" />
-        <div className="absolute right-4 top-4 hidden rounded-full border border-white/40 bg-white/15 px-3 py-1 text-[11px] tracking-[0.18em] text-white/90 backdrop-blur md:block">
-          GHANA MADE
-        </div>
 
         <div className="animate-fade-up-delay-1 absolute bottom-24 left-1/2 z-10 w-full max-w-4xl -translate-x-1/2 px-4 text-center text-white sm:bottom-28 lg:bottom-20">
           <p className="mb-2 text-xs tracking-[0.35em] text-white/85 sm:text-sm">NEW COLLECTION</p>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { verifyPaystackTransaction, verifyPaystackWebhookSignature } from "@/lib/paystack/client";
+import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
 import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { buildPaymentEventKey, hasPaymentEvent, recordPaymentEvent } from "@/lib/services/payment-event-service";
 
@@ -32,13 +33,14 @@ export async function POST(request: Request) {
   }
 
   const eventType = payload.event ?? "unknown";
+  const auditEventType = `webhook.${eventType}`;
   const reference = payload.data?.reference;
 
   if (!reference) {
     return NextResponse.json({ ok: true, received: true });
   }
 
-  const eventKey = buildPaymentEventKey(reference, eventType);
+  const eventKey = buildPaymentEventKey(reference, auditEventType);
   const seen = await hasPaymentEvent(eventKey);
 
   if (seen) {
@@ -47,14 +49,17 @@ export async function POST(request: Request) {
 
   try {
     const verification = await verifyPaystackTransaction(reference);
+    let orderReconcile: Awaited<ReturnType<typeof reconcileOrderAfterVerification>> = null;
+    let customOrderReconcile: Awaited<ReturnType<typeof reconcileCustomOrderAfterVerification>> = null;
 
     if (verification.status) {
       if (verification.data.reference !== reference) {
         await recordPaymentEvent({
           reference,
-          eventType,
+          eventType: auditEventType,
           payload: {
             ...payload,
+            verification: verification.data,
             expectedReference: reference,
             returnedReference: verification.data.reference,
             reason: "reference-mismatch",
@@ -65,25 +70,38 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: true, received: true, referenceMismatch: true });
       }
 
-      await reconcileOrderAfterVerification(reference, {
+      orderReconcile = await reconcileOrderAfterVerification(reference, {
         status: verification.data.status,
         amountSubunit: verification.data.amount,
         currency: verification.data.currency,
         paidAt: verification.data.paid_at,
         gatewayResponse: verification.data.gateway_response,
       });
+      if (!orderReconcile) {
+        customOrderReconcile = await reconcileCustomOrderAfterVerification(reference, {
+          status: verification.data.status,
+          amountSubunit: verification.data.amount,
+          currency: verification.data.currency,
+          paidAt: verification.data.paid_at,
+          gatewayResponse: verification.data.gateway_response,
+        });
+      }
     }
 
     await recordPaymentEvent({
       reference,
-      eventType,
-      payload,
+      eventType: auditEventType,
+      payload: {
+        ...payload,
+        reconcileTarget: orderReconcile ? "store" : customOrderReconcile ? "custom" : "unknown",
+        verification: verification.status ? verification.data : { status: false, message: verification.message },
+      },
       verified: verification.status && verification.data.status.toLowerCase() === "success",
     });
   } catch (error) {
     await recordPaymentEvent({
       reference,
-      eventType,
+      eventType: auditEventType,
       payload: {
         ...payload,
         error: error instanceof Error ? error.message : "unknown-webhook-error",

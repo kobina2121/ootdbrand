@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
+import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
 import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { recordPaymentEvent } from "@/lib/services/payment-event-service";
 
@@ -27,21 +28,31 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
       if (!verification.status) {
         state = "pending";
       } else {
-        const reconcile = await reconcileOrderAfterVerification(reference, {
+        const orderReconcile = await reconcileOrderAfterVerification(reference, {
           status: verification.data.status,
           amountSubunit: verification.data.amount,
           currency: verification.data.currency,
           paidAt: verification.data.paid_at,
           gatewayResponse: verification.data.gateway_response,
         });
+        const customOrderReconcile =
+          orderReconcile ??
+          (await reconcileCustomOrderAfterVerification(reference, {
+            status: verification.data.status,
+            amountSubunit: verification.data.amount,
+            currency: verification.data.currency,
+            paidAt: verification.data.paid_at,
+            gatewayResponse: verification.data.gateway_response,
+          }));
 
         await recordPaymentEvent({
           reference,
-          eventType: "verify.callback",
+          eventType: "verify.success-page",
           payload: verification.data,
           verified: verification.data.status.toLowerCase() === "success",
         });
 
+        const reconcile = orderReconcile ?? customOrderReconcile;
         state = reconcile?.status === "Success" ? "success" : "failed";
       }
     } catch {

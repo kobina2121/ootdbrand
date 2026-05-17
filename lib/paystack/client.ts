@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 const PAYSTACK_API_BASE_URL = process.env.PAYSTACK_API_BASE_URL ?? "https://api.paystack.co";
 
@@ -130,8 +130,19 @@ export function verifyPaystackWebhookSignature(rawBody: string, signature?: stri
     return false;
   }
 
-  const digest = createHmac("sha512", getPaystackWebhookSecret()).update(rawBody).digest("hex");
-  return digest === signature;
+  try {
+    const digest = createHmac("sha512", getPaystackWebhookSecret()).update(rawBody).digest("hex");
+    const expected = Buffer.from(digest, "utf8");
+    const received = Buffer.from(signature.trim().toLowerCase(), "utf8");
+
+    if (expected.length !== received.length) {
+      return false;
+    }
+
+    return timingSafeEqual(expected, received);
+  } catch {
+    return false;
+  }
 }
 
 export type { PaystackVerifyResponse };

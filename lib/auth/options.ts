@@ -2,20 +2,27 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
+import { getAuthSecret, getSessionTokenCookieName, shouldUseSecureAuthCookies } from "@/lib/auth/session-config";
 import { upsertOAuthCustomerUser, verifyUserCredentials } from "@/lib/services/user-service";
 
-const authSecret =
-  process.env.NEXTAUTH_SECRET ??
-  (process.env.NODE_ENV === "development" ? "theootd-dev-nextauth-secret-change-me" : undefined);
-
-if (!authSecret) {
-  throw new Error("Missing NEXTAUTH_SECRET environment variable.");
-}
+const authSecret = getAuthSecret();
+const secureCookies = shouldUseSecureAuthCookies();
 
 export const authOptions: NextAuthOptions = {
   secret: authSecret,
   session: {
     strategy: "jwt",
+  },
+  cookies: {
+    sessionToken: {
+      name: getSessionTokenCookieName(),
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: secureCookies,
+      },
+    },
   },
   providers: [
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
