@@ -17,7 +17,6 @@ const navLinks = [
   { href: "/custom-order", label: "Custom Order" },
   { href: "/orders", label: "Orders" },
   { href: "/cart", label: "Cart" },
-  { href: "/admin/products", label: "Admin" },
 ];
 
 const mobileTabs = [
@@ -40,6 +39,8 @@ export function AppShell({ children, user }: AppShellProps) {
   const pathname = usePathname();
   const { itemCount } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const visibleNavLinks =
+    user?.role === "admin" ? [...navLinks, { href: "/admin/products", label: "Admin" }] : navLinks;
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)]">
@@ -50,7 +51,7 @@ export function AppShell({ children, user }: AppShellProps) {
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">
-            {navLinks.map((link) => (
+            {visibleNavLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -123,7 +124,7 @@ export function AppShell({ children, user }: AppShellProps) {
                   <DialogTitle>Navigation</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col gap-2">
-                  {navLinks.map((link) => (
+                  {visibleNavLinks.map((link) => (
                     <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start">
                         {link.label}
