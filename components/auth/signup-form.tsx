@@ -14,26 +14,56 @@ export function SignupForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+  const [googleStatusChecked, setGoogleStatusChecked] = useState(false);
   const [isGoogleAvailable, setIsGoogleAvailable] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    getProviders()
-      .then((providers) => {
+    const checkGoogleAvailability = async () => {
+      try {
+        const statusResponse = await fetch("/api/auth/google-status", { cache: "no-store" });
+        if (!statusResponse.ok) {
+          throw new Error("google-status-unavailable");
+        }
+
+        const statusJson = (await statusResponse.json()) as {
+          ok: boolean;
+          data?: { enabled?: boolean };
+        };
+
+        if (!isMounted) {
+          return;
+        }
+
+        const envEnabled = Boolean(statusJson.data?.enabled);
+
+        if (!envEnabled) {
+          setIsGoogleAvailable(false);
+          setGoogleStatusChecked(true);
+          return;
+        }
+
+        const providers = await getProviders();
         if (!isMounted) {
           return;
         }
 
         setIsGoogleAvailable(Boolean(providers?.google));
-      })
-      .catch(() => {
+      } catch {
         if (!isMounted) {
           return;
         }
 
         setIsGoogleAvailable(false);
-      });
+      } finally {
+        if (isMounted) {
+          setGoogleStatusChecked(true);
+        }
+      }
+    };
+
+    void checkGoogleAvailability();
 
     return () => {
       isMounted = false;
@@ -136,11 +166,11 @@ export function SignupForm() {
             </svg>
             {isGoogleSubmitting ? "Redirecting..." : "Continue with Google"}
           </Button>
-        ) : (
+        ) : googleStatusChecked ? (
           <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
             Google sign-up is currently unavailable. Please continue with email and password.
           </p>
-        )}
+        ) : null}
         <div className="mb-4 flex items-center gap-3">
           <div className="h-px flex-1 bg-black/10" />
           <span className="text-xs tracking-[0.2em] text-muted-foreground">OR</span>
