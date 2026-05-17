@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { verifyPaystackTransaction, verifyPaystackWebhookSignature } from "@/lib/paystack/client";
+import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
 import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { buildPaymentEventKey, hasPaymentEvent, recordPaymentEvent } from "@/lib/services/payment-event-service";
 
@@ -48,6 +49,8 @@ export async function POST(request: Request) {
 
   try {
     const verification = await verifyPaystackTransaction(reference);
+    let orderReconcile: Awaited<ReturnType<typeof reconcileOrderAfterVerification>> = null;
+    let customOrderReconcile: Awaited<ReturnType<typeof reconcileCustomOrderAfterVerification>> = null;
 
     if (verification.status) {
       if (verification.data.reference !== reference) {
@@ -67,13 +70,22 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: true, received: true, referenceMismatch: true });
       }
 
-      await reconcileOrderAfterVerification(reference, {
+      orderReconcile = await reconcileOrderAfterVerification(reference, {
         status: verification.data.status,
         amountSubunit: verification.data.amount,
         currency: verification.data.currency,
         paidAt: verification.data.paid_at,
         gatewayResponse: verification.data.gateway_response,
       });
+      if (!orderReconcile) {
+        customOrderReconcile = await reconcileCustomOrderAfterVerification(reference, {
+          status: verification.data.status,
+          amountSubunit: verification.data.amount,
+          currency: verification.data.currency,
+          paidAt: verification.data.paid_at,
+          gatewayResponse: verification.data.gateway_response,
+        });
+      }
     }
 
     await recordPaymentEvent({
@@ -81,6 +93,7 @@ export async function POST(request: Request) {
       eventType: auditEventType,
       payload: {
         ...payload,
+        reconcileTarget: orderReconcile ? "store" : customOrderReconcile ? "custom" : "unknown",
         verification: verification.status ? verification.data : { status: false, message: verification.message },
       },
       verified: verification.status && verification.data.status.toLowerCase() === "success",

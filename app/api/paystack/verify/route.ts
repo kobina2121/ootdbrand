@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
+import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
 import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { recordPaymentEvent } from "@/lib/services/payment-event-service";
 
@@ -40,13 +41,22 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("Verification reference mismatch"), { status: 409 });
     }
 
-    const reconcile = await reconcileOrderAfterVerification(parsed.data.reference, {
+    const orderReconcile = await reconcileOrderAfterVerification(parsed.data.reference, {
       status: verification.data.status,
       amountSubunit: verification.data.amount,
       currency: verification.data.currency,
       paidAt: verification.data.paid_at,
       gatewayResponse: verification.data.gateway_response,
     });
+    const customOrderReconcile =
+      orderReconcile ??
+      (await reconcileCustomOrderAfterVerification(parsed.data.reference, {
+        status: verification.data.status,
+        amountSubunit: verification.data.amount,
+        currency: verification.data.currency,
+        paidAt: verification.data.paid_at,
+        gatewayResponse: verification.data.gateway_response,
+      }));
 
     await recordPaymentEvent({
       reference: parsed.data.reference,
@@ -55,15 +65,18 @@ export async function POST(request: Request) {
       verified: verification.data.status.toLowerCase() === "success",
     });
 
-    if (!reconcile) {
+    if (!orderReconcile && !customOrderReconcile) {
       return NextResponse.json(failure("Order not found for this payment reference"), { status: 404 });
     }
+
+    const reconcile = orderReconcile ?? customOrderReconcile!;
 
     return NextResponse.json(
       success("Transaction verified", {
         reference: parsed.data.reference,
         orderStatus: reconcile.status,
         reason: reconcile.reason,
+        orderType: orderReconcile ? "store" : "custom",
       }),
     );
   } catch (error) {
