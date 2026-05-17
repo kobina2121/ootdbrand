@@ -1,0 +1,220 @@
+Project: Production-Ready E-commerce MVP (Clothing Brand)
+Stack: Next.js 14+ (App Router), TypeScript, Tailwind CSS, Shadcn UI, MongoDB (Mongoose or Prisma), Paystack
+
+---
+
+## Level 1 - UI Essentials (Foundation)
+
+### Public Storefront
+- AppShell (Header, Footer, Mobile Nav)
+- HomePage (Hero, Featured Products, Category Highlights)
+- ProductListPage (Grid, Filters, Sort, Pagination)
+- ProductDetailPage (Gallery, Variant Selectors: size/color, Quantity, Add to Cart)
+- CartPage (Line items, quantity controls, subtotal)
+- CheckoutPage (Shipping form, order summary, pay button)
+- OrderSuccessPage / OrderFailedPage
+- AccountOrdersPage (customer order history)
+
+### Admin UI
+- AdminLayout (Sidebar + top bar)
+- AdminProductTable (search, pagination, status chips)
+- AdminProductForm (create/edit with variant builder)
+- AdminOrderTable (status, payment reference, quick actions)
+
+### Shared Shadcn Components (Required)
+- Buttons, Inputs, Textareas, Select, Checkbox, RadioGroup
+- Dialog/AlertDialog (delete confirmations)
+- Table (admin lists)
+- Badge (status)
+- Toast/Sonner (feedback)
+- Skeleton/Spinner (loading states)
+- Form primitives (react-hook-form + zod)
+
+Complexity: Low-Medium
+
+---
+
+## Level 2 - State & Logic (Application Layer)
+
+### Client/Server State
+- Cart state (Context/Zustand) persisted in localStorage
+- Server Actions / Route Handlers for cart sync + checkout init
+- Product filter/sort query-state via URL search params
+- Optimistic UI for cart updates
+
+### Business Logic
+- Price resolution by variant
+- Inventory checks per variant (size+color SKU)
+- Shipping fee + total calculator
+- Coupon-ready discount hook (optional MVP extension)
+
+### Validation & Errors
+- Shared Zod schemas (Product, Variant, Checkout payload)
+- Consistent API response envelope
+- Error boundaries + empty states
+
+Complexity: Medium
+
+---
+
+## Level 3 - Auth & Database (Core Backend)
+
+### Auth & Authorization
+- NextAuth/Auth.js (credentials or OAuth)
+- Roles: customer, admin
+- Middleware route protection:
+  - Protect /admin/* for admins only
+  - Redirect unauthorized users
+- Server-side guards in admin actions/routes (defense in depth)
+
+### MongoDB Schema (Mongoose/Prisma)
+
+#### Product
+- id
+- name, slug, description
+- category, tags
+- basePrice
+- images[]
+- variants[]:
+  - size (S, M, L, XL…)
+  - color (name/code)
+  - sku (unique)
+  - priceOverride?
+  - stock
+- isActive
+- timestamps
+
+#### User
+- id
+- name, email (unique), passwordHash?
+- role (customer | admin)
+- timestamps
+
+#### Order
+- id
+- userId? (guest checkout optional)
+- items[]:
+  - productId
+  - productNameSnapshot
+  - variant (size, color, sku)
+  - unitPrice
+  - quantity
+- amountSubtotal, shippingFee, amountTotal
+- currency (NGN)
+- status (Pending | Success | Failed)
+- paymentProvider (paystack)
+- paymentReference (unique, indexed)
+- shippingAddress
+- timestamps
+
+#### PaymentEvent (optional but recommended)
+- reference
+- eventType
+- payload
+- verified
+- timestamps
+
+### Data Layer
+- Repository/service modules for products/orders/payments
+- Indexing strategy:
+  - Product.slug
+  - Product.variants.sku
+  - Order.paymentReference
+  - Order.status
+
+Complexity: High
+
+---
+
+## Level 4 - Payment & Webhooks (Critical Path)
+
+### Paystack Checkout Flow
+1. Customer submits checkout form.
+2. Backend creates Order(status=Pending) + Paystack transaction initialization.
+3. Return Paystack authorization URL to frontend.
+4. Redirect customer to Paystack.
+5. Paystack returns customer to success/failure page.
+6. Backend verifies transaction via Paystack verify endpoint.
+7. Update order status:
+   - Success if verified and amount matches
+   - Failed otherwise
+
+### Webhook Handler (Required)
+- Endpoint: /api/webhooks/paystack
+- Validate Paystack signature (x-paystack-signature) using secret
+- Handle events idempotently (skip already processed reference)
+- Re-verify transaction server-to-server before marking Success
+- Persist webhook payload/audit record
+- Return fast 200 responses to prevent retries loop
+
+### Security & Reliability
+- Never trust client callback alone
+- Verify amount/currency/reference match DB order
+- Use raw body parsing where needed for signature validation
+- Add retry-safe order update logic (atomic update by reference + status guard)
+
+Complexity: Very High
+
+---
+
+## Modular Implementation Strategy
+
+### Module A - Project Setup
+- Bootstrap Next.js app, Tailwind, Shadcn UI
+- Configure env management (PAYSTACK_SECRET_KEY, PAYSTACK_WEBHOOK_SECRET, MONGODB_URI, NEXTAUTH_SECRET)
+
+### Module B - Domain & Data
+- Implement schemas/models and indexes
+- Seed admin user + sample products with variants
+
+### Module C - Storefront
+- Product listing/detail pages
+- Cart + checkout UI with accessible Shadcn components
+
+### Module D - Admin
+- /admin/products CRUD (Create, Read, Update, Delete)
+- Protected by middleware + server guards
+
+### Module E - Payments
+- Checkout initialization endpoint
+- Paystack redirect + callback handling
+- Webhook verification and order reconciliation
+
+### Module F - Quality & Launch Readiness
+- Validation, error boundaries, logging
+- Basic tests:
+  - Product CRUD
+  - Checkout init
+  - Webhook verification/order status transitions
+- Deployment checklist (env vars, webhook URL, DB indexes)
+
+---
+
+## Suggested Folder Structure
+
+- app/(store)/...
+- app/(admin)/admin/products/...
+- app/api/products/...
+- app/api/orders/...
+- app/api/paystack/initialize/...
+- app/api/paystack/verify/...
+- app/api/webhooks/paystack/...
+- components/ui/* (Shadcn)
+- components/store/*
+- components/admin/*
+- lib/db/*
+- lib/auth/*
+- lib/paystack/*
+- lib/validators/*
+- lib/services/*
+- middleware.ts
+- types/*
+
+---
+
+## Final Git Instruction
+After implementation and verification, run an atomic commit and push to main:
+
+1. git add -A
+2. git commit -m "feat: ship ecommerce MVP with admin CRUD, variant-aware schema, and Paystack webhook verification"
+3. git push origin main

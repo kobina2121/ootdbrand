@@ -1,0 +1,66 @@
+import { randomUUID } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+
+import { NextResponse } from "next/server";
+
+import { failure, success } from "@/lib/api-response";
+import { requireAdminUser } from "@/lib/auth/guards";
+
+export const runtime = "nodejs";
+
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+]);
+
+const extensionByMimeType: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/avif": ".avif",
+};
+
+export async function POST(request: Request) {
+  const admin = await requireAdminUser();
+
+  if (!admin) {
+    return NextResponse.json(failure("Unauthorized"), { status: 403 });
+  }
+
+  try {
+    const formData = await request.formData();
+    const fileEntry = formData.get("file");
+
+    if (!(fileEntry instanceof File)) {
+      return NextResponse.json(failure("No file uploaded"), { status: 400 });
+    }
+
+    if (!ALLOWED_MIME_TYPES.has(fileEntry.type)) {
+      return NextResponse.json(failure("Unsupported image type"), { status: 400 });
+    }
+
+    if (fileEntry.size > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json(failure("Image is too large (max 5MB)"), { status: 400 });
+    }
+
+    const extension = extensionByMimeType[fileEntry.type] ?? (path.extname(fileEntry.name) || ".jpg");
+    const fileName = `product-${randomUUID()}${extension}`;
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
+    const filePath = path.join(uploadDir, fileName);
+
+    await mkdir(uploadDir, { recursive: true });
+
+    const buffer = Buffer.from(await fileEntry.arrayBuffer());
+    await writeFile(filePath, buffer);
+
+    const imagePath = `/uploads/products/${fileName}`;
+
+    return NextResponse.json(success("Image uploaded", { imagePath }), { status: 201 });
+  } catch {
+    return NextResponse.json(failure("Could not upload image"), { status: 500 });
+  }
+}
