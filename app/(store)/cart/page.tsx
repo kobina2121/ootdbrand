@@ -5,14 +5,26 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 
 import { useCart } from "@/components/store/cart-provider";
+import { ProductGrid } from "@/components/store/product-grid";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { formatPriceNgn } from "@/lib/products";
 
+type SuggestedProduct = {
+  slug: string;
+  name: string;
+  category: string;
+  image: string;
+  price: number;
+  sizes: string[];
+};
+
 export default function CartPage() {
   const { items, subtotal, shipping, total, updateQuantity, removeItem, clearCart, syncCart } = useCart();
   const [pendingSku, setPendingSku] = useState<string | null>(null);
+  const [suggestedProducts, setSuggestedProducts] = useState<SuggestedProduct[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const isHydrated = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -29,6 +41,48 @@ export default function CartPage() {
       toast.error(message);
     });
   }, [isHydrated, syncCart]);
+
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const loadSuggestions = async () => {
+      try {
+        setIsLoadingSuggestions(true);
+
+        const exclude = [...new Set(items.map((item) => item.slug))].join(",");
+        const query = new URLSearchParams({ limit: "4" });
+        if (exclude) {
+          query.set("exclude", exclude);
+        }
+
+        const response = await fetch(`/api/products?${query.toString()}`, {
+          signal: controller.signal,
+        });
+
+        const json = (await response.json()) as {
+          ok: boolean;
+          data?: { products?: SuggestedProduct[] };
+        };
+
+        if (!response.ok || !json.ok) {
+          return;
+        }
+
+        setSuggestedProducts(json.data?.products ?? []);
+      } catch {
+        // No-op: suggestions are optional.
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    };
+
+    void loadSuggestions();
+
+    return () => controller.abort();
+  }, [isHydrated, items]);
 
   if (!isHydrated) {
     return (
@@ -162,6 +216,25 @@ export default function CartPage() {
           </CardContent>
         </Card>
       </div>
+
+      <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold">You May Also Like</h2>
+          <Link
+            href="/products"
+            className="text-sm text-muted-foreground transition hover:text-foreground"
+          >
+            Browse all
+          </Link>
+        </div>
+        {isLoadingSuggestions ? (
+          <p className="text-sm text-muted-foreground">Loading suggestions...</p>
+        ) : suggestedProducts.length > 0 ? (
+          <ProductGrid products={suggestedProducts} />
+        ) : (
+          <p className="text-sm text-muted-foreground">More styles are coming soon.</p>
+        )}
+      </section>
     </div>
   );
 }
