@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Home, Menu, Search, ShoppingBag, UserRound } from "lucide-react";
 
@@ -37,10 +37,17 @@ type AppShellProps = {
 
 export function AppShell({ children, user }: AppShellProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { itemCount } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const nextPath = searchParams.get("next") ?? "";
+  const isAdminLoginView = pathname === "/login" && nextPath.startsWith("/admin");
   const visibleNavLinks =
-    user?.role === "admin" ? [...navLinks, { href: "/admin/products", label: "Admin" }] : navLinks;
+    isAdminLoginView
+      ? [{ href: "/", label: "Store Home" }]
+      : user?.role === "admin"
+        ? [...navLinks, { href: "/admin/products", label: "Admin" }]
+        : navLinks;
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)]">
@@ -62,7 +69,13 @@ export function AppShell({ children, user }: AppShellProps) {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          {isAdminLoginView ? (
+            <div className="hidden rounded-full border border-black/15 bg-black/[0.03] px-4 py-1.5 md:block">
+              <p className="text-[11px] tracking-[0.2em] text-[#3d3732] uppercase">Admin Access</p>
+            </div>
+          ) : null}
+
+          <div className={`flex items-center gap-2 ${isAdminLoginView ? "md:hidden" : ""}`}>
             <div className="hidden items-center gap-2 md:flex">
               {user ? (
                 <div className="flex items-center gap-2">
