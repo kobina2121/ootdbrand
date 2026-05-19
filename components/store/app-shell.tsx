@@ -53,35 +53,36 @@ export function AppShell({ children, user }: AppShellProps) {
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)]">
       <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur">
         <div className="page-container flex items-center justify-between py-3 sm:py-4">
-          <Link href="/" className="text-xl font-semibold tracking-tight text-[#1f1b18]">
+          <Link href="/" className="shrink-0 pr-3 text-xl font-semibold tracking-tight text-[#1f1b18] lg:pr-6">
             theootd.brand
           </Link>
 
-          <nav className="hidden items-center gap-7 md:flex">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 md:flex lg:gap-6 xl:gap-8">
             {visibleNavLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-xs tracking-[0.22em] uppercase transition ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1f1b18] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:bg-[#1f1b18]" : "text-muted-foreground hover:text-foreground"}`}
+                className={`relative whitespace-nowrap text-[11px] tracking-[0.16em] uppercase transition lg:text-xs ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1f1b18] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:bg-[#1f1b18]" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          {isAdminLoginView ? (
-            <div className="hidden rounded-full border border-black/15 bg-black/[0.03] px-4 py-1.5 md:block">
-              <p className="text-[11px] tracking-[0.2em] text-[#3d3732] uppercase">Admin Access</p>
-            </div>
-          ) : null}
-
-          <div className={`flex items-center gap-2 ${isAdminLoginView ? "md:hidden" : ""}`}>
-            <div className="hidden items-center gap-2 md:flex">
+          <div className={`ml-auto flex shrink-0 items-center gap-1.5 lg:gap-2 ${isAdminLoginView ? "md:hidden" : ""}`}>
+            {isAdminLoginView ? (
+              <div className="hidden rounded-full border border-black/15 bg-black/[0.03] px-4 py-1.5 md:block">
+                <p className="whitespace-nowrap text-[11px] tracking-[0.2em] text-[#3d3732] uppercase">Admin Access</p>
+              </div>
+            ) : null}
+            <div className="hidden items-center gap-2 lg:flex xl:gap-3">
               {user ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Hi, {user.name || "User"}</span>
+                  <span className="max-w-[170px] truncate whitespace-nowrap text-[11px] tracking-[0.14em] uppercase text-muted-foreground xl:max-w-[210px]">
+                    Hi, {user.name || "User"}
+                  </span>
                   <Link href="/account/security">
-                    <Button variant="ghost" size="sm" className="rounded-full">
+                    <Button variant="ghost" size="sm" className="hidden rounded-full xl:inline-flex">
                       Change Password
                     </Button>
                   </Link>
@@ -98,7 +99,7 @@ export function AppShell({ children, user }: AppShellProps) {
                 </>
               )}
             </div>
-            <div className="hidden items-center gap-1 md:flex">
+            <div className="hidden items-center gap-0.5 md:flex lg:gap-1">
               <Link href="/products">
                 <Button size="icon" variant="ghost">
                   <Search className="h-4 w-4" />
