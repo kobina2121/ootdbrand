@@ -45,9 +45,7 @@ export function AppShell({ children, user }: AppShellProps) {
   const visibleNavLinks =
     isAdminLoginView
       ? [{ href: "/", label: "Store Home" }]
-      : user?.role === "admin"
-        ? [...navLinks, { href: "/admin/products", label: "Admin" }]
-        : navLinks;
+      : navLinks;
 
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)]">
@@ -78,9 +76,17 @@ export function AppShell({ children, user }: AppShellProps) {
             <div className="hidden items-center gap-2 lg:flex xl:gap-3">
               {user ? (
                 <div className="flex items-center gap-2">
-                  <span className="max-w-[170px] truncate whitespace-nowrap text-[11px] tracking-[0.14em] uppercase text-muted-foreground xl:max-w-[210px]">
-                    Hi, {user.name || "User"}
-                  </span>
+                  {user.role === "admin" ? (
+                    <Link href="/admin/products">
+                      <Button variant="outline" size="sm" className="h-9 rounded-full border-black/20 bg-white/90 px-4">
+                        Admin Panel
+                      </Button>
+                    </Link>
+                  ) : (
+                    <span className="max-w-[170px] truncate whitespace-nowrap text-[11px] tracking-[0.14em] uppercase text-muted-foreground xl:max-w-[210px]">
+                      Hi, {user.name || "User"}
+                    </span>
+                  )}
                   <Link href="/account/security">
                     <Button variant="ghost" size="sm" className="hidden rounded-full xl:inline-flex">
                       Change Password
@@ -149,6 +155,13 @@ export function AppShell({ children, user }: AppShellProps) {
                     <div className="space-y-2 rounded-xl border border-black/10 bg-black/[0.02] p-3">
                       <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Signed in as</p>
                       <p className="text-sm text-foreground">{user.email || user.name || "User"}</p>
+                      {user.role === "admin" ? (
+                        <Link href="/admin/products" onClick={() => setMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start rounded-full border-black/20">
+                            Admin Panel
+                          </Button>
+                        </Link>
+                      ) : null}
                       <Link href="/account/security" onClick={() => setMobileMenuOpen(false)}>
                         <Button variant="ghost" className="w-full justify-start rounded-full">
                           Change Password
