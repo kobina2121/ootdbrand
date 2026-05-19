@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 const variantSchema = z.object({
-  size: z.string().min(1, "Size is required"),
+  sizes: z.array(z.string().min(1)).min(1, "Select at least one size"),
   colorName: z.string().min(1, "Color name is required"),
   colorCode: z
     .string()
@@ -88,7 +88,7 @@ const defaultValues: ProductEditorValues = {
   status: "active",
   variants: [
     {
-      size: "M",
+      sizes: ["M"],
       colorName: "Black",
       colorCode: "#111827",
       image: "",
@@ -188,7 +188,9 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
 
     const variants = form.getValues("variants") ?? [];
     const existingVariants = new Set(
-      variants.map((variant) => `${variant.size.toUpperCase()}__${variant.colorCode.toUpperCase()}`),
+      variants.flatMap((variant) =>
+        variant.sizes.map((size) => `${size.toUpperCase()}__${variant.colorCode.toUpperCase()}`),
+      ),
     );
     const existingSkus = new Set(variants.map((variant) => variant.sku.toUpperCase()));
     const slugBase = form
@@ -235,7 +237,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
         existingVariants.add(variantKey);
 
         append({
-          size,
+          sizes: [size],
           colorName: color.name,
           colorCode: color.code,
           image: "",
@@ -310,6 +312,45 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   };
 
   const onSubmit = async (values: ProductEditorValues) => {
+    const flattenedVariants = values.variants.flatMap((variant) => {
+      const normalizedSizes = Array.from(new Set(variant.sizes.map((size) => size.trim().toUpperCase()))).filter(Boolean);
+      const normalizedSku = variant.sku.trim().toUpperCase();
+
+      return normalizedSizes.map((size) => {
+        const nextSku = normalizedSizes.length === 1 ? normalizedSku : `${normalizedSku}-${size}`;
+
+        return {
+          size,
+          color: {
+            name: variant.colorName.trim(),
+            code: variant.colorCode.trim().toUpperCase(),
+          },
+          image: variant.image && variant.image.length > 0 ? variant.image : undefined,
+          sku: nextSku,
+          stock: variant.stock,
+          priceOverride:
+            variant.priceOverride === "" || typeof variant.priceOverride === "undefined"
+              ? undefined
+              : Number(variant.priceOverride),
+        };
+      });
+    });
+
+    const skuSet = new Set<string>();
+    const hasDuplicateSku = flattenedVariants.some((variant) => {
+      if (skuSet.has(variant.sku)) {
+        return true;
+      }
+
+      skuSet.add(variant.sku);
+      return false;
+    });
+
+    if (hasDuplicateSku) {
+      toast.error("Duplicate SKU detected after size expansion. Update SKU values and try again.");
+      return;
+    }
+
     const payload = {
       name: values.name,
       slug: values.slug,
@@ -324,20 +365,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
       basePrice: values.basePrice,
       images: values.images,
       isActive: values.status === "active",
-      variants: values.variants.map((variant) => ({
-        size: variant.size,
-        color: {
-          name: variant.colorName,
-          code: variant.colorCode,
-        },
-        image: variant.image && variant.image.length > 0 ? variant.image : undefined,
-        sku: variant.sku,
-        stock: variant.stock,
-        priceOverride:
-          variant.priceOverride === "" || typeof variant.priceOverride === "undefined"
-            ? undefined
-            : Number(variant.priceOverride),
-      })),
+      variants: flattenedVariants,
     };
 
     const endpoint = mode === "create" ? "/api/admin/products" : `/api/admin/products/${productId}`;
@@ -374,6 +402,14 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
     }
 
     onChange(Number(value));
+  };
+
+  const toggleVariantSize = (variantIndex: number, size: string) => {
+    const currentSizes = form.getValues(`variants.${variantIndex}.sizes`) ?? [];
+    const hasSize = currentSizes.includes(size);
+    const nextSizes = hasSize ? currentSizes.filter((entry) => entry !== size) : [...currentSizes, size];
+
+    form.setValue(`variants.${variantIndex}.sizes`, nextSizes, { shouldValidate: true, shouldDirty: true });
   };
 
   return (
@@ -606,7 +642,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                     size="sm"
                     onClick={() =>
                       append({
-                        size: "",
+                        sizes: ["M"],
                         colorName: "",
                         colorCode: "#111827",
                         image: "",
@@ -702,28 +738,30 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 <div key={field.id} className="grid gap-2 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-3">
                   <FormField
                     control={form.control}
-                    name={`variants.${index}.size`}
+                    name={`variants.${index}.sizes`}
                     render={({ field: variantField }) => (
                       <FormItem>
-                        <FormLabel>Size</FormLabel>
+                        <FormLabel>Sizes</FormLabel>
                         <FormControl>
-                          <select
-                            className="h-9 w-full rounded-md border bg-transparent px-3 text-sm"
-                            value={variantField.value}
-                            onChange={(event) => variantField.onChange(event.target.value)}
-                          >
-                            <option value="" disabled>
-                              Select size
-                            </option>
-                            {sizeOptions.map((sizeOption) => (
-                              <option key={sizeOption} value={sizeOption}>
-                                {sizeOption}
-                              </option>
-                            ))}
-                            {variantField.value && !sizeOptions.includes(variantField.value as (typeof sizeOptions)[number]) ? (
-                              <option value={variantField.value}>{variantField.value}</option>
-                            ) : null}
-                          </select>
+                          <div className="space-y-2 rounded-md border border-black/10 p-2">
+                            <div className="flex flex-wrap gap-2">
+                              {sizeOptions.map((sizeOption) => (
+                                <Button
+                                  key={`${field.id}-${sizeOption}`}
+                                  type="button"
+                                  size="sm"
+                                  variant={variantField.value?.includes(sizeOption) ? "default" : "outline"}
+                                  className="h-8 min-w-11"
+                                  onClick={() => toggleVariantSize(index, sizeOption)}
+                                >
+                                  {sizeOption}
+                                </Button>
+                              ))}
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Selected: {variantField.value?.length ? variantField.value.join(", ") : "None"}
+                            </p>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -784,10 +822,13 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                     name={`variants.${index}.sku`}
                     render={({ field: variantField }) => (
                       <FormItem>
-                        <FormLabel>SKU</FormLabel>
+                        <FormLabel>SKU Base</FormLabel>
                         <FormControl>
-                          <Input placeholder="CT-BLK-M" {...variantField} />
+                          <Input placeholder="CT-BLK" {...variantField} />
                         </FormControl>
+                        <p className="text-xs text-muted-foreground">
+                          If multiple sizes are selected, we save as `SKU-SIZE` (example: `CT-BLK-M`).
+                        </p>
                         <FormMessage />
                       </FormItem>
                     )}
