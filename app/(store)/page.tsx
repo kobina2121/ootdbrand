@@ -204,12 +204,12 @@ export default function HomePage() {
               muted
               loop
               playsInline
-              className="h-full w-full object-cover object-center"
+              className="h-full w-full object-cover object-center animate-hero-zoom"
             >
               <img
                 src={editorialShowcase.image}
                 alt={editorialShowcase.title}
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-cover object-center animate-hero-zoom"
               />
             </video>
           </div>
