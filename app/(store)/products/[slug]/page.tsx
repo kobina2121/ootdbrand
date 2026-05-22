@@ -4,6 +4,9 @@ import { ArrowLeft } from "lucide-react";
 
 import { ProductDetailClient } from "@/components/store/product-detail-client";
 import { ProductGrid } from "@/components/store/product-grid";
+import { ProductReviews } from "@/components/store/product-reviews";
+import { getCurrentSession } from "@/lib/auth/guards";
+import { listReviewsByProductSlug } from "@/lib/services/review-service";
 import { buttonVariants } from "@/components/ui/button";
 import { getProductBySlug, listProducts } from "@/lib/services/product-service";
 import { cn } from "@/lib/utils";
@@ -14,9 +17,11 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [product, allProducts] = await Promise.all([
+  const [product, allProducts, session, productReviews] = await Promise.all([
     getProductBySlug(slug),
     listProducts({ activeOnly: true, sort: "latest" }),
+    getCurrentSession(),
+    listReviewsByProductSlug(slug, 30),
   ]);
 
   if (!product) {
@@ -48,6 +53,19 @@ export default async function ProductDetailPage({
       </Link>
 
       <ProductDetailClient product={product} />
+
+      <ProductReviews
+        productSlug={product.slug}
+        canReview={Boolean(session?.user?.id)}
+        reviews={productReviews.map((review) => ({
+          id: review.id,
+          productSlug: review.productSlug,
+          userName: review.userName,
+          rating: review.rating,
+          comment: review.comment,
+          createdAt: review.createdAt.toISOString(),
+        }))}
+      />
 
       <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
         <div className="mb-5 flex items-center justify-between">
