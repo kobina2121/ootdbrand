@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
+import { hasSuccessfulPurchaseForProduct } from "@/lib/services/order-service";
 import { createProductReview, listReviewsByProductSlug } from "@/lib/services/review-service";
 
 vi.mock("@/lib/auth/guards", () => ({
@@ -12,11 +13,16 @@ vi.mock("@/lib/services/review-service", () => ({
   listReviewsByProductSlug: vi.fn(),
 }));
 
+vi.mock("@/lib/services/order-service", () => ({
+  hasSuccessfulPurchaseForProduct: vi.fn(),
+}));
+
 import { GET, POST } from "@/app/api/products/[slug]/reviews/route";
 
 const mockRequireAuthenticatedUser = vi.mocked(requireAuthenticatedUser);
 const mockCreateProductReview = vi.mocked(createProductReview);
 const mockListReviewsByProductSlug = vi.mocked(listReviewsByProductSlug);
+const mockHasSuccessfulPurchaseForProduct = vi.mocked(hasSuccessfulPurchaseForProduct);
 
 describe("Product reviews route", () => {
   beforeEach(() => {
@@ -72,6 +78,7 @@ describe("Product reviews route", () => {
     mockRequireAuthenticatedUser.mockResolvedValue({
       user: { id: "user-1", name: "Ama", email: "ama@example.com", role: "customer" },
     } as never);
+    mockHasSuccessfulPurchaseForProduct.mockResolvedValue(true);
 
     const request = new Request("http://localhost:3000/api/products/arc-hoodie/reviews", {
       method: "POST",
@@ -90,10 +97,34 @@ describe("Product reviews route", () => {
     expect(mockCreateProductReview).not.toHaveBeenCalled();
   });
 
+  it("requires a successful purchase to post a review", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue({
+      user: { id: "user-1", name: "Ama", email: "ama@example.com", role: "customer" },
+    } as never);
+    mockHasSuccessfulPurchaseForProduct.mockResolvedValue(false);
+
+    const request = new Request("http://localhost:3000/api/products/arc-hoodie/reviews", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ rating: 5, comment: "Amazing product!" }),
+    });
+
+    const response = await POST(request, { params: Promise.resolve({ slug: "arc-hoodie" }) });
+    const body = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "You can only leave a review after purchasing this product.",
+    });
+    expect(mockCreateProductReview).not.toHaveBeenCalled();
+  });
+
   it("creates review for authenticated user", async () => {
     mockRequireAuthenticatedUser.mockResolvedValue({
       user: { id: "user-1", name: "Ama", email: "ama@example.com", role: "customer" },
     } as never);
+    mockHasSuccessfulPurchaseForProduct.mockResolvedValue(true);
     mockCreateProductReview.mockResolvedValue({
       id: "review-2",
       productSlug: "arc-hoodie",
@@ -132,4 +163,3 @@ describe("Product reviews route", () => {
     });
   });
 });
-

@@ -20,14 +20,14 @@ type ProductReviewView = {
 type ProductReviewsProps = {
   productSlug: string;
   reviews: ProductReviewView[];
-  canReview: boolean;
+  reviewEligibility: "can_review" | "login_required" | "purchase_required";
 };
 
 function renderStars(rating: number) {
   return "★★★★★".slice(0, rating) + "☆☆☆☆☆".slice(0, 5 - rating);
 }
 
-export function ProductReviews({ productSlug, reviews: initialReviews, canReview }: ProductReviewsProps) {
+export function ProductReviews({ productSlug, reviews: initialReviews, reviewEligibility }: ProductReviewsProps) {
   const [reviews, setReviews] = useState<ProductReviewView[]>(initialReviews);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -98,7 +98,7 @@ export function ProductReviews({ productSlug, reviews: initialReviews, canReview
         </div>
       </div>
 
-      {canReview ? (
+      {reviewEligibility === "can_review" ? (
         <Card className="border-black/10 bg-[#faf9f7]">
           <CardHeader>
             <CardTitle className="text-lg">Leave a Review</CardTitle>
@@ -133,10 +133,16 @@ export function ProductReviews({ productSlug, reviews: initialReviews, canReview
         </Card>
       ) : (
         <p className="text-sm text-muted-foreground">
-          <Link href={`/login?next=/products/${encodeURIComponent(productSlug)}`} className="underline underline-offset-4">
-            Login
-          </Link>{" "}
-          to leave a review.
+          {reviewEligibility === "login_required" ? (
+            <>
+              <Link href={`/login?next=/products/${encodeURIComponent(productSlug)}`} className="underline underline-offset-4">
+                Login
+              </Link>{" "}
+              to leave a review.
+            </>
+          ) : (
+            "You can leave a star rating and review after purchasing this product."
+          )}
         </p>
       )}
 

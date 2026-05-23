@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { failure, success } from "@/lib/api-response";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
+import { hasSuccessfulPurchaseForProduct } from "@/lib/services/order-service";
 import { createProductReview, listReviewsByProductSlug } from "@/lib/services/review-service";
 import { productReviewPayloadSchema } from "@/lib/validators/review";
 
@@ -28,6 +29,11 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const { slug } = await context.params;
+  const hasPurchased = await hasSuccessfulPurchaseForProduct(session.user.id, slug);
+
+  if (!hasPurchased) {
+    return NextResponse.json(failure("You can only leave a review after purchasing this product."), { status: 403 });
+  }
 
   try {
     const json = await request.json();
@@ -55,4 +61,3 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json(failure("Could not save review"), { status: 500 });
   }
 }
-

@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { OrderModel, type OrderStatus } from "@/lib/db/models/order";
+import { ProductModel } from "@/lib/db/models/product";
 import { calculateShipping } from "@/lib/products";
 import { resolveOrderItemsFromCart } from "@/lib/services/product-service";
 import type { AppUser } from "@/lib/services/user-service";
@@ -246,4 +247,27 @@ export async function getOrdersByUserId(userId: string) {
     status: doc.status,
     createdAt: doc.createdAt,
   }));
+}
+
+export async function hasSuccessfulPurchaseForProduct(userId: string, productSlug: string) {
+  if (!Types.ObjectId.isValid(userId)) {
+    return false;
+  }
+
+  await connectToDatabase();
+
+  const product = await ProductModel.findOne({ slug: productSlug.toLowerCase() }).select({ _id: 1 }).lean();
+  if (!product?._id) {
+    return false;
+  }
+
+  const order = await OrderModel.findOne({
+    userId: new Types.ObjectId(userId),
+    status: "Success",
+    "items.productId": product._id,
+  })
+    .select({ _id: 1 })
+    .lean();
+
+  return Boolean(order?._id);
 }

@@ -6,6 +6,7 @@ import { ProductDetailClient } from "@/components/store/product-detail-client";
 import { ProductGrid } from "@/components/store/product-grid";
 import { ProductReviews } from "@/components/store/product-reviews";
 import { getCurrentSession } from "@/lib/auth/guards";
+import { hasSuccessfulPurchaseForProduct } from "@/lib/services/order-service";
 import { listReviewsByProductSlug } from "@/lib/services/review-service";
 import { buttonVariants } from "@/components/ui/button";
 import { getProductBySlug, listProducts } from "@/lib/services/product-service";
@@ -27,6 +28,15 @@ export default async function ProductDetailPage({
   if (!product) {
     notFound();
   }
+
+  const canReview = session?.user?.id
+    ? await hasSuccessfulPurchaseForProduct(session.user.id, product.slug)
+    : false;
+  const reviewEligibility = session?.user?.id
+    ? canReview
+      ? "can_review"
+      : "purchase_required"
+    : "login_required";
 
   const recommendations = allProducts
     .filter((entry) => entry.slug !== product.slug)
@@ -56,7 +66,7 @@ export default async function ProductDetailPage({
 
       <ProductReviews
         productSlug={product.slug}
-        canReview={Boolean(session?.user?.id)}
+        reviewEligibility={reviewEligibility}
         reviews={productReviews.map((review) => ({
           id: review.id,
           productSlug: review.productSlug,
