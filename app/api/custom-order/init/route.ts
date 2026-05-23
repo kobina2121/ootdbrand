@@ -31,14 +31,15 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("Invalid custom order payload"), { status: 400 });
     }
 
+    const { paymentMethod, ...customOrderPayload } = parsed.data;
     const session = await requireAuthenticatedUser();
     const customOrder = await createPendingCustomOrder(
-      parsed.data,
+      customOrderPayload,
       session?.user
         ? {
             id: session.user.id,
             name: session.user.name ?? "Customer",
-            email: session.user.email ?? parsed.data.email,
+            email: session.user.email ?? customOrderPayload.email,
             role: session.user.role,
           }
         : null,
@@ -55,10 +56,11 @@ export async function POST(request: Request) {
       reference: customOrder.paymentReference,
       callbackUrl,
       cancelUrl,
-      channels: ["card", "mobile_money"],
+      channels: [paymentMethod],
       metadata: {
         customOrderId: customOrder.id,
         orderType: "custom",
+        paymentMethod,
       },
     });
 

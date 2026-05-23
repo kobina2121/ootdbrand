@@ -28,14 +28,15 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("Invalid checkout payload"), { status: 400 });
     }
 
+    const { paymentMethod, ...orderPayload } = parsed.data;
     const session = await requireAuthenticatedUser();
     const order = await createPendingOrder(
-      parsed.data,
+      orderPayload,
       session?.user
         ? {
             id: session.user.id,
             name: session.user.name ?? "Guest",
-            email: session.user.email ?? parsed.data.email,
+            email: session.user.email ?? orderPayload.email,
             role: session.user.role,
           }
         : null,
@@ -52,9 +53,10 @@ export async function POST(request: Request) {
       reference: order.paymentReference,
       callbackUrl,
       cancelUrl,
-      channels: ["card", "mobile_money"],
+      channels: [paymentMethod],
       metadata: {
         orderId: order.id,
+        paymentMethod,
       },
     });
 

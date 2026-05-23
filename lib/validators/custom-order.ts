@@ -4,6 +4,7 @@ export const customOrderInitSchema = z.object({
   fullName: z.string().min(2),
   email: z.string().email(),
   phone: z.string().min(7),
+  paymentMethod: z.enum(["card", "mobile_money"]).default("card"),
   type: z.string().trim().optional(),
   category: z.string().min(2),
   size: z.string().min(1),

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Clock3, ImagePlus, MapPin, Ruler, Shirt } from "lucide-react";
+import { Clock3, CreditCard, ImagePlus, MapPin, Ruler, Shirt, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ export default function CustomOrderPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "mobile_money">("card");
   const [type, setType] = useState("");
   const [category, setCategory] = useState("");
   const [size, setSize] = useState("");
@@ -115,6 +116,7 @@ export default function CustomOrderPage() {
           fullName: name.trim(),
           email: email.trim(),
           phone: phone.trim(),
+          paymentMethod,
           type: type.trim() || undefined,
           category,
           size,
@@ -369,9 +371,45 @@ export default function CustomOrderPage() {
               />
             </div>
 
-            <p className="text-xs text-muted-foreground">Secure checkout via Paystack (Visa + Mobile Money).</p>
+            <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+              <p className="form-section-title">Payment Method</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("card")}
+                  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
+                    paymentMethod === "card"
+                      ? "border-black bg-black text-white"
+                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50"
+                  }`}
+                >
+                  <CreditCard className="size-4" />
+                  Visa Card
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("mobile_money")}
+                  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
+                    paymentMethod === "mobile_money"
+                      ? "border-black bg-black text-white"
+                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50"
+                  }`}
+                >
+                  <Smartphone className="size-4" />
+                  Mobile Money
+                </button>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).
+            </p>
             <Button type="submit" className="rounded-full px-7" disabled={isSubmitting}>
-              {isSubmitting ? "Preparing Payment..." : "Proceed to Visa or Mobile Money Payment"}
+              {isSubmitting
+                ? "Preparing Payment..."
+                : paymentMethod === "card"
+                  ? "Proceed to Visa Card Payment"
+                  : "Proceed to Mobile Money Payment"}
             </Button>
           </form>
         </CardContent>

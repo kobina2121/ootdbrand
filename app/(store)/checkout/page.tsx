@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, MapPin } from "lucide-react";
+import { CreditCard, MapPin, Smartphone } from "lucide-react";
 
 import { useCart } from "@/components/store/cart-provider";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { checkoutInitSchema } from "@/lib/validators/checkout";
 
 export default function CheckoutPage() {
   const { items, subtotal, shipping, total } = useCart();
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "mobile_money">("card");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
@@ -45,6 +46,7 @@ export default function CheckoutPage() {
       email: String(formData.get("email") ?? ""),
       phone: String(formData.get("phone") ?? ""),
       address: [addressLine, city, stateRegion, country].filter(Boolean).join(", "),
+      paymentMethod,
       items,
     };
 
@@ -123,6 +125,35 @@ export default function CheckoutPage() {
               </div>
               <Input name="country" placeholder="Country" defaultValue="Ghana" required className="rounded-xl border-black/15" />
             </div>
+            <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
+              <p className="form-section-title">Payment Method</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("card")}
+                  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
+                    paymentMethod === "card"
+                      ? "border-black bg-black text-white"
+                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50"
+                  }`}
+                >
+                  <CreditCard className="size-4" />
+                  Visa Card
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("mobile_money")}
+                  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
+                    paymentMethod === "mobile_money"
+                      ? "border-black bg-black text-white"
+                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50"
+                  }`}
+                >
+                  <Smartphone className="size-4" />
+                  Mobile Money
+                </button>
+              </div>
+            </div>
             {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
           </CardContent>
         </Card>
@@ -148,9 +179,9 @@ export default function CheckoutPage() {
               <span>Total</span>
               <span>{formatPriceNgn(total)}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Secure checkout via Paystack (Visa + Mobile Money).</p>
+            <p className="text-xs text-muted-foreground">Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).</p>
             <Button className="w-full rounded-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Initializing..." : "Pay with Visa or Mobile Money"}
+              {isSubmitting ? "Initializing..." : paymentMethod === "card" ? "Pay with Visa Card" : "Pay with Mobile Money"}
             </Button>
           </CardContent>
         </Card>
