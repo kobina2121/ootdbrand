@@ -369,9 +369,9 @@ export default function CustomOrderPage() {
               />
             </div>
 
-            <p className="text-xs text-muted-foreground">Secure card checkout (Visa accepted) via Paystack.</p>
+            <p className="text-xs text-muted-foreground">Secure checkout via Paystack (Visa + Mobile Money).</p>
             <Button type="submit" className="rounded-full px-7" disabled={isSubmitting}>
-              {isSubmitting ? "Preparing Payment..." : "Proceed to Visa Card Payment"}
+              {isSubmitting ? "Preparing Payment..." : "Proceed to Visa or Mobile Money Payment"}
             </Button>
           </form>
         </CardContent>

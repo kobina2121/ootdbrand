@@ -148,9 +148,9 @@ export default function CheckoutPage() {
               <span>Total</span>
               <span>{formatPriceNgn(total)}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Secure card checkout (Visa accepted) via Paystack.</p>
+            <p className="text-xs text-muted-foreground">Secure checkout via Paystack (Visa + Mobile Money).</p>
             <Button className="w-full rounded-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Initializing..." : "Pay with Visa Card"}
+              {isSubmitting ? "Initializing..." : "Pay with Visa or Mobile Money"}
             </Button>
           </CardContent>
         </Card>
