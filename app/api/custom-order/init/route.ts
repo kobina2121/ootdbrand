@@ -55,6 +55,7 @@ export async function POST(request: Request) {
       reference: customOrder.paymentReference,
       callbackUrl,
       cancelUrl,
+      channels: ["card"],
       metadata: {
         customOrderId: customOrder.id,
         orderType: "custom",

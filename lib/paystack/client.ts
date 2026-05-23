@@ -9,6 +9,7 @@ type PaystackInitializeInput = {
   callbackUrl: string;
   cancelUrl: string;
   metadata?: Record<string, unknown>;
+  channels?: Array<"card" | "bank" | "ussd" | "qr" | "mobile_money" | "bank_transfer" | "eft">;
 };
 
 type PaystackInitializeResponse = {
@@ -111,6 +112,7 @@ export async function initializePaystackTransaction(input: PaystackInitializeInp
       currency: "GHS",
       reference: input.reference,
       callback_url: input.callbackUrl,
+      channels: input.channels,
       metadata: {
         cancel_action: input.cancelUrl,
         ...input.metadata,
