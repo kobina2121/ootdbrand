@@ -196,3 +196,36 @@ export async function failPendingCustomOrderByReference(reference: string, reaso
     status: failed.status,
   };
 }
+
+export async function listCustomOrders(filters: { status?: "Pending" | "Success" | "Failed"; limit?: number } = {}) {
+  try {
+    await connectToDatabase();
+
+    const query: { status?: "Pending" | "Success" | "Failed" } = {};
+    if (filters.status) {
+      query.status = filters.status;
+    }
+
+    const docs = await CustomOrderModel.find(query)
+      .sort({ createdAt: -1 })
+      .limit(filters.limit ?? 100)
+      .lean();
+
+    return docs.map((doc) => ({
+      id: String(doc._id),
+      paymentReference: doc.paymentReference,
+      fullName: doc.fullName,
+      email: doc.email,
+      phone: doc.phone,
+      type: doc.type ?? "",
+      category: doc.category,
+      size: doc.size,
+      color: doc.color,
+      amountTotal: doc.amountTotal,
+      status: doc.status,
+      createdAt: doc.createdAt,
+    }));
+  } catch {
+    return [];
+  }
+}

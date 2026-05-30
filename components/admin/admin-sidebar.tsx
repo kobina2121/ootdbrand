@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Package, ShoppingBag } from "lucide-react";
+import { House, Package, Ruler, ShoppingBag } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/custom-orders", label: "Custom Orders", icon: Ruler },
   { href: "/", label: "Back to Store", icon: House },
 ];
 
