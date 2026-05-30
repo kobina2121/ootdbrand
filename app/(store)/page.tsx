@@ -2,9 +2,9 @@ import { featuredProducts } from "@/lib/mock-data";
 import Link from "next/link";
 import { ArrowRight, Palette, Scissors, Sparkles } from "lucide-react";
 
+import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
 import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const heroImage = "/images/hero/hero-main.jpg";
@@ -218,7 +218,10 @@ export default function HomePage() {
 
       <section className="animate-fade-up rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold">Featured Products</h2>
+          <div className="space-y-1">
+            <p className="text-[0.65rem] uppercase tracking-[0.28em] text-[#7b756f]">Editors&apos; Picks</p>
+            <h2 className="font-heading text-3xl leading-none text-[#1f1b18] sm:text-4xl">Featured Products</h2>
+          </div>
           <Link
             href="/products"
             className={cn(buttonVariants({ variant: "ghost" }), "text-muted-foreground transition hover:bg-black/5 hover:text-black")}
@@ -227,26 +230,17 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {featuredProducts.slice(0, 4).map((product) => (
-            <Card key={product.slug} className="group hover-lift overflow-hidden border-black/10">
-              <CardHeader className="space-y-3">
-                <div className="h-44 overflow-hidden rounded-md bg-muted">
-                  <img
-                    src={featuredImageBySlug[product.slug]}
-                    alt={product.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <CardTitle className="text-base">{product.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{product.category}</p>
-                <p className="mt-1 font-semibold">{product.price}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <FeaturedProductsCarousel
+          items={featuredProducts.map((product) => ({
+            slug: product.slug,
+            name: product.name,
+            category: product.category,
+            price: product.price,
+            image:
+              featuredImageBySlug[product.slug] ??
+              "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80",
+          }))}
+        />
       </section>
     </div>
   );
