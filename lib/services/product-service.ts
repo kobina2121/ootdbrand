@@ -214,7 +214,7 @@ export async function updateProductById(
 
   await connectToDatabase();
   const update = payload.slug ? { ...payload, slug: payload.slug.toLowerCase() } : payload;
-  const updated = await ProductModel.findByIdAndUpdate(id, update, { new: true }).lean();
+  const updated = await ProductModel.findByIdAndUpdate(id, update, { returnDocument: "after" }).lean();
 
   if (!updated) {
     return null;

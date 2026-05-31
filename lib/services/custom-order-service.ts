@@ -134,7 +134,7 @@ export async function reconcileCustomOrderAfterVerification(
           ...(paidAt ? { paidAt } : {}),
         },
       },
-      { new: true },
+      { returnDocument: "after" },
     ).lean();
 
     return {
@@ -160,7 +160,7 @@ export async function reconcileCustomOrderAfterVerification(
         paymentGatewayResponse: verification.gatewayResponse ?? reason,
       },
     },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
 
   return {
@@ -183,7 +183,7 @@ export async function failPendingCustomOrderByReference(reference: string, reaso
         paymentGatewayResponse: reason,
       },
     },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
 
   if (!failed) {

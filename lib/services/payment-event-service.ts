@@ -37,7 +37,7 @@ export async function recordPaymentEvent(input: {
     },
     {
       upsert: true,
-      new: true,
+      returnDocument: "after",
     },
   );
 
