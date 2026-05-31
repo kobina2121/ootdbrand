@@ -12,7 +12,7 @@ import { formatPriceNgn } from "@/lib/products";
 import { checkoutInitSchema } from "@/lib/validators/checkout";
 
 export default function CheckoutPage() {
-  const { items, subtotal, shipping, total } = useCart();
+  const { items, subtotal, total } = useCart();
   const [paymentMethod, setPaymentMethod] = useState<"card" | "mobile_money">("card");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -170,10 +170,6 @@ export default function CheckoutPage() {
             <div className="flex items-center justify-between text-sm">
               <span>Subtotal</span>
               <span>{formatPriceNgn(subtotal)}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span>Shipping</span>
-              <span>{shipping === 0 ? "Free" : formatPriceNgn(shipping)}</span>
             </div>
             <div className="flex items-center justify-between font-semibold">
               <span>Total</span>

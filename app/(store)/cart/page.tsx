@@ -21,7 +21,7 @@ type SuggestedProduct = {
 };
 
 export default function CartPage() {
-  const { items, subtotal, shipping, total, updateQuantity, removeItem, clearCart, syncCart } = useCart();
+  const { items, subtotal, total, updateQuantity, removeItem, clearCart, syncCart } = useCart();
   const [pendingSku, setPendingSku] = useState<string | null>(null);
   const [suggestedProducts, setSuggestedProducts] = useState<SuggestedProduct[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -201,10 +201,6 @@ export default function CartPage() {
             <div className="flex items-center justify-between text-sm">
               <span>Subtotal</span>
               <span>{formatPriceNgn(subtotal)}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span>Shipping</span>
-              <span>{shipping === 0 ? "Free" : formatPriceNgn(shipping)}</span>
             </div>
             <div className="flex items-center justify-between font-semibold">
               <span>Total</span>

@@ -132,7 +132,8 @@ export function getVariantPrice(product: Product, sku: string) {
 }
 
 export function calculateShipping(subtotal: number) {
-  return subtotal >= 100000 ? 0 : 3500;
+  void subtotal;
+  return 0;
 }
 
 export type DiscountComputation = {
