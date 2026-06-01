@@ -39,8 +39,6 @@ export default async function AdminProductEditPage({
                   image: variant.image ?? "",
                   sku: variant.sku,
                   stock: variant.stock,
-                  priceOverride:
-                    typeof variant.priceOverride === "number" ? variant.priceOverride : "",
                 }))
               : [
                   {
@@ -50,7 +48,6 @@ export default async function AdminProductEditPage({
                     image: "",
                     sku: "",
                     stock: 0,
-                    priceOverride: "",
                   },
                 ],
         }}

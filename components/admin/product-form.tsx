@@ -32,9 +32,6 @@ const variantSchema = z.object({
     .optional(),
   sku: z.string().min(2, "SKU is required"),
   stock: z.number().int().nonnegative("Stock cannot be negative"),
-  priceOverride: z
-    .union([z.number().int().nonnegative("Price must be positive"), z.literal("")])
-    .optional(),
 });
 
 const productEditorSchema = z.object({
@@ -43,7 +40,7 @@ const productEditorSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   category: z.string().min(2, "Category is required"),
   tags: z.string().optional(),
-  basePrice: z.number().int().nonnegative("Base price must be positive"),
+  basePrice: z.number().int().nonnegative("Fixed price must be positive"),
   images: z
     .array(
       z
@@ -94,7 +91,6 @@ const defaultValues: ProductEditorValues = {
       image: "",
       sku: "",
       stock: 0,
-      priceOverride: "",
     },
   ],
 };
@@ -243,7 +239,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
           image: "",
           sku: nextSku,
           stock: 0,
-          priceOverride: "",
         });
 
         createdCount += 1;
@@ -328,10 +323,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
           image: variant.image && variant.image.length > 0 ? variant.image : undefined,
           sku: nextSku,
           stock: variant.stock,
-          priceOverride:
-            variant.priceOverride === "" || typeof variant.priceOverride === "undefined"
-              ? undefined
-              : Number(variant.priceOverride),
         };
       });
     });
@@ -456,7 +447,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 name="basePrice"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel>Base price</FormLabel>
+                    <FormLabel>Fixed price</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -465,6 +456,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                         onChange={(event) => field.onChange(Number(event.target.value))}
                       />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground">One price applies to every size and color variant.</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -648,7 +640,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                         image: "",
                         sku: "",
                         stock: 0,
-                        priceOverride: "",
                       })
                     }
                   >
@@ -851,28 +842,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name={`variants.${index}.priceOverride`}
-                    render={({ field: variantField }) => (
-                      <FormItem>
-                        <FormLabel>Price Override (Optional)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="45000"
-                            value={variantField.value === "" ? "" : String(variantField.value ?? "")}
-                            onChange={(event) => {
-                              const value = event.target.value;
-                              variantField.onChange(value === "" ? "" : Number(value));
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   {variantFields.length > 1 ? (
                     <div className="sm:col-span-3">
                       <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
