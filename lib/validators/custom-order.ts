@@ -2,13 +2,17 @@ import { z } from "zod";
 
 export const customOrderInitSchema = z.object({
   productSlug: z.string().min(2),
-  variantSku: z.string().min(2),
   fullName: z.string().min(2),
   email: z.string().email(),
   phone: z.string().min(7),
   paymentMethod: z.enum(["card", "mobile_money"]).default("card"),
   type: z.string().trim().optional(),
-  measurements: z.string().min(5),
+  preferredSize: z.string().min(1),
+  preferredColor: z.string().min(1),
+  bustSize: z.string().min(1),
+  waistSize: z.string().min(1),
+  hipSize: z.string().min(1),
+  additionalMeasurements: z.string().trim().optional(),
   notes: z.string().trim().optional(),
   referenceImage: z.string().trim().optional(),
   deliveryAddress: z.object({

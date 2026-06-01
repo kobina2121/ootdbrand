@@ -10,12 +10,16 @@ import type { AppUser } from "@/lib/services/user-service";
 
 export type CreatePendingCustomOrderInput = {
   productSlug: string;
-  variantSku: string;
   fullName: string;
   email: string;
   phone: string;
   type?: string;
-  measurements: string;
+  preferredSize: string;
+  preferredColor: string;
+  bustSize: string;
+  waistSize: string;
+  hipSize: string;
+  additionalMeasurements?: string;
   notes?: string;
   referenceImage?: string;
   deliveryAddress: {
@@ -60,28 +64,30 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     throw new Error("Selected product was not found.");
   }
 
-  const variant = product.variants.find((entry) => entry.sku === input.variantSku);
-
-  if (!variant) {
-    throw new Error("Selected product option was not found.");
-  }
-
-  const variantColorName = variant.color?.name?.trim();
-  if (!variantColorName) {
-    throw new Error("Selected product color is not configured.");
-  }
-
-  const baseUnitPrice = variant.priceOverride ?? product.basePrice;
+  const leadVariant = product.variants[0];
+  const baseUnitPrice = product.basePrice;
   const customizationCharge = resolveCustomOrderCustomizationFeeGhs();
   const amountTotal = calculateCustomOrderTotal(baseUnitPrice, customizationCharge);
+  const normalizedPreferredSize = input.preferredSize.trim();
+  const normalizedPreferredColor = input.preferredColor.trim();
+  const measurementSummary = [
+    `Bust: ${input.bustSize.trim()}`,
+    `Waist: ${input.waistSize.trim()}`,
+    `Hip: ${input.hipSize.trim()}`,
+    input.additionalMeasurements?.trim() ? `Additional: ${input.additionalMeasurements.trim()}` : "",
+  ]
+    .filter(Boolean)
+    .join(" | ");
+  const variantSkuSnapshot = leadVariant?.sku ?? `CUSTOM-${product.slug.toUpperCase()}`;
+  const productImageSnapshot = leadVariant?.image ?? product.images?.[0] ?? "";
 
   const customOrder = await CustomOrderModel.create({
     userId: user && Types.ObjectId.isValid(user.id) ? new Types.ObjectId(user.id) : undefined,
     productId: product._id,
     productSlug: product.slug,
     productNameSnapshot: product.name,
-    productImageSnapshot: variant.image ?? product.images?.[0] ?? "",
-    variantSkuSnapshot: variant.sku,
+    productImageSnapshot,
+    variantSkuSnapshot,
     variantUnitPriceSnapshot: baseUnitPrice,
     baseProductPriceSnapshot: baseUnitPrice,
     customizationChargeSnapshot: customizationCharge,
@@ -90,9 +96,13 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     phone: input.phone,
     type: input.type || undefined,
     category: product.category,
-    size: variant.size,
-    color: variantColorName,
-    measurements: input.measurements,
+    size: normalizedPreferredSize,
+    color: normalizedPreferredColor,
+    measurements: measurementSummary,
+    bustSize: input.bustSize.trim(),
+    waistSize: input.waistSize.trim(),
+    hipSize: input.hipSize.trim(),
+    additionalMeasurements: input.additionalMeasurements?.trim() || undefined,
     notes: input.notes || undefined,
     referenceImage: input.referenceImage || undefined,
     deliveryAddress: input.deliveryAddress,
@@ -256,6 +266,10 @@ export async function listCustomOrders(filters: { status?: "Pending" | "Success"
       trackingUrl: doc.trackingUrl ?? "",
       adminUpdate: doc.adminUpdate ?? "",
       measurements: doc.measurements,
+      bustSize: doc.bustSize ?? "",
+      waistSize: doc.waistSize ?? "",
+      hipSize: doc.hipSize ?? "",
+      additionalMeasurements: doc.additionalMeasurements ?? "",
       notes: doc.notes ?? "",
       referenceImage: doc.referenceImage ?? "",
       paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
@@ -306,6 +320,10 @@ export async function getCustomOrdersByUserId(userId: string) {
     size: doc.size,
     color: doc.color,
     measurements: doc.measurements,
+    bustSize: doc.bustSize ?? "",
+    waistSize: doc.waistSize ?? "",
+    hipSize: doc.hipSize ?? "",
+    additionalMeasurements: doc.additionalMeasurements ?? "",
     notes: doc.notes ?? "",
     referenceImage: doc.referenceImage ?? "",
     paymentGatewayStatus: doc.paymentGatewayStatus ?? "",

@@ -46,21 +46,23 @@ export default function CustomOrderPage() {
   const { userRole } = useCart();
   const searchParams = useSearchParams();
   const preferredProductSlug = searchParams.get("product")?.toLowerCase() ?? "";
-  const preferredVariantSku = searchParams.get("variant")?.trim() ?? "";
 
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [isCatalogLoading, setIsCatalogLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedProductSlug, setSelectedProductSlug] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
-  const [selectedSize, setSelectedSize] = useState("");
+  const [preferredColor, setPreferredColor] = useState("");
+  const [preferredSize, setPreferredSize] = useState("");
+  const [bustSize, setBustSize] = useState("");
+  const [waistSize, setWaistSize] = useState("");
+  const [hipSize, setHipSize] = useState("");
+  const [additionalMeasurements, setAdditionalMeasurements] = useState("");
   const [customizationFee, setCustomizationFee] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"card" | "mobile_money">("card");
   const [type, setType] = useState("");
-  const [measurements, setMeasurements] = useState("");
   const [notes, setNotes] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>({
@@ -89,50 +91,7 @@ export default function CustomOrderPage() {
     return products.filter((product) => product.category === selectedCategory);
   }, [products, selectedCategory]);
 
-  const availableColors = useMemo(() => {
-    if (!selectedProduct) {
-      return [];
-    }
-
-    const colorMap = new Map<string, { color: string; colorCode: string }>();
-    selectedProduct.variants.forEach((variant) => {
-      if (!colorMap.has(variant.color)) {
-        colorMap.set(variant.color, {
-          color: variant.color,
-          colorCode: variant.colorCode,
-        });
-      }
-    });
-    return Array.from(colorMap.values());
-  }, [selectedProduct]);
-
-  const variantsForColor = useMemo(() => {
-    if (!selectedProduct || !selectedColor) {
-      return [];
-    }
-
-    return selectedProduct.variants.filter((variant) => variant.color === selectedColor);
-  }, [selectedColor, selectedProduct]);
-
-  const availableSizes = useMemo(
-    () => Array.from(new Set(variantsForColor.map((variant) => variant.size))),
-    [variantsForColor],
-  );
-
-  const selectedVariant = useMemo(() => {
-    if (!selectedProduct) {
-      return null;
-    }
-
-    const exact = selectedProduct.variants.find((variant) => variant.color === selectedColor && variant.size === selectedSize);
-    if (exact) {
-      return exact;
-    }
-
-    return selectedProduct.variants[0] ?? null;
-  }, [selectedColor, selectedProduct, selectedSize]);
-
-  const selectedProductUnitPrice = selectedVariant?.price ?? selectedProduct?.basePrice ?? 0;
+  const selectedProductUnitPrice = selectedProduct?.basePrice ?? 0;
   const selectedCustomOrderTotal = calculateCustomOrderTotal(selectedProductUnitPrice, customizationFee);
 
   const photoPreview = useMemo(() => {
@@ -180,10 +139,6 @@ export default function CustomOrderPage() {
         if (preferred) {
           setSelectedCategory(preferred.category);
           setSelectedProductSlug(preferred.slug);
-          const initialVariant =
-            preferred.variants.find((variant) => variant.sku === preferredVariantSku) ?? preferred.variants[0];
-          setSelectedColor(initialVariant?.color ?? "");
-          setSelectedSize(initialVariant?.size ?? "");
         }
       } catch (error) {
         if (isMounted) {
@@ -200,7 +155,7 @@ export default function CustomOrderPage() {
     return () => {
       isMounted = false;
     };
-  }, [preferredProductSlug, preferredVariantSku]);
+  }, [preferredProductSlug]);
 
   const uploadReferenceImage = async () => {
     if (!photoFile) {
@@ -233,15 +188,10 @@ export default function CustomOrderPage() {
 
     if (!firstProduct) {
       setSelectedProductSlug("");
-      setSelectedColor("");
-      setSelectedSize("");
       return;
     }
 
     setSelectedProductSlug(firstProduct.slug);
-    const firstVariant = firstProduct.variants[0];
-    setSelectedColor(firstVariant?.color ?? "");
-    setSelectedSize(firstVariant?.size ?? "");
   };
 
   const handleProductChange = (slug: string) => {
@@ -251,14 +201,6 @@ export default function CustomOrderPage() {
       return;
     }
     setSelectedCategory(product.category);
-    const firstVariant = product.variants[0];
-    if (firstVariant) {
-      setSelectedColor(firstVariant.color);
-      setSelectedSize(firstVariant.size);
-    } else {
-      setSelectedColor("");
-      setSelectedSize("");
-    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -266,13 +208,14 @@ export default function CustomOrderPage() {
 
     if (
       !selectedProduct ||
-      !selectedVariant ||
       !name ||
       !email ||
       !phone ||
-      !selectedVariant.size ||
-      !selectedVariant.color ||
-      !measurements ||
+      !preferredSize ||
+      !preferredColor ||
+      !bustSize ||
+      !waistSize ||
+      !hipSize ||
       !deliveryAddress.addressLine ||
       !deliveryAddress.city ||
       !deliveryAddress.stateRegion ||
@@ -293,13 +236,17 @@ export default function CustomOrderPage() {
         },
         body: JSON.stringify({
           productSlug: selectedProduct.slug,
-          variantSku: selectedVariant.sku,
           fullName: name.trim(),
           email: email.trim(),
           phone: phone.trim(),
           paymentMethod,
           type: type.trim() || undefined,
-          measurements: measurements.trim(),
+          preferredSize: preferredSize.trim(),
+          preferredColor: preferredColor.trim(),
+          bustSize: bustSize.trim(),
+          waistSize: waistSize.trim(),
+          hipSize: hipSize.trim(),
+          additionalMeasurements: additionalMeasurements.trim() || undefined,
           notes: notes.trim() || undefined,
           referenceImage,
           deliveryAddress: {
@@ -418,7 +365,7 @@ export default function CustomOrderPage() {
               {selectedProduct ? (
                 <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[120px_1fr]">
                   <img
-                    src={selectedVariant?.image || selectedProduct.image}
+                    src={selectedProduct.image}
                     alt={selectedProduct.name}
                     className="h-32 w-full rounded-lg object-cover"
                   />
@@ -436,7 +383,7 @@ export default function CustomOrderPage() {
                       Total to pay: {formatPriceNgn(selectedCustomOrderTotal)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      SKU: {selectedVariant?.sku ?? "Select color and size"}
+                      Custom order links directly to this product's catalog pricing.
                     </p>
                   </div>
                 </div>
@@ -506,57 +453,60 @@ export default function CustomOrderPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Size *</p>
-                  <select
-                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                    value={selectedSize}
+                  <Input
+                    value={preferredSize}
+                    onChange={(event) => setPreferredSize(event.target.value)}
+                    placeholder="e.g. XS, S, M, L, XL or custom size"
+                    className="rounded-xl border-black/15"
                     disabled={!selectedProduct}
-                    onChange={(event) => setSelectedSize(event.target.value)}
-                  >
-                    <option value="" disabled>
-                      Select size
-                    </option>
-                    {availableSizes.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Color *</p>
-                  <select
-                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                    value={selectedColor}
+                  <Input
+                    value={preferredColor}
+                    onChange={(event) => setPreferredColor(event.target.value)}
+                    placeholder="e.g. Wine, Ivory, Sage Green, Custom Mix"
+                    className="rounded-xl border-black/15"
                     disabled={!selectedProduct}
-                    onChange={(event) => {
-                      const nextColor = event.target.value;
-                      setSelectedColor(nextColor);
-                      const firstSize = selectedProduct?.variants.find((variant) => variant.color === nextColor)?.size ?? "";
-                      setSelectedSize(firstSize);
-                    }}
-                  >
-                    <option value="" disabled>
-                      Select color
-                    </option>
-                    {availableColors.map((option) => (
-                      <option key={`${option.color}-${option.colorCode}`} value={option.color}>
-                        {option.color}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <p className="inline-flex items-center gap-2 text-sm font-medium">
                   <Ruler className="size-4" />
-                  Measurements *
+                  Body Measurements *
                 </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <Input
+                    value={bustSize}
+                    onChange={(event) => setBustSize(event.target.value)}
+                    placeholder="Bust size (in/cm)"
+                    className="rounded-xl border-black/15"
+                    disabled={!selectedProduct}
+                  />
+                  <Input
+                    value={waistSize}
+                    onChange={(event) => setWaistSize(event.target.value)}
+                    placeholder="Waist size (in/cm)"
+                    className="rounded-xl border-black/15"
+                    disabled={!selectedProduct}
+                  />
+                  <Input
+                    value={hipSize}
+                    onChange={(event) => setHipSize(event.target.value)}
+                    placeholder="Hip size (in/cm)"
+                    className="rounded-xl border-black/15"
+                    disabled={!selectedProduct}
+                  />
+                </div>
                 <Textarea
-                  rows={4}
-                  value={measurements}
-                  onChange={(event) => setMeasurements(event.target.value)}
-                  placeholder="Bust: 34in, Waist: 28in, Hips: 40in, Length: 62in"
+                  rows={3}
+                  value={additionalMeasurements}
+                  onChange={(event) => setAdditionalMeasurements(event.target.value)}
+                  placeholder="Additional measurements (optional): shoulder, sleeve, dress length, inseam, etc."
                   className="rounded-xl border-black/15"
+                  disabled={!selectedProduct}
                 />
               </div>
               <div className="space-y-2">
@@ -678,7 +628,7 @@ export default function CustomOrderPage() {
             <p className="text-xs text-muted-foreground">
               Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).
             </p>
-            <Button type="submit" className="rounded-full px-7" disabled={isSubmitting || !selectedVariant}>
+            <Button type="submit" className="rounded-full px-7" disabled={isSubmitting || !selectedProduct}>
               {isSubmitting
                 ? "Preparing Payment..."
                 : paymentMethod === "card"

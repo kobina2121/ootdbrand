@@ -29,12 +29,16 @@ const mockInitializePaystackTransaction = vi.mocked(initializePaystackTransactio
 
 const validPayload = {
   productSlug: "arc-hoodie",
-  variantSku: "AH-CRM-S",
   fullName: "Custom Buyer",
   email: "custom@example.com",
   phone: "+233536477207",
   type: "Dress",
-  measurements: "Bust 34, Waist 28, Hips 40, Length 62",
+  preferredSize: "M / Tall Fit",
+  preferredColor: "Deep Wine",
+  bustSize: "34in",
+  waistSize: "28in",
+  hipSize: "40in",
+  additionalMeasurements: "Length 62in",
   notes: "Sleeveless neckline.",
   referenceImage: "/uploads/custom-orders/sample.jpg",
   deliveryAddress: {

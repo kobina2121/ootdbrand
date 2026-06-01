@@ -166,7 +166,22 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                         <div className="rounded-md border border-black/10 p-2">
                           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Customization details</p>
                           <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Measurements:</span> {order.measurements}
+                            <span className="font-medium text-foreground">Preferred size:</span> {order.size}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Preferred color:</span> {order.color}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Bust:</span> {order.bustSize || "N/A"}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Waist:</span> {order.waistSize || "N/A"}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Hip:</span> {order.hipSize || "N/A"}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Additional:</span> {order.additionalMeasurements || "N/A"}
                           </p>
                           <p className="mt-1 text-xs text-muted-foreground">
                             <span className="font-medium text-foreground">Notes:</span> {order.notes || "No notes"}

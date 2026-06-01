@@ -67,7 +67,8 @@ export async function POST(request: Request) {
         orderType: "custom",
         paymentMethod,
         productSlug: customOrderPayload.productSlug,
-        variantSku: customOrderPayload.variantSku,
+        preferredSize: customOrderPayload.preferredSize,
+        preferredColor: customOrderPayload.preferredColor,
         baseUnitPrice: customOrder.baseUnitPrice,
         customizationCharge: customOrder.customizationCharge,
       },
@@ -119,7 +120,7 @@ export async function POST(request: Request) {
 
     if (
       error instanceof Error &&
-      (error.message === "Selected product was not found." || error.message === "Selected product option was not found.")
+      error.message === "Selected product was not found."
     ) {
       return NextResponse.json(failure(error.message), { status: 404 });
     }
