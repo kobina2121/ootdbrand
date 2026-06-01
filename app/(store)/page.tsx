@@ -1,6 +1,6 @@
 import { featuredProducts } from "@/lib/mock-data";
 import Link from "next/link";
-import { ArrowRight, Palette, Scissors, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
 import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
@@ -60,24 +60,6 @@ const featuredImageBySlug: Record<string, string> = {
   "linen-shirt": "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=80",
   "studio-shorts": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=900&q=80",
 };
-
-const valueHighlights = [
-  {
-    icon: Palette,
-    title: "Premium Fabric Selection",
-    subtitle: "Carefully chosen materials for comfort and elegance",
-  },
-  {
-    icon: Scissors,
-    title: "Tailored Craftsmanship",
-    subtitle: "Designed with precision for flattering, confident fits",
-  },
-  {
-    icon: Sparkles,
-    title: "Signature Styling",
-    subtitle: "Distinct looks made for your lifestyle and story",
-  },
-] as const;
 
 const brandStats = [
   { value: "200+", label: "Happy Customers" },
@@ -140,21 +122,6 @@ export default function HomePage() {
             New In <ArrowRight className="size-4" />
           </Link>
         </div>
-      </section>
-
-      <section className="animate-fade-up-delay-1 grid gap-3 sm:grid-cols-3">
-        {valueHighlights.map((item) => {
-          const Icon = item.icon;
-          return (
-            <article key={item.title} className="group hover-lift rounded-2xl border border-black/10 bg-white px-4 py-4 shadow-sm hover:shadow-black/10">
-              <div className="mb-2 inline-flex rounded-full bg-black/5 p-2 transition-transform duration-300 group-hover:scale-110">
-                <Icon className="size-4" />
-              </div>
-              <h3 className="text-sm font-semibold">{item.title}</h3>
-              <p className="mt-1 text-xs text-muted-foreground">{item.subtitle}</p>
-            </article>
-          );
-        })}
       </section>
 
       <section className="animate-fade-up-delay-1 rounded-2xl border border-black/10 bg-[linear-gradient(125deg,#f7f5f1_0%,#f0ece6_100%)] px-6 py-6 shadow-sm sm:px-10 sm:py-8">
