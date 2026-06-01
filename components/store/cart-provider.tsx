@@ -7,6 +7,7 @@ import { calculateCartTotals, type CartItem } from "@/lib/products";
 type AddPayload = Omit<CartItem, "quantity"> & { quantity?: number };
 
 type CartContextValue = {
+  userRole: "customer" | "admin" | null;
   items: CartItem[];
   itemCount: number;
   subtotal: number;
@@ -57,7 +58,13 @@ async function syncCartPayload(items: CartItem[]) {
   }
 }
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({
+  children,
+  userRole = null,
+}: {
+  children: React.ReactNode;
+  userRole?: "customer" | "admin" | null;
+}) {
   const [items, setItems] = useState<CartItem[]>(() => {
     if (typeof window === "undefined") {
       return [];
@@ -178,6 +185,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<CartContextValue>(
     () => ({
+      userRole,
       items,
       itemCount: items.reduce((count, item) => count + item.quantity, 0),
       subtotal: totals.subtotal,
@@ -189,7 +197,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       clearCart,
       syncCart,
     }),
-    [addItem, clearCart, items, removeItem, syncCart, totals.shipping, totals.subtotal, totals.total, updateQuantity],
+    [addItem, clearCart, items, removeItem, syncCart, totals.shipping, totals.subtotal, totals.total, updateQuantity, userRole],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

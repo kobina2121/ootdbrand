@@ -15,7 +15,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
     : null;
 
   return (
-    <CartProvider>
+    <CartProvider userRole={user?.role ?? null}>
       <AppShell user={user}>{children}</AppShell>
     </CartProvider>
   );

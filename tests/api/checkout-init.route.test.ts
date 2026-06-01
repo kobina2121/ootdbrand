@@ -117,6 +117,35 @@ describe("POST /api/checkout/init", () => {
     expect(mockInitializePaystackTransaction).not.toHaveBeenCalled();
   });
 
+  it("returns 403 when an admin account tries to checkout", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue({
+      user: {
+        id: "admin_1",
+        name: "Store Admin",
+        email: "admin@theootd.brand",
+        role: "admin",
+      },
+      expires: new Date(Date.now() + 60_000).toISOString(),
+    });
+
+    const request = new Request("http://localhost:3000/api/checkout/init", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(validCheckoutPayload),
+    });
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "Admin accounts cannot place store orders.",
+    });
+    expect(mockCreatePendingOrder).not.toHaveBeenCalled();
+    expect(mockInitializePaystackTransaction).not.toHaveBeenCalled();
+  });
+
   it("returns 504 when Paystack initialization times out", async () => {
     mockRequireAuthenticatedUser.mockResolvedValue(null);
     mockCreatePendingOrder.mockResolvedValue({

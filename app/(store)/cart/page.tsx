@@ -21,7 +21,7 @@ type SuggestedProduct = {
 };
 
 export default function CartPage() {
-  const { items, subtotal, total, updateQuantity, removeItem, clearCart, syncCart } = useCart();
+  const { items, subtotal, total, updateQuantity, removeItem, clearCart, syncCart, userRole } = useCart();
   const [pendingSku, setPendingSku] = useState<string | null>(null);
   const [suggestedProducts, setSuggestedProducts] = useState<SuggestedProduct[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -92,6 +92,22 @@ export default function CartPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Preparing your cart details.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (userRole === "admin") {
+    return (
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+        <CardHeader>
+          <CardTitle className="font-heading text-5xl leading-none">Admin Shopping Disabled</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">Admin accounts cannot place store orders or manage cart items.</p>
+          <Link href="/admin/products">
+            <Button className="rounded-full">Go to Admin Dashboard</Button>
+          </Link>
         </CardContent>
       </Card>
     );

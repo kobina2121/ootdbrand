@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getCurrentSession } from "@/lib/auth/guards";
 import { failure, success } from "@/lib/api-response";
 import { calculateCartTotals } from "@/lib/products";
 import { resolveOrderItemsFromCart } from "@/lib/services/product-service";
@@ -7,6 +8,11 @@ import { cartPayloadSchema } from "@/lib/validators/cart";
 
 export async function POST(request: Request) {
   try {
+    const session = await getCurrentSession();
+    if (session?.user?.role === "admin") {
+      return NextResponse.json(failure("Admin accounts cannot use cart checkout flows."), { status: 403 });
+    }
+
     const json = await request.json();
     const parsed = cartPayloadSchema.safeParse(json);
 

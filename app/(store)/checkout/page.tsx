@@ -12,7 +12,7 @@ import { formatPriceNgn } from "@/lib/products";
 import { checkoutInitSchema } from "@/lib/validators/checkout";
 
 export default function CheckoutPage() {
-  const { items, subtotal, total } = useCart();
+  const { items, subtotal, total, userRole } = useCart();
   const isClientReady = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -31,6 +31,22 @@ export default function CheckoutPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Preparing your cart...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (userRole === "admin") {
+    return (
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+        <CardHeader>
+          <CardTitle className="font-heading text-5xl leading-none">Checkout Disabled for Admin</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">Admin accounts cannot complete customer checkout.</p>
+          <Button asChild className="rounded-full">
+            <a href="/admin/products">Go to Admin Dashboard</a>
+          </Button>
         </CardContent>
       </Card>
     );

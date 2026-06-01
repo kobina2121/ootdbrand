@@ -110,6 +110,35 @@ describe("POST /api/custom-order/init", () => {
     });
   });
 
+  it("returns 403 when an admin account tries to place a custom order", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue({
+      user: {
+        id: "admin_1",
+        name: "Store Admin",
+        email: "admin@theootd.brand",
+        role: "admin",
+      },
+      expires: new Date(Date.now() + 60_000).toISOString(),
+    });
+
+    const request = new Request("http://localhost:3000/api/custom-order/init", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(validPayload),
+    });
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "Admin accounts cannot place custom orders.",
+    });
+    expect(mockCreatePendingCustomOrder).not.toHaveBeenCalled();
+    expect(mockInitializePaystackTransaction).not.toHaveBeenCalled();
+  });
+
   it("marks pending custom order failed when paystack init returns status=false", async () => {
     mockCreatePendingCustomOrder.mockResolvedValue({
       id: "custom_order_002",

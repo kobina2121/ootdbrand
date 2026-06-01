@@ -31,6 +31,10 @@ export async function POST(request: Request) {
 
     const { paymentMethod, ...orderPayload } = parsed.data;
     const session = await requireAuthenticatedUser();
+    if (session?.user?.role === "admin") {
+      return NextResponse.json(failure("Admin accounts cannot place store orders."), { status: 403 });
+    }
+
     const order = await createPendingOrder(
       orderPayload,
       session?.user

@@ -6,6 +6,7 @@ import { Clock3, CreditCard, ImagePlus, MapPin, Ruler, Shirt, Smartphone } from 
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/components/store/cart-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,6 +43,7 @@ type CatalogProduct = {
 };
 
 export default function CustomOrderPage() {
+  const { userRole } = useCart();
   const searchParams = useSearchParams();
   const preferredProductSlug = searchParams.get("product")?.toLowerCase() ?? "";
   const preferredVariantSku = searchParams.get("variant")?.trim() ?? "";
@@ -327,6 +329,22 @@ export default function CustomOrderPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (userRole === "admin") {
+    return (
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+        <CardHeader>
+          <CardTitle className="font-heading text-5xl leading-none">Custom Orders Disabled for Admin</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">Admin accounts cannot place customer custom orders.</p>
+          <Button asChild className="rounded-full">
+            <a href="/admin/custom-orders">Go to Custom Order Admin</a>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-4">

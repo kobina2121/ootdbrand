@@ -25,7 +25,8 @@ type AddToCartFormProps = {
 export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = false }: AddToCartFormProps) {
   const [internalSku, setInternalSku] = useState(product.variants[0]?.sku ?? "");
   const [quantity, setQuantity] = useState(1);
-  const { addItem } = useCart();
+  const { addItem, userRole } = useCart();
+  const isAdminUser = userRole === "admin";
   const activeSku = sku ?? internalSku;
   const setSku = (nextSku: string) => {
     if (typeof sku === "undefined") {
@@ -46,6 +47,11 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
   }
 
   const onAddToCart = async () => {
+    if (isAdminUser) {
+      toast.error("Admin accounts cannot place store orders.");
+      return;
+    }
+
     try {
       await addItem({
         slug: product.slug,
@@ -101,8 +107,10 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
         </div>
       </div>
 
-      <Button size="lg" className="w-full rounded-full sm:w-auto" onClick={onAddToCart}>
-        Add to Cart · {new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(unitPrice)}
+      <Button size="lg" className="w-full rounded-full sm:w-auto" onClick={onAddToCart} disabled={isAdminUser}>
+        {isAdminUser
+          ? "Admin cannot add to cart"
+          : `Add to Cart · ${new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(unitPrice)}`}
       </Button>
     </div>
   );
