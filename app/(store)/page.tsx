@@ -7,7 +7,10 @@ import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const heroImage = "/images/hero/hero-main.jpg";
+const heroImages = [
+  "/images/hero/hero-main.jpg",
+  "/images/hero/hero-bench.jpg",
+] as const;
 
 const categoryHighlights = [
   {
@@ -84,11 +87,15 @@ export default function HomePage() {
       <div className="pointer-events-none absolute -right-16 top-[28rem] hidden h-64 w-64 rounded-full bg-[#d8c8ba]/35 blur-3xl md:block animate-drift-x-reverse" />
 
       <section className="animate-fade-up relative h-[68svh] min-h-[500px] overflow-hidden rounded-3xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] lg:h-[88svh] lg:min-h-[780px]">
-        <img
-          src={heroImage}
-          alt="theootd.brand hero"
-          className="absolute inset-0 h-full w-full object-cover object-[center_18%] lg:object-[center_12%] animate-hero-zoom"
-        />
+        {heroImages.map((image, index) => (
+          <img
+            key={image}
+            src={image}
+            alt={`theootd.brand hero ${index + 1}`}
+            className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"
+            style={{ animationDelay: `${index * 6}s` }}
+          />
+        ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/45 lg:from-black/10 lg:to-black/30" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.26),transparent_36%)]" />
 
