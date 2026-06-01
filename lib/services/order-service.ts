@@ -220,6 +220,26 @@ export async function listOrders(filters: { status?: OrderStatus; limit?: number
       .limit(filters.limit ?? 50)
       .lean();
 
+    const productIds = Array.from(
+      new Set(
+        docs.flatMap((doc) =>
+          doc.items
+            .map((item) => String(item.productId))
+            .filter((productId) => Types.ObjectId.isValid(productId)),
+        ),
+      ),
+    ).map((id) => new Types.ObjectId(id));
+
+    const products = productIds.length
+      ? await ProductModel.find({ _id: { $in: productIds } })
+          .select({ _id: 1, images: 1 })
+          .lean()
+      : [];
+
+    const productImageMap = new Map<string, string>(
+      products.map((product) => [String(product._id), product.images?.[0] || ""]),
+    );
+
     return docs.map((doc) => ({
       id: String(doc._id),
       paymentReference: doc.paymentReference,
@@ -228,7 +248,9 @@ export async function listOrders(filters: { status?: OrderStatus; limit?: number
       customerPhone: doc.shippingAddress.phone,
       deliveryAddress: doc.shippingAddress.addressLine,
       items: doc.items.map((item) => ({
+        productId: String(item.productId),
         productName: item.productNameSnapshot,
+        image: productImageMap.get(String(item.productId)) ?? "",
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         lineTotal: item.unitPrice * item.quantity,
@@ -279,12 +301,12 @@ export async function getOrdersByUserId(userId: string) {
 
   const products = productIds.length
     ? await ProductModel.find({ _id: { $in: productIds } })
-        .select({ _id: 1, image: 1, images: 1 })
+        .select({ _id: 1, images: 1 })
         .lean()
     : [];
 
   const productImageMap = new Map<string, string>(
-    products.map((product) => [String(product._id), product.image || product.images?.[0] || ""]),
+    products.map((product) => [String(product._id), product.images?.[0] || ""]),
   );
 
   return docs.map((doc) => ({

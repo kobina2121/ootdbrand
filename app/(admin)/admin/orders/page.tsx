@@ -138,13 +138,26 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
                     <TableCell className="align-top">
                       <div className="space-y-1">
                         {order.items.map((item) => (
-                          <div key={`${order.id}-${item.variant.sku}`} className="rounded-md border border-black/10 px-2 py-1">
-                            <p className="text-sm font-medium">{item.productName}</p>
-                            <p className="text-xs text-muted-foreground">
-                              Qty: {item.quantity} · Size: {item.variant.size} · Color: {item.variant.colorName}
-                            </p>
-                            <p className="text-xs text-muted-foreground">SKU: {item.variant.sku}</p>
-                            <p className="text-xs font-medium">{formatPriceNgn(item.lineTotal)}</p>
+                          <div key={`${order.id}-${item.variant.sku}`} className="rounded-md border border-black/10 px-2 py-2">
+                            <div className="flex items-start gap-3">
+                              <div className="h-14 w-14 overflow-hidden rounded-md border border-black/10 bg-muted/40">
+                                {item.image ? (
+                                  <img src={item.image} alt={item.productName} className="h-full w-full object-cover" />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
+                                    No image
+                                  </div>
+                                )}
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium">{item.productName}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  Qty: {item.quantity} · Size: {item.variant.size} · Color: {item.variant.colorName}
+                                </p>
+                                <p className="text-xs text-muted-foreground">SKU: {item.variant.sku}</p>
+                                <p className="text-xs font-medium">{formatPriceNgn(item.lineTotal)}</p>
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -166,9 +179,13 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}>
-                        {order.status}
-                      </Badge>
+                      <div className="space-y-1">
+                        <Badge variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}>
+                          {order.status}
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">Delivery: {order.deliveryStatus}</p>
+                        <p className="text-xs text-muted-foreground">Tracking: {order.trackingNumber || "Pending"}</p>
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <OrderTableActions reference={order.paymentReference} customerEmail={order.customerEmail} />

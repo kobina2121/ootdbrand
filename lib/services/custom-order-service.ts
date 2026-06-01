@@ -66,6 +66,11 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     throw new Error("Selected product option was not found.");
   }
 
+  const variantColorName = variant.color?.name?.trim();
+  if (!variantColorName) {
+    throw new Error("Selected product color is not configured.");
+  }
+
   const baseUnitPrice = variant.priceOverride ?? product.basePrice;
   const customizationCharge = resolveCustomOrderCustomizationFeeGhs();
   const amountTotal = calculateCustomOrderTotal(baseUnitPrice, customizationCharge);
@@ -86,7 +91,7 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     type: input.type || undefined,
     category: product.category,
     size: variant.size,
-    color: variant.color,
+    color: variantColorName,
     measurements: input.measurements,
     notes: input.notes || undefined,
     referenceImage: input.referenceImage || undefined,
@@ -245,6 +250,7 @@ export async function listCustomOrders(filters: { status?: "Pending" | "Success"
       size: doc.size,
       color: doc.color,
       amountTotal: doc.amountTotal,
+      paymentProvider: doc.paymentProvider,
       deliveryStatus: doc.deliveryStatus ?? "Pending",
       trackingNumber: doc.trackingNumber ?? "",
       trackingUrl: doc.trackingUrl ?? "",
@@ -290,6 +296,7 @@ export async function getCustomOrdersByUserId(userId: string) {
     amountTotal: doc.amountTotal,
     currency: doc.currency,
     status: doc.status,
+    paymentProvider: doc.paymentProvider,
     deliveryStatus: doc.deliveryStatus ?? "Pending",
     trackingNumber: doc.trackingNumber ?? "",
     trackingUrl: doc.trackingUrl ?? "",

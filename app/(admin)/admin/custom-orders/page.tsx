@@ -104,9 +104,9 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead>Reference</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Style</TableHead>
-                <TableHead>Deposit</TableHead>
+                <TableHead>Customer & Delivery</TableHead>
+                <TableHead>Product & Customization</TableHead>
+                <TableHead>Payment & Tracking</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Quick Actions</TableHead>
               </TableRow>
@@ -124,25 +124,98 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
               ) : (
                 customOrders.map((order) => (
                   <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.paymentReference}</TableCell>
-                    <TableCell>
-                      <p className="font-medium">{order.fullName}</p>
-                      <p className="text-xs text-muted-foreground">{order.email}</p>
-                      <p className="text-xs text-muted-foreground">{order.phone}</p>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        <p className="font-medium">{order.paymentReference}</p>
+                        <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <p className="font-medium">{order.type || order.category}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {order.category} · {order.size} · {order.color}
-                      </p>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        <p className="font-medium">{order.fullName}</p>
+                        <p className="text-xs text-muted-foreground">{order.email}</p>
+                        <p className="text-xs text-muted-foreground">{order.phone}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {order.deliveryAddress.addressLine}, {order.deliveryAddress.city}, {order.deliveryAddress.stateRegion},{" "}
+                          {order.deliveryAddress.country}
+                        </p>
+                      </div>
                     </TableCell>
-                    <TableCell>{formatPriceNgn(order.amountTotal)}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}
-                      >
-                        {order.status}
-                      </Badge>
+                    <TableCell className="align-top">
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-3 rounded-md border border-black/10 p-2">
+                          <div className="h-16 w-16 overflow-hidden rounded-md border border-black/10 bg-muted/40">
+                            {order.productImage ? (
+                              <img src={order.productImage} alt={order.productName} className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
+                                No image
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium">{order.productName}</p>
+                            <p className="text-xs text-muted-foreground">Slug: {order.productSlug}</p>
+                            <p className="text-xs text-muted-foreground">Variant SKU: {order.variantSku}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {order.category} · {order.size} · {order.color}
+                            </p>
+                            {order.type ? <p className="text-xs text-muted-foreground">Type: {order.type}</p> : null}
+                          </div>
+                        </div>
+                        <div className="rounded-md border border-black/10 p-2">
+                          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Customization details</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Measurements:</span> {order.measurements}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Notes:</span> {order.notes || "No notes"}
+                          </p>
+                          {order.referenceImage ? (
+                            <a
+                              href={order.referenceImage}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-1 inline-block text-xs text-[#1f1b18] underline"
+                            >
+                              View uploaded reference image
+                            </a>
+                          ) : (
+                            <p className="mt-1 text-xs text-muted-foreground">Reference image: None</p>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Provider: {order.paymentProvider ?? "paystack"}</p>
+                        <p className="text-xs text-muted-foreground">Product price: {formatPriceNgn(order.baseUnitPrice)}</p>
+                        <p className="text-xs text-muted-foreground">Customization fee: {formatPriceNgn(order.customizationCharge)}</p>
+                        <p className="text-sm font-semibold">Total: {formatPriceNgn(order.amountTotal)}</p>
+                        <p className="text-xs text-muted-foreground">Gateway status: {order.paymentGatewayStatus || "N/A"}</p>
+                        <p className="text-xs text-muted-foreground">Gateway response: {order.paymentGatewayResponse || "N/A"}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Paid at: {order.paidAt ? new Date(order.paidAt).toLocaleString() : "Not paid yet"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">Delivery: {order.deliveryStatus}</p>
+                        <p className="text-xs text-muted-foreground">Tracking: {order.trackingNumber || "Pending assignment"}</p>
+                        {order.trackingUrl ? (
+                          <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-xs text-[#1f1b18] underline">
+                            Open tracking link
+                          </a>
+                        ) : null}
+                        <p className="text-xs text-muted-foreground">Admin update: {order.adminUpdate || "No update yet."}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        <Badge
+                          variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}
+                        >
+                          {order.status}
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">{order.deliveryStatus}</p>
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <OrderTableActions reference={order.paymentReference} customerEmail={order.email} />
