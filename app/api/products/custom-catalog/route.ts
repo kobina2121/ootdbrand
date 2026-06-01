@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 
 import { failure, success } from "@/lib/api-response";
+import { resolveCustomOrderCustomizationFeeGhs } from "@/lib/custom-order-pricing";
 import { listProducts } from "@/lib/services/product-service";
 
 export async function GET() {
   try {
     const products = await listProducts({ activeOnly: true, sort: "latest" });
+    const customizationFee = resolveCustomOrderCustomizationFeeGhs();
 
     const catalog = products.map((product) => ({
       slug: product.slug,
@@ -25,7 +27,12 @@ export async function GET() {
       })),
     }));
 
-    return NextResponse.json(success("Custom catalog fetched", { products: catalog }));
+    return NextResponse.json(
+      success("Custom catalog fetched", {
+        products: catalog,
+        customizationFee,
+      }),
+    );
   } catch {
     return NextResponse.json(failure("Could not fetch custom catalog"), { status: 500 });
   }

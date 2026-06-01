@@ -34,9 +34,6 @@ const validPayload = {
   email: "custom@example.com",
   phone: "+233536477207",
   type: "Dress",
-  category: "MAXI",
-  size: "M",
-  color: "Wine",
   measurements: "Bust 34, Waist 28, Hips 40, Length 62",
   notes: "Sleeveless neckline.",
   referenceImage: "/uploads/custom-orders/sample.jpg",
@@ -60,6 +57,8 @@ describe("POST /api/custom-order/init", () => {
       id: "custom_order_001",
       paymentReference: "CUS-ABCD1234",
       amountTotal: 150,
+      baseUnitPrice: 150,
+      customizationCharge: 0,
       currency: "GHS",
       status: "Pending",
     });
@@ -116,6 +115,8 @@ describe("POST /api/custom-order/init", () => {
       id: "custom_order_002",
       paymentReference: "CUS-FAIL1234",
       amountTotal: 150,
+      baseUnitPrice: 150,
+      customizationCharge: 0,
       currency: "GHS",
       status: "Pending",
     });

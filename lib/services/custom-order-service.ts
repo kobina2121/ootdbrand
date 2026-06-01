@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { Types } from "mongoose";
 
+import { calculateCustomOrderTotal, resolveCustomOrderCustomizationFeeGhs } from "@/lib/custom-order-pricing";
 import { CustomOrderModel } from "@/lib/db/models/custom-order";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { ProductModel } from "@/lib/db/models/product";
@@ -14,9 +15,6 @@ export type CreatePendingCustomOrderInput = {
   email: string;
   phone: string;
   type?: string;
-  category: string;
-  size: string;
-  color: string;
   measurements: string;
   notes?: string;
   referenceImage?: string;
@@ -68,7 +66,9 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     throw new Error("Selected product option was not found.");
   }
 
-  const amountTotal = variant.priceOverride ?? product.basePrice;
+  const baseUnitPrice = variant.priceOverride ?? product.basePrice;
+  const customizationCharge = resolveCustomOrderCustomizationFeeGhs();
+  const amountTotal = calculateCustomOrderTotal(baseUnitPrice, customizationCharge);
 
   const customOrder = await CustomOrderModel.create({
     userId: user && Types.ObjectId.isValid(user.id) ? new Types.ObjectId(user.id) : undefined,
@@ -77,14 +77,16 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     productNameSnapshot: product.name,
     productImageSnapshot: variant.image ?? product.images?.[0] ?? "",
     variantSkuSnapshot: variant.sku,
-    variantUnitPriceSnapshot: amountTotal,
+    variantUnitPriceSnapshot: baseUnitPrice,
+    baseProductPriceSnapshot: baseUnitPrice,
+    customizationChargeSnapshot: customizationCharge,
     fullName: input.fullName,
     email: input.email,
     phone: input.phone,
     type: input.type || undefined,
-    category: input.category,
-    size: input.size,
-    color: input.color,
+    category: product.category,
+    size: variant.size,
+    color: variant.color,
     measurements: input.measurements,
     notes: input.notes || undefined,
     referenceImage: input.referenceImage || undefined,
@@ -99,6 +101,8 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
   return {
     id: String(customOrder._id),
     paymentReference,
+    baseUnitPrice,
+    customizationCharge,
     amountTotal,
     currency: customOrder.currency,
     status: customOrder.status,
@@ -229,6 +233,8 @@ export async function listCustomOrders(filters: { status?: "Pending" | "Success"
       productImage: doc.productImageSnapshot ?? "",
       variantSku: doc.variantSkuSnapshot,
       variantUnitPrice: doc.variantUnitPriceSnapshot,
+      baseUnitPrice: doc.baseProductPriceSnapshot,
+      customizationCharge: doc.customizationChargeSnapshot ?? 0,
       paymentReference: doc.paymentReference,
       fullName: doc.fullName,
       email: doc.email,

@@ -64,6 +64,8 @@ export async function POST(request: Request) {
         paymentMethod,
         productSlug: customOrderPayload.productSlug,
         variantSku: customOrderPayload.variantSku,
+        baseUnitPrice: customOrder.baseUnitPrice,
+        customizationCharge: customOrder.customizationCharge,
       },
     });
 
@@ -91,6 +93,8 @@ export async function POST(request: Request) {
       success("Custom order payment initialized", {
         customOrderId: customOrder.id,
         reference: customOrder.paymentReference,
+        baseUnitPrice: customOrder.baseUnitPrice,
+        customizationCharge: customOrder.customizationCharge,
         amount: customOrder.amountTotal,
         currency: customOrder.currency,
         authorizationUrl: paystackInit.data.authorization_url,

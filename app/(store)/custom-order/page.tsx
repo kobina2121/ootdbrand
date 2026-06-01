@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { calculateCustomOrderTotal } from "@/lib/custom-order-pricing";
 import { formatPriceNgn } from "@/lib/products";
 
 const typeOptions = ["Dress", "Top", "Skirt", "Set", "Jumpsuit"] as const;
@@ -47,9 +48,11 @@ export default function CustomOrderPage() {
 
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [isCatalogLoading, setIsCatalogLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedProductSlug, setSelectedProductSlug] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [customizationFee, setCustomizationFee] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -70,6 +73,19 @@ export default function CustomOrderPage() {
     () => products.find((product) => product.slug === selectedProductSlug) ?? null,
     [products, selectedProductSlug],
   );
+
+  const categories = useMemo(
+    () => Array.from(new Set(products.map((product) => product.category))),
+    [products],
+  );
+
+  const filteredProducts = useMemo(() => {
+    if (!selectedCategory) {
+      return [];
+    }
+
+    return products.filter((product) => product.category === selectedCategory);
+  }, [products, selectedCategory]);
 
   const availableColors = useMemo(() => {
     if (!selectedProduct) {
@@ -114,6 +130,9 @@ export default function CustomOrderPage() {
     return selectedProduct.variants[0] ?? null;
   }, [selectedColor, selectedProduct, selectedSize]);
 
+  const selectedProductUnitPrice = selectedVariant?.price ?? selectedProduct?.basePrice ?? 0;
+  const selectedCustomOrderTotal = calculateCustomOrderTotal(selectedProductUnitPrice, customizationFee);
+
   const photoPreview = useMemo(() => {
     if (!photoFile) {
       return "";
@@ -138,7 +157,7 @@ export default function CustomOrderPage() {
         const response = await fetch("/api/products/custom-catalog", { cache: "no-store" });
         const json = (await response.json()) as {
           ok: boolean;
-          data?: { products?: CatalogProduct[] };
+          data?: { products?: CatalogProduct[]; customizationFee?: number };
           message?: string;
         };
 
@@ -152,10 +171,12 @@ export default function CustomOrderPage() {
 
         const catalog = json.data.products;
         setProducts(catalog);
+        setCustomizationFee(json.data.customizationFee ?? 0);
 
         const preferred = catalog.find((entry) => entry.slug === preferredProductSlug) ?? catalog[0];
 
         if (preferred) {
+          setSelectedCategory(preferred.category);
           setSelectedProductSlug(preferred.slug);
           const initialVariant =
             preferred.variants.find((variant) => variant.sku === preferredVariantSku) ?? preferred.variants[0];
@@ -204,12 +225,30 @@ export default function CustomOrderPage() {
     return json.data.imagePath;
   };
 
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    const firstProduct = products.find((entry) => entry.category === category);
+
+    if (!firstProduct) {
+      setSelectedProductSlug("");
+      setSelectedColor("");
+      setSelectedSize("");
+      return;
+    }
+
+    setSelectedProductSlug(firstProduct.slug);
+    const firstVariant = firstProduct.variants[0];
+    setSelectedColor(firstVariant?.color ?? "");
+    setSelectedSize(firstVariant?.size ?? "");
+  };
+
   const handleProductChange = (slug: string) => {
     setSelectedProductSlug(slug);
     const product = products.find((entry) => entry.slug === slug);
     if (!product) {
       return;
     }
+    setSelectedCategory(product.category);
     const firstVariant = product.variants[0];
     if (firstVariant) {
       setSelectedColor(firstVariant.color);
@@ -258,9 +297,6 @@ export default function CustomOrderPage() {
           phone: phone.trim(),
           paymentMethod,
           type: type.trim() || undefined,
-          category: selectedProduct.category,
-          size: selectedVariant.size,
-          color: selectedVariant.color,
           measurements: measurements.trim(),
           notes: notes.trim() || undefined,
           referenceImage,
@@ -316,19 +352,43 @@ export default function CustomOrderPage() {
           <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
             <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
               <p className="form-section-title">Selected Product *</p>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Category *</p>
+                <select
+                  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                  value={selectedCategory}
+                  disabled={isCatalogLoading}
+                  onChange={(event) => handleCategoryChange(event.target.value)}
+                >
+                  {isCatalogLoading ? <option>Loading categories...</option> : null}
+                  {!isCatalogLoading ? (
+                    <>
+                      <option value="" disabled>
+                        Select a category
+                      </option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </>
+                  ) : null}
+                </select>
+              </div>
+
               <select
                 className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
                 value={selectedProductSlug}
-                disabled={isCatalogLoading}
+                disabled={isCatalogLoading || !selectedCategory}
                 onChange={(event) => handleProductChange(event.target.value)}
               >
                 {isCatalogLoading ? <option>Loading products...</option> : null}
                 {!isCatalogLoading ? (
                   <>
                     <option value="" disabled>
-                      Select a product
+                      {selectedCategory ? "Select a product" : "Select a category first"}
                     </option>
-                    {products.map((product) => (
+                    {filteredProducts.map((product) => (
                       <option key={product.slug} value={product.slug}>
                         {product.name} · {formatPriceNgn(product.basePrice)}
                       </option>
@@ -349,7 +409,13 @@ export default function CustomOrderPage() {
                     <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{selectedProduct.category}</p>
                     <p className="text-sm text-[#6b655f]">{selectedProduct.description}</p>
                     <p className="text-sm font-medium text-[#1f1b18]">
-                      Custom price: {formatPriceNgn(selectedVariant?.price ?? selectedProduct.basePrice)}
+                      Product price: {formatPriceNgn(selectedProductUnitPrice)}
+                    </p>
+                    <p className="text-sm text-[#6b655f]">
+                      Customization fee: {formatPriceNgn(customizationFee)}
+                    </p>
+                    <p className="text-sm font-semibold text-[#1f1b18]">
+                      Total to pay: {formatPriceNgn(selectedCustomOrderTotal)}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       SKU: {selectedVariant?.sku ?? "Select color and size"}
@@ -549,6 +615,20 @@ export default function CustomOrderPage() {
 
             <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
               <p className="form-section-title">Payment Method</p>
+              <div className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-[#1f1b18]">
+                <p className="flex items-center justify-between">
+                  <span>Product price</span>
+                  <span>{formatPriceNgn(selectedProductUnitPrice)}</span>
+                </p>
+                <p className="mt-1 flex items-center justify-between text-[#6b655f]">
+                  <span>Customization fee</span>
+                  <span>{formatPriceNgn(customizationFee)}</span>
+                </p>
+                <p className="mt-2 flex items-center justify-between font-semibold">
+                  <span>Total payable</span>
+                  <span>{formatPriceNgn(selectedCustomOrderTotal)}</span>
+                </p>
+              </div>
               <div className="grid gap-2 sm:grid-cols-2">
                 <button
                   type="button"
@@ -584,8 +664,8 @@ export default function CustomOrderPage() {
               {isSubmitting
                 ? "Preparing Payment..."
                 : paymentMethod === "card"
-                  ? "Proceed to Visa Card Payment"
-                  : "Proceed to Mobile Money Payment"}
+                  ? `Pay ${formatPriceNgn(selectedCustomOrderTotal)} with Visa Card`
+                  : `Pay ${formatPriceNgn(selectedCustomOrderTotal)} with Mobile Money`}
             </Button>
           </form>
         </CardContent>

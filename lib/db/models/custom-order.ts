@@ -19,6 +19,8 @@ const customOrderSchema = new Schema(
     productImageSnapshot: { type: String, required: false, trim: true },
     variantSkuSnapshot: { type: String, required: true, trim: true },
     variantUnitPriceSnapshot: { type: Number, required: true, min: 0 },
+    baseProductPriceSnapshot: { type: Number, required: true, min: 0 },
+    customizationChargeSnapshot: { type: Number, required: true, min: 0, default: 0 },
     fullName: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
     phone: { type: String, required: true, trim: true },
