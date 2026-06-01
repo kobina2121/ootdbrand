@@ -338,8 +338,8 @@ export default function CustomOrderPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">Admin accounts cannot place customer custom orders.</p>
-          <Button asChild className="rounded-full">
-            <a href="/admin/custom-orders">Go to Custom Order Admin</a>
+          <Button className="rounded-full" onClick={() => window.location.assign("/admin/custom-orders")}>
+            Go to Custom Order Admin
           </Button>
         </CardContent>
       </Card>

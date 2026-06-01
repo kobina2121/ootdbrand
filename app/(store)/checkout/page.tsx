@@ -44,8 +44,8 @@ export default function CheckoutPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">Admin accounts cannot complete customer checkout.</p>
-          <Button asChild className="rounded-full">
-            <a href="/admin/products">Go to Admin Dashboard</a>
+          <Button className="rounded-full" onClick={() => window.location.assign("/admin/products")}>
+            Go to Admin Dashboard
           </Button>
         </CardContent>
       </Card>
