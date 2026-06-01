@@ -1,12 +1,15 @@
 import { Bell } from "lucide-react";
+import Link from "next/link";
 
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { Button } from "@/components/ui/button";
 import { enforceAdminPageAccess } from "@/lib/auth/guards";
+import { getUnreadAdminNotificationCount } from "@/lib/services/admin-notification-service";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await enforceAdminPageAccess("/admin/products");
+  const unreadNotifications = await getUnreadAdminNotificationCount();
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff,_#f5f6f8_40%,_#eceef2_100%)]">
@@ -20,10 +23,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 <p className="text-base font-medium">Signed in as {session.user.email}</p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="rounded-full border border-black/10">
-                  <Bell className="size-4" />
-                  <span className="sr-only">Alerts</span>
-                </Button>
+                <Link href="/admin/notifications" className="relative">
+                  <Button variant="ghost" size="icon" className="rounded-full border border-black/10">
+                    <Bell className="size-4" />
+                    <span className="sr-only">Alerts</span>
+                  </Button>
+                  {unreadNotifications > 0 ? (
+                    <span className="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-[10px] font-semibold text-white">
+                      {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                    </span>
+                  ) : null}
+                </Link>
                 <AdminLogoutButton />
               </div>
             </div>

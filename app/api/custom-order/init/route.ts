@@ -7,6 +7,7 @@ import {
   createPendingCustomOrder,
   failPendingCustomOrderByReference,
 } from "@/lib/services/custom-order-service";
+import { notifyAdminNewOrder } from "@/lib/services/admin-alert-service";
 import { customOrderInitSchema } from "@/lib/validators/custom-order";
 
 function resolveAppBaseUrl(request: Request) {
@@ -73,6 +74,16 @@ export async function POST(request: Request) {
         status: 502,
       });
     }
+
+    await notifyAdminNewOrder({
+      orderType: "custom-order",
+      reference: customOrder.paymentReference,
+      customerName: customOrderPayload.fullName,
+      customerEmail: customOrderPayload.email,
+      customerPhone: customOrderPayload.phone,
+      amount: customOrder.amountTotal,
+      createdAt: customOrder.createdAt ?? new Date(),
+    }).catch(() => null);
 
     return NextResponse.json(
       success("Custom order payment initialized", {

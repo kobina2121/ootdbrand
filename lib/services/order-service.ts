@@ -85,6 +85,7 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
     shippingFee,
     currency: order.currency,
     status: order.status,
+    createdAt: order.createdAt,
   };
 }
 

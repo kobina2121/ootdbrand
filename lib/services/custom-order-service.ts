@@ -92,6 +92,7 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     amountTotal,
     currency: customOrder.currency,
     status: customOrder.status,
+    createdAt: customOrder.createdAt,
   };
 }
 

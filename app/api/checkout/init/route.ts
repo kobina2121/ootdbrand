@@ -4,6 +4,7 @@ import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { failure, success } from "@/lib/api-response";
 import { initializePaystackTransaction } from "@/lib/paystack/client";
 import { createPendingOrder, failPendingOrderByReference } from "@/lib/services/order-service";
+import { notifyAdminNewOrder } from "@/lib/services/admin-alert-service";
 import { checkoutInitSchema } from "@/lib/validators/checkout";
 
 function resolveAppBaseUrl(request: Request) {
@@ -64,6 +65,16 @@ export async function POST(request: Request) {
       await failPendingOrderByReference(order.paymentReference, paystackInit.message || "paystack initialization failed");
       return NextResponse.json(failure(paystackInit.message || "Could not initialize Paystack checkout"), { status: 502 });
     }
+
+    await notifyAdminNewOrder({
+      orderType: "store-order",
+      reference: order.paymentReference,
+      customerName: orderPayload.fullName,
+      customerEmail: orderPayload.email,
+      customerPhone: orderPayload.phone,
+      amount: order.amountTotal,
+      createdAt: order.createdAt ?? new Date(),
+    }).catch(() => null);
 
     return NextResponse.json(
       success("Checkout initialized", {
