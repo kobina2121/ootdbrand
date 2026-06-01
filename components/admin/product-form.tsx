@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { DefaultValues } from "react-hook-form";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -84,13 +85,13 @@ const textAreaClassName =
   "min-h-28 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25";
 const fieldHelperClassName = "min-h-5 text-xs text-muted-foreground";
 
-const defaultValues: ProductEditorValues = {
+const defaultValues: DefaultValues<ProductEditorValues> = {
   name: "",
   slug: "",
   description: "",
   category: "",
   tags: "",
-  basePrice: 0,
+  basePrice: undefined,
   images: [],
   status: "active",
   variants: [
@@ -100,7 +101,7 @@ const defaultValues: ProductEditorValues = {
       colorCode: "#111827",
       image: "",
       sku: "",
-      stock: 0,
+      stock: undefined,
     },
   ],
 };
@@ -396,9 +397,9 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
     }
   };
 
-  const handleVariantStockInput = (value: string, onChange: (value: number) => void) => {
+  const handleVariantStockInput = (value: string, onChange: (value: number | undefined) => void) => {
     if (value === "") {
-      onChange(0);
+      onChange(undefined);
       return;
     }
 
@@ -464,8 +465,9 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                         type="number"
                         placeholder="42000"
                         className={numericFieldClassName}
-                        value={field.value}
-                        onChange={(event) => field.onChange(Number(event.target.value))}
+                        value={field.value ?? ""}
+                        onChange={(event) => field.onChange(event.target.value === "" ? undefined : Number(event.target.value))}
+                        onFocus={(event) => event.currentTarget.select()}
                       />
                     </FormControl>
                     <p className={fieldHelperClassName}>One price applies to every size and color variant.</p>
@@ -854,8 +856,9 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                             type="number"
                             placeholder="10"
                             className={numericFieldClassName}
-                            value={variantField.value}
+                            value={variantField.value ?? ""}
                             onChange={(event) => handleVariantStockInput(event.target.value, variantField.onChange)}
+                            onFocus={(event) => event.currentTarget.select()}
                           />
                         </FormControl>
                         <FormMessage />

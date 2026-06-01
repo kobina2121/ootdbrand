@@ -102,6 +102,7 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
             max={variant.stock}
             value={quantity}
             onChange={(event) => setQuantity(Math.min(variant.stock, Math.max(1, Number(event.target.value) || 1)))}
+            onFocus={(event) => event.currentTarget.select()}
             className="h-10 w-28 rounded-xl border-black/15 bg-white"
           />
         </div>

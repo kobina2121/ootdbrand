@@ -194,6 +194,7 @@ export default function CartPage() {
                     type="number"
                     min={1}
                     className="h-9 w-20 rounded-lg border-black/15"
+                    onFocus={(event) => event.currentTarget.select()}
                     onChange={(event) => {
                       const value = Number(event.target.value) || 1;
                       void handleQuantityUpdate(item.sku, value);
