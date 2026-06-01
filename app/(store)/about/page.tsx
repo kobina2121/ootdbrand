@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Heart, Sparkles, Target } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
 const milestones = [
@@ -54,9 +53,6 @@ export default function AboutPage() {
     <div className="space-y-10">
       <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede7_100%)] p-6 shadow-sm sm:p-10">
         <div className="max-w-3xl space-y-5">
-          <Badge variant="outline" className="rounded-full border-black/20 bg-white/70 px-4 py-1">
-            About theootd.brand
-          </Badge>
           <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Our Story</h1>
           <p className="text-base leading-relaxed text-[#645f59] sm:text-lg">
             theootd.brand is built on style, intention, and identity. We create statement pieces for women who want to
