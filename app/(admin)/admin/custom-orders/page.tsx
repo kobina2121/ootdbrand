@@ -229,7 +229,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <OrderTableActions reference={order.paymentReference} customerEmail={order.email} />
+                      <OrderTableActions reference={order.paymentReference} customerEmail={order.email} orderType="custom" />
                     </TableCell>
                   </TableRow>
                 ))

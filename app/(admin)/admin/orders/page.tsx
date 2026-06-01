@@ -188,7 +188,7 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <OrderTableActions reference={order.paymentReference} customerEmail={order.customerEmail} />
+                      <OrderTableActions reference={order.paymentReference} customerEmail={order.customerEmail} orderType="store" />
                     </TableCell>
                   </TableRow>
                 ))
