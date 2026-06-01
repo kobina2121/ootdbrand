@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { CreditCard, MapPin, Smartphone } from "lucide-react";
 
@@ -13,10 +13,28 @@ import { checkoutInitSchema } from "@/lib/validators/checkout";
 
 export default function CheckoutPage() {
   const { items, subtotal, total } = useCart();
+  const isClientReady = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const [paymentMethod, setPaymentMethod] = useState<"card" | "mobile_money">("card");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+
+  if (!isClientReady) {
+    return (
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+        <CardHeader>
+          <CardTitle className="font-heading text-5xl leading-none">Loading checkout</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Preparing your cart...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (items.length === 0) {
     return (
