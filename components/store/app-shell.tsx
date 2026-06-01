@@ -42,6 +42,7 @@ export function AppShell({ children, user }: AppShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const nextPath = searchParams.get("next") ?? "";
   const isAdminLoginView = pathname === "/login" && nextPath.startsWith("/admin");
+  const isAdminUser = user?.role === "admin";
   const visibleNavLinks =
     isAdminLoginView
       ? [{ href: "/", label: "Store Home" }]
@@ -121,14 +122,16 @@ export function AppShell({ children, user }: AppShellProps) {
               <Link href="/cart">
                 <Button size="icon" variant="ghost" className="relative">
                   <ShoppingBag className="h-4 w-4" />
-                  <span
-                    suppressHydrationWarning
-                    className={`absolute -right-1 -top-1 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground ${
-                      itemCount > 0 ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    {itemCount > 0 ? itemCount : ""}
-                  </span>
+                  {!isAdminUser ? (
+                    <span
+                      suppressHydrationWarning
+                      className={`absolute -right-1 -top-1 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground ${
+                        itemCount > 0 ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      {itemCount > 0 ? itemCount : ""}
+                    </span>
+                  ) : null}
                   <span className="sr-only">Cart</span>
                 </Button>
               </Link>

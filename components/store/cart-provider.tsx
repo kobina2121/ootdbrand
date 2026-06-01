@@ -182,22 +182,38 @@ export function CartProvider({
   }, []);
 
   const totals = useMemo(() => calculateCartTotals(items), [items]);
+  const effectiveItems = useMemo(() => (userRole === "admin" ? [] : items), [items, userRole]);
+  const effectiveTotals = useMemo(
+    () => (userRole === "admin" ? calculateCartTotals([]) : totals),
+    [totals, userRole],
+  );
 
   const value = useMemo<CartContextValue>(
     () => ({
       userRole,
-      items,
-      itemCount: items.reduce((count, item) => count + item.quantity, 0),
-      subtotal: totals.subtotal,
-      shipping: totals.shipping,
-      total: totals.total,
+      items: effectiveItems,
+      itemCount: effectiveItems.reduce((count, item) => count + item.quantity, 0),
+      subtotal: effectiveTotals.subtotal,
+      shipping: effectiveTotals.shipping,
+      total: effectiveTotals.total,
       addItem,
       removeItem,
       updateQuantity,
       clearCart,
       syncCart,
     }),
-    [addItem, clearCart, items, removeItem, syncCart, totals.shipping, totals.subtotal, totals.total, updateQuantity, userRole],
+    [
+      addItem,
+      clearCart,
+      effectiveItems,
+      effectiveTotals.shipping,
+      effectiveTotals.subtotal,
+      effectiveTotals.total,
+      removeItem,
+      syncCart,
+      updateQuantity,
+      userRole,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
