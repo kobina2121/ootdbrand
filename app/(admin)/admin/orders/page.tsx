@@ -101,8 +101,10 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead>Reference</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Total</TableHead>
+                <TableHead>Customer & Contact</TableHead>
+                <TableHead>Items Ordered</TableHead>
+                <TableHead>Delivery Address</TableHead>
+                <TableHead>Payment Details</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Quick Actions</TableHead>
               </TableRow>
@@ -110,7 +112,7 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
             <TableBody>
               {orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
                     <div className="flex flex-col items-center gap-2">
                       <ReceiptText className="size-6 text-muted-foreground" />
                       <p>No orders yet.</p>
@@ -120,9 +122,49 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
               ) : (
                 orders.map((order) => (
                   <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.paymentReference}</TableCell>
-                    <TableCell>{order.customerName}</TableCell>
-                    <TableCell>{formatPriceNgn(order.amountTotal)}</TableCell>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        <p className="font-medium">{order.paymentReference}</p>
+                        <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        <p className="font-medium">{order.customerName}</p>
+                        <p className="text-xs text-muted-foreground">{order.customerEmail}</p>
+                        <p className="text-xs text-muted-foreground">{order.customerPhone}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        {order.items.map((item) => (
+                          <div key={`${order.id}-${item.variant.sku}`} className="rounded-md border border-black/10 px-2 py-1">
+                            <p className="text-sm font-medium">{item.productName}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Qty: {item.quantity} · Size: {item.variant.size} · Color: {item.variant.colorName}
+                            </p>
+                            <p className="text-xs text-muted-foreground">SKU: {item.variant.sku}</p>
+                            <p className="text-xs font-medium">{formatPriceNgn(item.lineTotal)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <p className="text-sm leading-relaxed text-muted-foreground">{order.deliveryAddress}</p>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Provider: {order.paymentProvider}</p>
+                        <p className="text-xs text-muted-foreground">Subtotal: {formatPriceNgn(order.amountSubtotal)}</p>
+                        <p className="text-xs text-muted-foreground">Shipping: {formatPriceNgn(order.shippingFee)}</p>
+                        <p className="text-sm font-semibold">Total: {formatPriceNgn(order.amountTotal)}</p>
+                        <p className="text-xs text-muted-foreground">Gateway status: {order.paymentGatewayStatus || "N/A"}</p>
+                        <p className="text-xs text-muted-foreground">Gateway response: {order.paymentGatewayResponse || "N/A"}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Paid at: {order.paidAt ? new Date(order.paidAt).toLocaleString() : "Not paid yet"}
+                        </p>
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <Badge variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}>
                         {order.status}
