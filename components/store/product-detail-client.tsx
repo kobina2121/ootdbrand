@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 
 import { AddToCartForm } from "@/components/store/add-to-cart-form";
 import { Badge } from "@/components/ui/badge";
@@ -118,7 +117,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </div>
 
         <p className="text-2xl font-semibold">
-          Starting from{" "}
           {new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(
             product.basePrice,
           )}
@@ -127,27 +125,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         {inStock && selectedVariant ? (
           <div className="rounded-2xl border border-black/10 bg-[#f8f6f2] p-4">
             <AddToCartForm product={product} sku={selectedVariant.sku} hideVariantSelect />
-            <ButtonAsLink
-              href={`/custom-order?product=${encodeURIComponent(product.slug)}&variant=${encodeURIComponent(selectedVariant.sku)}`}
-            >
-              Customize This Product
-            </ButtonAsLink>
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">This item is currently unavailable.</p>
         )}
       </section>
     </div>
-  );
-}
-
-function ButtonAsLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="mt-3 inline-flex rounded-full border border-black/20 bg-white px-4 py-2 text-sm font-medium text-[#1f1b18] transition hover:border-black/50 hover:bg-black hover:text-white"
-    >
-      {children}
-    </Link>
   );
 }

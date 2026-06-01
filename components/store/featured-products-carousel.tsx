@@ -100,7 +100,7 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
               }}
               className="min-w-[88%] snap-center sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] xl:min-w-[calc(25%-12px)]"
             >
-              <Card className="group h-full overflow-hidden border-black/10 bg-white shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+              <Card className="group h-full overflow-hidden border-[#cfd3d8] bg-white shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
                 <div className="aspect-[4/3] overflow-hidden bg-[#dedede] p-6">
                   <img
                     src={product.image}
