@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
+import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { resetPasswordByToken } from "@/lib/services/user-service";
 
 const resetPasswordSchema = z.object({
@@ -15,6 +16,26 @@ const resetPasswordSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    if (!isTrustedOrigin(request)) {
+      return NextResponse.json(failure("Invalid request origin."), { status: 403 });
+    }
+
+    if (!isJsonRequest(request)) {
+      return NextResponse.json(failure("Unsupported content type."), { status: 415 });
+    }
+
+    const rateLimit = checkRateLimit(request, {
+      bucket: "auth:reset-password",
+      limit: 8,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (!rateLimit.ok) {
+      return NextResponse.json(failure("Too many reset attempts. Please wait and retry."), {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      });
+    }
+
     const json = await request.json();
     const parsed = resetPasswordSchema.safeParse(json);
 

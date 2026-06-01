@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
 import { isSmtpConfigured, sendResetPasswordEmail } from "@/lib/email/smtp";
+import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { requestPasswordReset } from "@/lib/services/user-service";
 
 const forgotPasswordSchema = z.object({
@@ -11,6 +12,26 @@ const forgotPasswordSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    if (!isTrustedOrigin(request)) {
+      return NextResponse.json(failure("Invalid request origin."), { status: 403 });
+    }
+
+    if (!isJsonRequest(request)) {
+      return NextResponse.json(failure("Unsupported content type."), { status: 415 });
+    }
+
+    const rateLimit = checkRateLimit(request, {
+      bucket: "auth:forgot-password",
+      limit: 5,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (!rateLimit.ok) {
+      return NextResponse.json(failure("Too many reset attempts. Try again shortly."), {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      });
+    }
+
     if (!isSmtpConfigured()) {
       return NextResponse.json(
         failure("Email service is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM."),

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { requireAdminUser } from "@/lib/auth/guards";
 import { failure, success } from "@/lib/api-response";
+import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { deleteProductById, getProductById, updateProductById } from "@/lib/services/product-service";
 import { adminProductUpdateSchema } from "@/lib/validators/admin";
 
@@ -66,6 +67,26 @@ export async function GET(_: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
+  if (!isTrustedOrigin(request)) {
+    return NextResponse.json(failure("Invalid request origin."), { status: 403 });
+  }
+
+  if (!isJsonRequest(request)) {
+    return NextResponse.json(failure("Unsupported content type."), { status: 415 });
+  }
+
+  const rateLimit = checkRateLimit(request, {
+    bucket: "admin:products:update",
+    limit: 45,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!rateLimit.ok) {
+    return NextResponse.json(failure("Too many product update requests. Please retry shortly."), {
+      status: 429,
+      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    });
+  }
+
   const admin = await requireAdminUser();
 
   if (!admin) {
@@ -96,7 +117,23 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 }
 
-export async function DELETE(_: Request, context: RouteContext) {
+export async function DELETE(request: Request, context: RouteContext) {
+  if (!isTrustedOrigin(request)) {
+    return NextResponse.json(failure("Invalid request origin."), { status: 403 });
+  }
+
+  const rateLimit = checkRateLimit(request, {
+    bucket: "admin:products:delete",
+    limit: 20,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!rateLimit.ok) {
+    return NextResponse.json(failure("Too many product delete requests. Please retry shortly."), {
+      status: 429,
+      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    });
+  }
+
   const admin = await requireAdminUser();
 
   if (!admin) {

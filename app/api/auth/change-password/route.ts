@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
+import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { changePasswordForUser } from "@/lib/services/user-service";
 
 const changePasswordSchema = z.object({
@@ -15,6 +16,26 @@ const changePasswordSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  if (!isTrustedOrigin(request)) {
+    return NextResponse.json(failure("Invalid request origin."), { status: 403 });
+  }
+
+  if (!isJsonRequest(request)) {
+    return NextResponse.json(failure("Unsupported content type."), { status: 415 });
+  }
+
+  const rateLimit = checkRateLimit(request, {
+    bucket: "auth:change-password",
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+  });
+  if (!rateLimit.ok) {
+    return NextResponse.json(failure("Too many password change attempts. Try again shortly."), {
+      status: 429,
+      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    });
+  }
+
   const session = await requireAuthenticatedUser();
 
   if (!session?.user) {

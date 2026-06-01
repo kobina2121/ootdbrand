@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { failure, success } from "@/lib/api-response";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { initializePaystackTransaction } from "@/lib/paystack/client";
+import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import {
   createPendingCustomOrder,
   failPendingCustomOrderByReference,
@@ -25,6 +26,26 @@ export async function POST(request: Request) {
   let createdReference: string | null = null;
 
   try {
+    if (!isTrustedOrigin(request)) {
+      return NextResponse.json(failure("Invalid request origin."), { status: 403 });
+    }
+
+    if (!isJsonRequest(request)) {
+      return NextResponse.json(failure("Unsupported content type."), { status: 415 });
+    }
+
+    const rateLimit = checkRateLimit(request, {
+      bucket: "custom-order:init",
+      limit: 12,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (!rateLimit.ok) {
+      return NextResponse.json(failure("Too many custom order attempts. Please wait and try again."), {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      });
+    }
+
     const json = await request.json();
     const parsed = customOrderInitSchema.safeParse(json);
 
