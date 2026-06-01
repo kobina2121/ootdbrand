@@ -74,6 +74,13 @@ const presetColorOptions: ColorOption[] = [
   { name: "Olive", code: "#4D7C0F" },
 ];
 
+const fieldClassName =
+  "h-11 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25";
+const selectClassName =
+  "h-11 w-full rounded-xl border border-black/15 bg-white px-3 text-[15px] shadow-none outline-none transition focus:border-black/30 focus:ring-1 focus:ring-black/25";
+const textAreaClassName =
+  "min-h-28 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25";
+
 const defaultValues: ProductEditorValues = {
   name: "",
   slug: "",
@@ -421,7 +428,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 <FormItem className="space-y-2">
                   <FormLabel>Product name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Cloud Tee" {...field} />
+                    <Input placeholder="Cloud Tee" className={fieldClassName} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -436,7 +443,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                   <FormItem className="space-y-2">
                     <FormLabel>Slug</FormLabel>
                     <FormControl>
-                      <Input placeholder="cloud-tee" {...field} />
+                      <Input placeholder="cloud-tee" className={fieldClassName} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -452,6 +459,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                       <Input
                         type="number"
                         placeholder="42000"
+                        className={fieldClassName}
                         value={field.value}
                         onChange={(event) => field.onChange(Number(event.target.value))}
                       />
@@ -470,7 +478,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 <FormItem className="space-y-2">
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Premium cotton blend..." rows={4} {...field} />
+                    <Textarea placeholder="Premium cotton blend..." rows={4} className={textAreaClassName} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -487,7 +495,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                     <FormControl>
                       <div className="space-y-2">
                         <select
-                          className="h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+                          className={selectClassName}
                           value={field.value}
                           onChange={(event) => field.onChange(event.target.value)}
                         >
@@ -528,7 +536,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                     <FormLabel>Status</FormLabel>
                     <FormControl>
                       <select
-                        className="h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+                        className={selectClassName}
                         value={field.value}
                         onChange={(event) => field.onChange(event.target.value)}
                       >
@@ -553,6 +561,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                       type="file"
                       accept="image/jpeg,image/png,image/webp,image/avif"
                       multiple
+                      className={fieldClassName}
                       disabled={isUploadingImage || uploadedImages.length >= 10}
                       onChange={async (event) => {
                         const inputElement = event.currentTarget;
@@ -617,7 +626,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 <FormItem className="space-y-2">
                   <FormLabel>Tags (comma separated)</FormLabel>
                   <FormControl>
-                    <Input placeholder="new, summer, limited" {...field} />
+                    <Input placeholder="new, summer, limited" className={fieldClassName} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -690,11 +699,13 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
                   <Input
                     placeholder="Custom color name"
+                    className={fieldClassName}
                     value={customColorName}
                     onChange={(event) => setCustomColorName(event.target.value)}
                   />
                   <Input
                     placeholder="#9F1239"
+                    className={fieldClassName}
                     value={customColorCode}
                     onChange={(event) => setCustomColorCode(event.target.value)}
                   />
@@ -765,7 +776,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                       <FormItem>
                         <FormLabel>Color Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Black" {...variantField} />
+                          <Input placeholder="Black" className={fieldClassName} {...variantField} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -778,7 +789,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                       <FormItem>
                         <FormLabel>Color Code</FormLabel>
                         <FormControl>
-                          <Input placeholder="#111827" {...variantField} />
+                          <Input placeholder="#111827" className={fieldClassName} {...variantField} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -792,7 +803,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                         <FormLabel>Display Image</FormLabel>
                         <FormControl>
                           <select
-                            className="h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+                            className={selectClassName}
                             value={variantField.value ?? ""}
                             onChange={(event) => variantField.onChange(event.target.value)}
                           >
@@ -815,7 +826,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                       <FormItem>
                         <FormLabel>SKU Base</FormLabel>
                         <FormControl>
-                          <Input placeholder="CT-BLK" {...variantField} />
+                          <Input placeholder="CT-BLK" className={fieldClassName} {...variantField} />
                         </FormControl>
                         <p className="text-xs text-muted-foreground">
                           If multiple sizes are selected, we save as `SKU-SIZE` (example: `CT-BLK-M`).
@@ -834,6 +845,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                           <Input
                             type="number"
                             placeholder="10"
+                            className={fieldClassName}
                             value={variantField.value}
                             onChange={(event) => handleVariantStockInput(event.target.value, variantField.onChange)}
                           />
