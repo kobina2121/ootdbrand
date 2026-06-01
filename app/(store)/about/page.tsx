@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Heart, Sparkles, Target } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +42,12 @@ const values = [
     description: "Our goal is simple: help every woman feel bold, beautiful, and seen.",
   },
 ] as const;
+
+const ownerProfile = {
+  name: "Founder, theootd.brand",
+  title: "Creative Director",
+  image: "/images/about/owner.jpg",
+};
 
 export default function AboutPage() {
   return (
@@ -88,6 +95,35 @@ export default function AboutPage() {
                 </article>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
+        <Card className="border-black/10 bg-white/90 shadow-sm">
+          <CardContent className="p-4 sm:p-6">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-black/10 bg-[#f4f3ef]">
+              <Image
+                src={ownerProfile.image}
+                alt={ownerProfile.name}
+                fill
+                className="object-cover"
+                sizes="(min-width: 1024px) 42vw, 100vw"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-black/10 bg-white/90 shadow-sm">
+          <CardContent className="space-y-3 p-6 sm:p-8">
+            <p className="text-xs tracking-[0.28em] text-muted-foreground">FOUNDER PORTRAIT</p>
+            <h2 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">{ownerProfile.name}</h2>
+            <p className="text-sm uppercase tracking-[0.2em] text-[#6b655f]">{ownerProfile.title}</p>
+            <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
+              This section highlights the face behind the brand and adds a personal connection to the story. You can replace
+              the current image with the official owner photo anytime by updating{" "}
+              <span className="font-medium text-[#1f1b18]">{ownerProfile.image}</span>.
+            </p>
           </CardContent>
         </Card>
       </section>
