@@ -12,6 +12,7 @@ type Product = {
   image: string;
   price: number;
   sizes: string[];
+  rating?: number;
 };
 
 export function ProductGrid({ products }: { products: Product[] }) {
@@ -40,6 +41,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
           <CardContent className="space-y-2 px-3 pb-3 sm:px-4 sm:pb-4">
             <p className="text-sm text-muted-foreground">From</p>
             <p className="text-lg font-semibold">{formatPriceNgn(product.price)}</p>
+            <p className="text-sm tracking-wide text-[#a47531]">{"★★★★★"} ({(product.rating ?? 5).toFixed(1)})</p>
             {product.sizes.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {product.sizes.map((size) => (

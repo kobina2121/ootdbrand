@@ -1,11 +1,11 @@
-import { featuredProducts } from "@/lib/mock-data";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
 import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
 import { buttonVariants } from "@/components/ui/button";
-import { formatPriceNgn } from "@/lib/products";
+import { formatPriceNgn, products } from "@/lib/products";
+import { listProducts } from "@/lib/services/product-service";
 import { cn } from "@/lib/utils";
 
 const heroImages = [
@@ -81,7 +81,21 @@ const editorialShowcase = {
   video: "/videos/editorial-showcase.mp4",
 } as const;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const catalogProducts = await listProducts({ activeOnly: true, sort: "latest" });
+  const featuredCatalogProducts = (catalogProducts.length > 0 ? catalogProducts : products).slice(0, 6);
+
+  const productDetailsBySlug = Object.fromEntries(
+    [...products, ...catalogProducts].map((product) => [
+      product.slug,
+      {
+        description: product.description,
+        sizes: Array.from(new Set(product.variants.map((variant) => variant.size))),
+        colors: Array.from(new Set(product.variants.map((variant) => variant.color))),
+      },
+    ]),
+  );
+
   return (
     <div className="relative space-y-10 sm:space-y-12">
       <div className="pointer-events-none absolute -left-20 top-20 hidden h-52 w-52 rounded-full bg-[#c8d4bc]/40 blur-3xl md:block animate-drift-x" />
@@ -191,31 +205,36 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="animate-fade-up rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
-        <div className="mb-5 flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-[0.65rem] uppercase tracking-[0.28em] text-[#7b756f]">Editors&apos; Picks</p>
-            <h2 className="font-heading text-3xl leading-none text-[#1f1b18] sm:text-4xl">Featured Products</h2>
+      <section className="animate-fade-up rounded-2xl border border-black/10 bg-white px-4 py-9 shadow-sm sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-6xl space-y-8 sm:space-y-10">
+          <div className="space-y-4 text-center">
+            <p className="text-[0.7rem] tracking-[0.42em] text-[#5e5e5e]">Products</p>
+            <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f2937] sm:text-5xl">Our Products</h2>
+            <p className="mx-auto max-w-xl text-sm text-[#646464] sm:text-lg">
+              Discover timeless pieces designed for confidence, elegance, and everyday luxury.
+            </p>
           </div>
-          <Link
-            href="/products"
-            className={cn(buttonVariants({ variant: "ghost" }), "text-muted-foreground transition hover:bg-black/5 hover:text-black")}
-          >
-            View all
-          </Link>
-        </div>
 
-        <FeaturedProductsCarousel
-          items={featuredProducts.map((product) => ({
-            slug: product.slug,
-            name: product.name,
-            category: product.category,
-            price: formatPriceNgn(product.price),
-            image:
-              featuredImageBySlug[product.slug] ??
-              "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80",
-          }))}
-        />
+          <div className="flex items-center justify-center">
+            <Link href="/products" className="text-xl font-semibold text-[#161616] underline-offset-4 hover:underline">
+              View all
+            </Link>
+          </div>
+
+          <FeaturedProductsCarousel
+            items={featuredCatalogProducts.map((product) => ({
+              slug: product.slug,
+              name: product.name,
+              category: product.category,
+              description: productDetailsBySlug[product.slug]?.description ?? "",
+              sizes: productDetailsBySlug[product.slug]?.sizes ?? [],
+              colors: productDetailsBySlug[product.slug]?.colors ?? [],
+              rating: 5,
+              price: formatPriceNgn(product.basePrice),
+              image: product.image || featuredImageBySlug[product.slug] || "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80",
+            }))}
+          />
+        </div>
       </section>
     </div>
   );

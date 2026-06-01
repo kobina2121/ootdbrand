@@ -53,6 +53,7 @@ export default async function ProductDetailPage({
       image: entry.image,
       price: entry.basePrice,
       sizes: [...new Set(entry.variants.map((variant) => variant.size))],
+      rating: 5,
     }));
 
   return (

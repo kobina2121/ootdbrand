@@ -136,6 +136,7 @@ export default async function ProductListPage({ searchParams }: PageProps) {
               image: product.image,
               price: product.basePrice,
               sizes: [...new Set(product.variants.map((variant) => variant.size))],
+              rating: 5,
             }))}
           />
         ) : (
