@@ -12,6 +12,21 @@ const defaultDevAdmin = {
   name: "Store Admin",
 } as const;
 
+function getAdminAuthConfig() {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || "";
+  const adminPassword = process.env.ADMIN_PASSWORD || "";
+  const adminName = process.env.ADMIN_NAME?.trim() || "Store Admin";
+  const allowDevFallback = process.env.ALLOW_DEV_DEFAULT_ADMIN === "true";
+  const useDefaultDevAdmin =
+    allowDevFallback && process.env.NODE_ENV === "development" && (!adminEmail || !adminPassword);
+
+  return {
+    adminEmail: adminEmail || (useDefaultDevAdmin ? defaultDevAdmin.email : ""),
+    adminPassword: adminPassword || (useDefaultDevAdmin ? defaultDevAdmin.password : ""),
+    adminName: adminName || (useDefaultDevAdmin ? defaultDevAdmin.name : "Store Admin"),
+  };
+}
+
 export type AppUser = {
   id: string;
   name: string;
@@ -59,12 +74,7 @@ export async function findUserByEmail(email: string) {
 }
 
 export async function ensureAdminUserFromEnv() {
-  const hasEnvAdmin = Boolean(process.env.ADMIN_EMAIL?.trim() && process.env.ADMIN_PASSWORD);
-  const useDefaultDevAdmin = !hasEnvAdmin && process.env.NODE_ENV === "development";
-
-  const adminEmail = (process.env.ADMIN_EMAIL?.trim().toLowerCase() || (useDefaultDevAdmin ? defaultDevAdmin.email : undefined)) ?? "";
-  const adminPassword = process.env.ADMIN_PASSWORD || (useDefaultDevAdmin ? defaultDevAdmin.password : undefined);
-  const adminName = process.env.ADMIN_NAME?.trim() || (useDefaultDevAdmin ? defaultDevAdmin.name : "Store Admin");
+  const { adminEmail, adminPassword, adminName } = getAdminAuthConfig();
 
   if (!adminEmail || !adminPassword) {
     return null;
@@ -106,10 +116,7 @@ export async function ensureAdminUserFromEnv() {
 
 export async function verifyUserCredentials(email: string, password: string) {
   const normalizedEmail = email.toLowerCase().trim();
-  const hasEnvAdmin = Boolean(process.env.ADMIN_EMAIL?.trim() && process.env.ADMIN_PASSWORD);
-  const useDefaultDevAdmin = !hasEnvAdmin && process.env.NODE_ENV === "development";
-  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || (useDefaultDevAdmin ? defaultDevAdmin.email : undefined);
-  const adminPassword = process.env.ADMIN_PASSWORD || (useDefaultDevAdmin ? defaultDevAdmin.password : undefined);
+  const { adminEmail, adminPassword, adminName } = getAdminAuthConfig();
 
   if (adminEmail && adminPassword && normalizedEmail === adminEmail && password === adminPassword) {
     try {
@@ -123,7 +130,7 @@ export async function verifyUserCredentials(email: string, password: string) {
 
     return {
       id: "env-admin",
-      name: process.env.ADMIN_NAME?.trim() || "Store Admin",
+      name: adminName,
       email: adminEmail,
       role: "admin",
     } satisfies AppUser;
