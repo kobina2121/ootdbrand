@@ -44,16 +44,16 @@ const values = [
 ] as const;
 
 const ownerProfile = {
-  name: "Founder, theootd.brand",
+  name: "Kobina",
   title: "Creative Director",
   image: "/images/about/owner.jpg",
 };
 
 export default function AboutPage() {
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-6 shadow-sm sm:p-10">
-        <div className="max-w-3xl space-y-4">
+    <div className="space-y-10">
+      <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede7_100%)] p-6 shadow-sm sm:p-10">
+        <div className="max-w-3xl space-y-5">
           <Badge variant="outline" className="rounded-full border-black/20 bg-white/70 px-4 py-1">
             About theootd.brand
           </Badge>
@@ -63,40 +63,6 @@ export default function AboutPage() {
             feel effortlessly elegant and unapologetically confident.
           </p>
         </div>
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-black/10 bg-white/85 shadow-sm">
-          <CardContent className="space-y-3 p-6 sm:p-8">
-            <p className="text-xs tracking-[0.28em] text-muted-foreground">THE OWNER</p>
-            <h2 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">Vision Behind the Brand</h2>
-            <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
-              Founded by a fashion enthusiast with a deep love for feminine silhouettes, theootd.brand started as a
-              passion project and evolved into a fast-growing label. The vision has always been to create pieces that
-              fit beautifully and tell a story of confidence.
-            </p>
-            <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
-              From design concept to final stitch, each collection reflects personal style, culture, and the desire to
-              make women feel powerful in what they wear.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-black/10 bg-[#f4f3ef] shadow-sm">
-          <CardContent className="space-y-3 p-6 sm:p-8">
-            <p className="text-xs tracking-[0.28em] text-muted-foreground">OUR HISTORY</p>
-            <h2 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">How We Grew</h2>
-            <div className="space-y-4 pt-2">
-              {milestones.map((item) => (
-                <article key={item.year} className="rounded-xl border border-black/10 bg-white px-4 py-3">
-                  <p className="text-xs tracking-[0.2em] text-muted-foreground">{item.year}</p>
-                  <h3 className="mt-1 text-sm font-semibold text-[#231f1c] sm:text-base">{item.title}</h3>
-                  <p className="mt-1 text-sm text-[#6b655f]">{item.description}</p>
-                </article>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
@@ -115,14 +81,54 @@ export default function AboutPage() {
         </Card>
 
         <Card className="border-black/10 bg-white/90 shadow-sm">
-          <CardContent className="space-y-3 p-6 sm:p-8">
-            <p className="text-xs tracking-[0.28em] text-muted-foreground">FOUNDER PORTRAIT</p>
+          <CardContent className="space-y-4 p-6 sm:p-8">
+            <p className="text-xs tracking-[0.28em] text-muted-foreground">MEET THE FOUNDER</p>
             <h2 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">{ownerProfile.name}</h2>
             <p className="text-sm uppercase tracking-[0.2em] text-[#6b655f]">{ownerProfile.title}</p>
             <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
-              This section highlights the face behind the brand and adds a personal connection to the story. You can replace
-              the current image with the official owner photo anytime by updating{" "}
-              <span className="font-medium text-[#1f1b18]">{ownerProfile.image}</span>.
+              theootd.brand started from a clear idea: women deserve pieces that make them feel beautiful, confident,
+              and fully themselves. Every collection is built with intention, from silhouette choices to finishing detail.
+            </p>
+            <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
+              The brand blends modern elegance with everyday wearability, so every customer can wear something that
+              feels personal and timeless.
+            </p>
+            <div className="rounded-xl border border-black/10 bg-[#f7f5f1] px-4 py-3">
+              <p className="text-xs tracking-[0.16em] text-muted-foreground">OWNER PHOTO PATH</p>
+              <p className="mt-1 text-sm text-[#1f1b18]">{ownerProfile.image}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <Card className="border-black/10 bg-[#f4f3ef] shadow-sm">
+          <CardContent className="space-y-3 p-6 sm:p-8">
+            <p className="text-xs tracking-[0.28em] text-muted-foreground">OUR HISTORY</p>
+            <h2 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">How We Grew</h2>
+            <div className="space-y-4 pt-2">
+              {milestones.map((item) => (
+                <article key={item.year} className="rounded-xl border border-black/10 bg-white px-4 py-3">
+                  <p className="text-xs tracking-[0.2em] text-muted-foreground">{item.year}</p>
+                  <h3 className="mt-1 text-sm font-semibold text-[#231f1c] sm:text-base">{item.title}</h3>
+                  <p className="mt-1 text-sm text-[#6b655f]">{item.description}</p>
+                </article>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-black/10 bg-white/85 shadow-sm">
+          <CardContent className="space-y-3 p-6 sm:p-8">
+            <p className="text-xs tracking-[0.28em] text-muted-foreground">VISION</p>
+            <h2 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">Why We Exist</h2>
+            <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
+              We design for confidence. Every drop is made to flatter, elevate, and give women looks that feel as good
+              as they look.
+            </p>
+            <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
+              Beyond clothing, theootd.brand is about expression, ownership of personal style, and wearing every piece
+              with bold intention.
             </p>
           </CardContent>
         </Card>
