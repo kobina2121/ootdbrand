@@ -136,6 +136,10 @@ export function calculateShipping(subtotal: number) {
   return 0;
 }
 
+export function calculateTransactionFee(subtotal: number) {
+  return subtotal > 0 ? 4 : 0;
+}
+
 export type DiscountComputation = {
   code: string;
   amount: number;
@@ -155,13 +159,15 @@ export function calculateCartTotals(items: CartItem[], discountAmount = 0) {
   const safeDiscount = Math.max(0, Math.min(discountAmount, subtotal));
   const discountedSubtotal = subtotal - safeDiscount;
   const shipping = calculateShipping(discountedSubtotal);
-  const total = discountedSubtotal + shipping;
+  const transactionFee = calculateTransactionFee(discountedSubtotal);
+  const total = discountedSubtotal + shipping + transactionFee;
 
   return {
     subtotal,
     discount: safeDiscount,
     discountedSubtotal,
     shipping,
+    transactionFee,
     total,
   };
 }

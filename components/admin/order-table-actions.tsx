@@ -25,14 +25,18 @@ export function OrderTableActions({ reference, customerEmail, orderType }: Order
     }
   };
 
-  const markAsDelivering = async () => {
+  const updateDeliveryState = async (
+    deliveryStatus: "Shipped" | "Delivered",
+    adminUpdate: string,
+    successMessage: string,
+  ) => {
     try {
       const response = await fetch(endpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          deliveryStatus: "Shipped",
-          adminUpdate: "Your order is being delivered.",
+          deliveryStatus,
+          adminUpdate,
         }),
       });
       const payload = (await response.json()) as { ok?: boolean; message?: string };
@@ -41,7 +45,7 @@ export function OrderTableActions({ reference, customerEmail, orderType }: Order
         return;
       }
 
-      toast.success("Marked as being delivered");
+      toast.success(successMessage);
       window.location.reload();
     } catch {
       toast.error("Could not update delivery status");
@@ -74,8 +78,19 @@ export function OrderTableActions({ reference, customerEmail, orderType }: Order
       <Button size="sm" variant="outline" onClick={copyReference}>
         Copy Ref
       </Button>
-      <Button size="sm" variant="outline" onClick={markAsDelivering}>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => updateDeliveryState("Shipped", "Your order is being delivered.", "Marked as being delivered")}
+      >
         Mark Delivering
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => updateDeliveryState("Delivered", "Your order has been delivered.", "Marked as delivered")}
+      >
+        Mark Delivered
       </Button>
       <a href={`mailto:${customerEmail}?subject=Order%20Update%20(${encodeURIComponent(reference)})`}>
         <Button size="sm" variant="outline">

@@ -170,6 +170,7 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
                         <p className="text-xs text-muted-foreground">Provider: {order.paymentProvider}</p>
                         <p className="text-xs text-muted-foreground">Subtotal: {formatPriceNgn(order.amountSubtotal)}</p>
                         <p className="text-xs text-muted-foreground">Shipping: {formatPriceNgn(order.shippingFee)}</p>
+                        <p className="text-xs text-muted-foreground">Transaction fee: {formatPriceNgn(order.transactionFee ?? 0)}</p>
                         <p className="text-sm font-semibold">Total: {formatPriceNgn(order.amountTotal)}</p>
                         <p className="text-xs text-muted-foreground">Gateway status: {order.paymentGatewayStatus || "N/A"}</p>
                         <p className="text-xs text-muted-foreground">Gateway response: {order.paymentGatewayResponse || "N/A"}</p>

@@ -51,6 +51,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
     if (payload.adminUpdate !== undefined) {
       update.adminUpdate = payload.adminUpdate;
+    } else if (payload.deliveryStatus === "Delivered") {
+      update.adminUpdate = "Your custom order has been delivered.";
     } else if (payload.deliveryStatus === "Shipped") {
       update.adminUpdate = "Your custom order is being delivered.";
     }

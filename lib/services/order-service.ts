@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { OrderModel, type OrderStatus } from "@/lib/db/models/order";
 import { ProductModel } from "@/lib/db/models/product";
-import { calculateShipping } from "@/lib/products";
+import { calculateShipping, calculateTransactionFee } from "@/lib/products";
 import { resolveOrderItemsFromCart } from "@/lib/services/product-service";
 import type { AppUser } from "@/lib/services/user-service";
 
@@ -56,7 +56,8 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
 
   const amountSubtotal = resolvedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   const shippingFee = calculateShipping(amountSubtotal);
-  const amountTotal = amountSubtotal + shippingFee;
+  const transactionFee = calculateTransactionFee(amountSubtotal);
+  const amountTotal = amountSubtotal + shippingFee + transactionFee;
   const paymentReference = `PSK-${randomUUID().slice(0, 8).toUpperCase()}`;
 
   const order = await OrderModel.create({
@@ -64,6 +65,7 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
     items: resolvedItems,
     amountSubtotal,
     shippingFee,
+    transactionFee,
     amountTotal,
     currency: "GHS",
     status: "Pending",
@@ -84,6 +86,7 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
     amountTotal,
     amountSubtotal,
     shippingFee,
+    transactionFee,
     currency: order.currency,
     status: order.status,
     createdAt: order.createdAt,
@@ -263,6 +266,7 @@ export async function listOrders(filters: { status?: OrderStatus; limit?: number
       })),
       amountSubtotal: doc.amountSubtotal,
       shippingFee: doc.shippingFee,
+      transactionFee: doc.transactionFee ?? 0,
       amountTotal: doc.amountTotal,
       currency: doc.currency,
       status: doc.status,
@@ -318,6 +322,7 @@ export async function getOrdersByUserId(userId: string) {
     amountTotal: doc.amountTotal,
     amountSubtotal: doc.amountSubtotal,
     shippingFee: doc.shippingFee,
+    transactionFee: doc.transactionFee ?? 0,
     currency: doc.currency,
     status: doc.status,
     deliveryStatus: doc.deliveryStatus ?? "Pending",

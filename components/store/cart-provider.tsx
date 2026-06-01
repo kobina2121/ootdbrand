@@ -12,6 +12,7 @@ type CartContextValue = {
   itemCount: number;
   subtotal: number;
   shipping: number;
+  transactionFee: number;
   total: number;
   addItem: (payload: AddPayload) => Promise<void>;
   removeItem: (sku: string) => Promise<void>;
@@ -195,6 +196,7 @@ export function CartProvider({
       itemCount: effectiveItems.reduce((count, item) => count + item.quantity, 0),
       subtotal: effectiveTotals.subtotal,
       shipping: effectiveTotals.shipping,
+      transactionFee: effectiveTotals.transactionFee,
       total: effectiveTotals.total,
       addItem,
       removeItem,
@@ -208,6 +210,7 @@ export function CartProvider({
       effectiveItems,
       effectiveTotals.shipping,
       effectiveTotals.subtotal,
+      effectiveTotals.transactionFee,
       effectiveTotals.total,
       removeItem,
       syncCart,

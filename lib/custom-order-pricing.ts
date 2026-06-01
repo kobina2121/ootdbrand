@@ -12,8 +12,13 @@ export function resolveCustomOrderCustomizationFeeGhs() {
   return Math.round(parsed * 100) / 100;
 }
 
-export function calculateCustomOrderTotal(basePriceGhs: number, customizationFeeGhs: number) {
+export function resolveTransactionFeeGhs() {
+  return 4;
+}
+
+export function calculateCustomOrderTotal(basePriceGhs: number, customizationFeeGhs: number, transactionFeeGhs = 0) {
   const safeBase = Number.isFinite(basePriceGhs) && basePriceGhs > 0 ? basePriceGhs : 0;
   const safeFee = Number.isFinite(customizationFeeGhs) && customizationFeeGhs > 0 ? customizationFeeGhs : 0;
-  return Math.round((safeBase + safeFee) * 100) / 100;
+  const safeTransactionFee = Number.isFinite(transactionFeeGhs) && transactionFeeGhs > 0 ? transactionFeeGhs : 0;
+  return Math.round((safeBase + safeFee + safeTransactionFee) * 100) / 100;
 }

@@ -94,6 +94,7 @@ export default async function AccountOrdersPage() {
 
                 <div className="grid gap-3 rounded-xl border border-black/10 bg-[#f7f5f1]/80 p-3 text-sm sm:grid-cols-2">
                   <p><span className="text-muted-foreground">Subtotal:</span> {formatPriceNgn(order.amountSubtotal)}</p>
+                  <p><span className="text-muted-foreground">Transaction fee:</span> {formatPriceNgn(order.transactionFee ?? 0)}</p>
                   <p><span className="text-muted-foreground">Total:</span> {formatPriceNgn(order.amountTotal)}</p>
                   <p><span className="text-muted-foreground">Tracking:</span> {order.trackingNumber || "Pending assignment"}</p>
                   <p className="truncate"><span className="text-muted-foreground">Delivery Address:</span> {order.shippingAddress.addressLine}</p>
@@ -159,12 +160,13 @@ export default async function AccountOrdersPage() {
                       {order.category} · {order.size} · {order.color} · SKU {order.variantSku}
                     </p>
                     <p className="text-sm">
-                      {formatPriceNgn(order.baseUnitPrice)} + {formatPriceNgn(order.customizationCharge)} customization
+                      {formatPriceNgn(order.baseUnitPrice)} + {formatPriceNgn(order.customizationCharge)} customization + {formatPriceNgn(order.transactionFee ?? 0)} fee
                     </p>
                   </div>
                 </div>
 
                 <div className="grid gap-3 rounded-xl border border-black/10 bg-[#f7f5f1]/80 p-3 text-sm sm:grid-cols-2">
+                  <p><span className="text-muted-foreground">Transaction fee:</span> {formatPriceNgn(order.transactionFee ?? 0)}</p>
                   <p><span className="text-muted-foreground">Total:</span> {formatPriceNgn(order.amountTotal)}</p>
                   <p><span className="text-muted-foreground">Tracking:</span> {order.trackingNumber || "Pending assignment"}</p>
                   <p className="truncate"><span className="text-muted-foreground">Type:</span> {order.type || "Not specified"}</p>

@@ -34,6 +34,7 @@ const orderSchema = new Schema(
     items: { type: [orderItemSchema], required: true, default: [] },
     amountSubtotal: { type: Number, required: true, min: 0 },
     shippingFee: { type: Number, required: true, min: 0 },
+    transactionFee: { type: Number, required: true, min: 0, default: 0 },
     amountTotal: { type: Number, required: true, min: 0 },
     currency: { type: String, default: "GHS", required: true },
     status: {

@@ -202,6 +202,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                         <p className="text-xs text-muted-foreground">Provider: {order.paymentProvider ?? "paystack"}</p>
                         <p className="text-xs text-muted-foreground">Product price: {formatPriceNgn(order.baseUnitPrice)}</p>
                         <p className="text-xs text-muted-foreground">Customization fee: {formatPriceNgn(order.customizationCharge)}</p>
+                        <p className="text-xs text-muted-foreground">Transaction fee: {formatPriceNgn(order.transactionFee ?? 0)}</p>
                         <p className="text-sm font-semibold">Total: {formatPriceNgn(order.amountTotal)}</p>
                         <p className="text-xs text-muted-foreground">Gateway status: {order.paymentGatewayStatus || "N/A"}</p>
                         <p className="text-xs text-muted-foreground">Gateway response: {order.paymentGatewayResponse || "N/A"}</p>

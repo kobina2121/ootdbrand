@@ -12,7 +12,7 @@ import { formatPriceNgn } from "@/lib/products";
 import { checkoutInitSchema } from "@/lib/validators/checkout";
 
 export default function CheckoutPage() {
-  const { items, subtotal, total, userRole } = useCart();
+  const { items, subtotal, transactionFee, total, userRole } = useCart();
   const isClientReady = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -204,6 +204,10 @@ export default function CheckoutPage() {
             <div className="flex items-center justify-between text-sm">
               <span>Subtotal</span>
               <span>{formatPriceNgn(subtotal)}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span>Transaction fee</span>
+              <span>{formatPriceNgn(transactionFee)}</span>
             </div>
             <div className="flex items-center justify-between font-semibold">
               <span>Total</span>

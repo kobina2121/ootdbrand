@@ -10,7 +10,7 @@ import { useCart } from "@/components/store/cart-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { calculateCustomOrderTotal } from "@/lib/custom-order-pricing";
+import { calculateCustomOrderTotal, resolveTransactionFeeGhs } from "@/lib/custom-order-pricing";
 import { formatPriceNgn } from "@/lib/products";
 
 const typeOptions = ["Dress", "Top", "Skirt", "Set", "Jumpsuit"] as const;
@@ -92,7 +92,8 @@ export default function CustomOrderPage() {
   }, [products, selectedCategory]);
 
   const selectedProductUnitPrice = selectedProduct?.basePrice ?? 0;
-  const selectedCustomOrderTotal = calculateCustomOrderTotal(selectedProductUnitPrice, customizationFee);
+  const transactionFee = resolveTransactionFeeGhs();
+  const selectedCustomOrderTotal = calculateCustomOrderTotal(selectedProductUnitPrice, customizationFee, transactionFee);
 
   const photoPreview = useMemo(() => {
     if (!photoFile) {
@@ -162,24 +163,31 @@ export default function CustomOrderPage() {
       return undefined;
     }
 
-    const formData = new FormData();
-    formData.append("file", photoFile);
+    try {
+      const formData = new FormData();
+      formData.append("file", photoFile);
 
-    const response = await fetch("/api/uploads/custom-order-image", {
-      method: "POST",
-      body: formData,
-    });
-    const json = (await response.json()) as {
-      ok: boolean;
-      message: string;
-      data: { imagePath?: string };
-    };
+      const response = await fetch("/api/uploads/custom-order-image", {
+        method: "POST",
+        body: formData,
+      });
 
-    if (!response.ok || !json.ok || !json.data.imagePath) {
-      throw new Error(json.message || "Could not upload reference image.");
+      const json = (await response.json()) as {
+        ok: boolean;
+        message: string;
+        data: { imagePath?: string };
+      };
+
+      if (!response.ok || !json.ok || !json.data.imagePath) {
+        toast.error(json.message || "Could not upload image. Continuing without image.");
+        return undefined;
+      }
+
+      return json.data.imagePath;
+    } catch {
+      toast.error("Could not upload image. Continuing without image.");
+      return undefined;
     }
-
-    return json.data.imagePath;
   };
 
   const handleCategoryChange = (category: string) => {
@@ -378,6 +386,9 @@ export default function CustomOrderPage() {
                     </p>
                     <p className="text-sm text-[#6b655f]">
                       Customization fee: {formatPriceNgn(customizationFee)}
+                    </p>
+                    <p className="text-sm text-[#6b655f]">
+                      Transaction fee: {formatPriceNgn(transactionFee)}
                     </p>
                     <p className="text-sm font-semibold text-[#1f1b18]">
                       Total to pay: {formatPriceNgn(selectedCustomOrderTotal)}
@@ -591,6 +602,10 @@ export default function CustomOrderPage() {
                 <p className="mt-1 flex items-center justify-between text-[#6b655f]">
                   <span>Customization fee</span>
                   <span>{formatPriceNgn(customizationFee)}</span>
+                </p>
+                <p className="mt-1 flex items-center justify-between text-[#6b655f]">
+                  <span>Transaction fee</span>
+                  <span>{formatPriceNgn(transactionFee)}</span>
                 </p>
                 <p className="mt-2 flex items-center justify-between font-semibold">
                   <span>Total payable</span>

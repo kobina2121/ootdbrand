@@ -2,7 +2,11 @@ import { randomUUID } from "node:crypto";
 
 import { Types } from "mongoose";
 
-import { calculateCustomOrderTotal, resolveCustomOrderCustomizationFeeGhs } from "@/lib/custom-order-pricing";
+import {
+  calculateCustomOrderTotal,
+  resolveCustomOrderCustomizationFeeGhs,
+  resolveTransactionFeeGhs,
+} from "@/lib/custom-order-pricing";
 import { CustomOrderModel } from "@/lib/db/models/custom-order";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { ProductModel } from "@/lib/db/models/product";
@@ -67,7 +71,8 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
   const leadVariant = product.variants[0];
   const baseUnitPrice = product.basePrice;
   const customizationCharge = resolveCustomOrderCustomizationFeeGhs();
-  const amountTotal = calculateCustomOrderTotal(baseUnitPrice, customizationCharge);
+  const transactionFee = resolveTransactionFeeGhs();
+  const amountTotal = calculateCustomOrderTotal(baseUnitPrice, customizationCharge, transactionFee);
   const normalizedPreferredSize = input.preferredSize.trim();
   const normalizedPreferredColor = input.preferredColor.trim();
   const measurementSummary = [
@@ -91,6 +96,7 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     variantUnitPriceSnapshot: baseUnitPrice,
     baseProductPriceSnapshot: baseUnitPrice,
     customizationChargeSnapshot: customizationCharge,
+    transactionFeeSnapshot: transactionFee,
     fullName: input.fullName,
     email: input.email,
     phone: input.phone,
@@ -119,6 +125,7 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     paymentReference,
     baseUnitPrice,
     customizationCharge,
+    transactionFee,
     amountTotal,
     currency: customOrder.currency,
     status: customOrder.status,
@@ -251,6 +258,7 @@ export async function listCustomOrders(filters: { status?: "Pending" | "Success"
       variantUnitPrice: doc.variantUnitPriceSnapshot,
       baseUnitPrice: doc.baseProductPriceSnapshot,
       customizationCharge: doc.customizationChargeSnapshot ?? 0,
+      transactionFee: doc.transactionFeeSnapshot ?? 0,
       paymentReference: doc.paymentReference,
       fullName: doc.fullName,
       email: doc.email,
@@ -307,6 +315,7 @@ export async function getCustomOrdersByUserId(userId: string) {
     variantUnitPrice: doc.variantUnitPriceSnapshot,
     baseUnitPrice: doc.baseProductPriceSnapshot,
     customizationCharge: doc.customizationChargeSnapshot ?? 0,
+    transactionFee: doc.transactionFeeSnapshot ?? 0,
     amountTotal: doc.amountTotal,
     currency: doc.currency,
     status: doc.status,
