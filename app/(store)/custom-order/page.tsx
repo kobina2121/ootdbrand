@@ -625,16 +625,18 @@ export default function CustomOrderPage() {
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground">
-              Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).
-            </p>
-            <Button type="submit" className="rounded-full px-7" disabled={isSubmitting || !selectedProduct}>
-              {isSubmitting
-                ? "Preparing Payment..."
-                : paymentMethod === "card"
-                  ? `Pay ${formatPriceNgn(selectedCustomOrderTotal)} with Visa Card`
-                  : `Pay ${formatPriceNgn(selectedCustomOrderTotal)} with Mobile Money`}
-            </Button>
+            <div className="flex flex-col items-center gap-3 text-center">
+              <p className="text-xs text-muted-foreground">
+                Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).
+              </p>
+              <Button type="submit" className="rounded-full px-7" disabled={isSubmitting || !selectedProduct}>
+                {isSubmitting
+                  ? "Preparing Payment..."
+                  : paymentMethod === "card"
+                    ? `Pay ${formatPriceNgn(selectedCustomOrderTotal)} with Visa Card`
+                    : `Pay ${formatPriceNgn(selectedCustomOrderTotal)} with Mobile Money`}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
