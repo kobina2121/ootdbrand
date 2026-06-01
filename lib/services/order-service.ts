@@ -67,6 +67,7 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
     amountTotal,
     currency: "GHS",
     status: "Pending",
+    deliveryStatus: "Pending",
     paymentProvider: "paystack",
     paymentReference,
     shippingAddress: {
@@ -243,6 +244,10 @@ export async function listOrders(filters: { status?: OrderStatus; limit?: number
       amountTotal: doc.amountTotal,
       currency: doc.currency,
       status: doc.status,
+      deliveryStatus: doc.deliveryStatus ?? "Pending",
+      trackingNumber: doc.trackingNumber ?? "",
+      trackingUrl: doc.trackingUrl ?? "",
+      adminUpdate: doc.adminUpdate ?? "",
       paymentProvider: doc.paymentProvider,
       paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
       paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
@@ -262,11 +267,62 @@ export async function getOrdersByUserId(userId: string) {
   await connectToDatabase();
   const docs = await OrderModel.find({ userId: new Types.ObjectId(userId) }).sort({ createdAt: -1 }).lean();
 
+  const productIds = Array.from(
+    new Set(
+      docs.flatMap((doc) =>
+        doc.items
+          .map((item) => String(item.productId))
+          .filter((productId) => Types.ObjectId.isValid(productId)),
+      ),
+    ),
+  ).map((id) => new Types.ObjectId(id));
+
+  const products = productIds.length
+    ? await ProductModel.find({ _id: { $in: productIds } })
+        .select({ _id: 1, image: 1, images: 1 })
+        .lean()
+    : [];
+
+  const productImageMap = new Map<string, string>(
+    products.map((product) => [String(product._id), product.image || product.images?.[0] || ""]),
+  );
+
   return docs.map((doc) => ({
     id: String(doc._id),
     paymentReference: doc.paymentReference,
+    paymentProvider: doc.paymentProvider,
+    paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
+    paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
     amountTotal: doc.amountTotal,
+    amountSubtotal: doc.amountSubtotal,
+    shippingFee: doc.shippingFee,
+    currency: doc.currency,
     status: doc.status,
+    deliveryStatus: doc.deliveryStatus ?? "Pending",
+    trackingNumber: doc.trackingNumber ?? "",
+    trackingUrl: doc.trackingUrl ?? "",
+    adminUpdate: doc.adminUpdate ?? "",
+    paidAt: doc.paidAt ?? null,
+    shippingAddress: {
+      fullName: doc.shippingAddress.fullName,
+      email: doc.shippingAddress.email,
+      phone: doc.shippingAddress.phone,
+      addressLine: doc.shippingAddress.addressLine,
+    },
+    items: doc.items.map((item) => ({
+      productId: String(item.productId),
+      productName: item.productNameSnapshot,
+      image: productImageMap.get(String(item.productId)) ?? "",
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      lineTotal: item.unitPrice * item.quantity,
+      variant: {
+        size: item.variant?.size ?? "",
+        colorName: item.variant?.color?.name ?? "",
+        colorCode: item.variant?.color?.code ?? "#9CA3AF",
+        sku: item.variant?.sku ?? "",
+      },
+    })),
     createdAt: doc.createdAt,
   }));
 }

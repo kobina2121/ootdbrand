@@ -94,6 +94,7 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     amountTotal,
     currency: "GHS",
     status: "Pending",
+    deliveryStatus: "Pending",
     paymentProvider: "paystack",
     paymentReference,
   });
@@ -244,10 +245,71 @@ export async function listCustomOrders(filters: { status?: "Pending" | "Success"
       size: doc.size,
       color: doc.color,
       amountTotal: doc.amountTotal,
+      deliveryStatus: doc.deliveryStatus ?? "Pending",
+      trackingNumber: doc.trackingNumber ?? "",
+      trackingUrl: doc.trackingUrl ?? "",
+      adminUpdate: doc.adminUpdate ?? "",
+      measurements: doc.measurements,
+      notes: doc.notes ?? "",
+      referenceImage: doc.referenceImage ?? "",
+      paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
+      paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
+      paidAt: doc.paidAt ?? null,
+      deliveryAddress: {
+        addressLine: doc.deliveryAddress.addressLine,
+        city: doc.deliveryAddress.city,
+        stateRegion: doc.deliveryAddress.stateRegion,
+        country: doc.deliveryAddress.country,
+      },
       status: doc.status,
       createdAt: doc.createdAt,
     }));
   } catch {
     return [];
   }
+}
+
+export async function getCustomOrdersByUserId(userId: string) {
+  if (!Types.ObjectId.isValid(userId)) {
+    return [];
+  }
+
+  await connectToDatabase();
+  const docs = await CustomOrderModel.find({ userId: new Types.ObjectId(userId) }).sort({ createdAt: -1 }).lean();
+
+  return docs.map((doc) => ({
+    id: String(doc._id),
+    paymentReference: doc.paymentReference,
+    productSlug: doc.productSlug,
+    productName: doc.productNameSnapshot,
+    productImage: doc.productImageSnapshot ?? "",
+    variantSku: doc.variantSkuSnapshot,
+    variantUnitPrice: doc.variantUnitPriceSnapshot,
+    baseUnitPrice: doc.baseProductPriceSnapshot,
+    customizationCharge: doc.customizationChargeSnapshot ?? 0,
+    amountTotal: doc.amountTotal,
+    currency: doc.currency,
+    status: doc.status,
+    deliveryStatus: doc.deliveryStatus ?? "Pending",
+    trackingNumber: doc.trackingNumber ?? "",
+    trackingUrl: doc.trackingUrl ?? "",
+    adminUpdate: doc.adminUpdate ?? "",
+    type: doc.type ?? "",
+    category: doc.category,
+    size: doc.size,
+    color: doc.color,
+    measurements: doc.measurements,
+    notes: doc.notes ?? "",
+    referenceImage: doc.referenceImage ?? "",
+    paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
+    paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
+    paidAt: doc.paidAt ?? null,
+    deliveryAddress: {
+      addressLine: doc.deliveryAddress.addressLine,
+      city: doc.deliveryAddress.city,
+      stateRegion: doc.deliveryAddress.stateRegion,
+      country: doc.deliveryAddress.country,
+    },
+    createdAt: doc.createdAt,
+  }));
 }
