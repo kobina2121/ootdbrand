@@ -93,7 +93,7 @@ export default function HomePage() {
             src={image}
             alt={`theootd.brand hero ${index + 1}`}
             className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"
-            style={{ animationDelay: `${index * 6}s` }}
+            style={{ animationDelay: `${index * 4}s` }}
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/45 lg:from-black/10 lg:to-black/30" />
