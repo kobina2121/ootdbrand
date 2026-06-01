@@ -10,22 +10,17 @@ import { Input } from "@/components/ui/input";
 type ForgotPasswordResponse = {
   ok: boolean;
   message: string;
-  data?: {
-    resetUrl?: string;
-  };
 };
 
 export function ForgotPasswordForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [resetUrl, setResetUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
-    setResetUrl(null);
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").trim();
@@ -54,9 +49,6 @@ export function ForgotPasswordForm() {
       }
 
       setSuccessMessage(json.message);
-      if (json.data?.resetUrl) {
-        setResetUrl(json.data.resetUrl);
-      }
     } catch {
       setErrorMessage("Could not start password reset.");
     } finally {
@@ -75,14 +67,6 @@ export function ForgotPasswordForm() {
           <Input name="email" type="email" placeholder="Enter your email" className="h-11 rounded-xl border-black/15" required />
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
           {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
-          {resetUrl ? (
-            <p className="rounded-xl border border-black/10 bg-black/[0.02] px-3 py-2 text-sm text-muted-foreground">
-              Dev reset link:{" "}
-              <a href={resetUrl} className="font-medium text-foreground underline underline-offset-4">
-                Open reset page
-              </a>
-            </p>
-          ) : null}
           <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Please wait..." : "Send Reset Link"}
           </Button>
