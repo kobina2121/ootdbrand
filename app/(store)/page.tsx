@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
 import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
 import { buttonVariants } from "@/components/ui/button";
+import { formatPriceNgn } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 const heroImages = [
@@ -209,7 +210,7 @@ export default function HomePage() {
             slug: product.slug,
             name: product.name,
             category: product.category,
-            price: product.price,
+            price: formatPriceNgn(product.price),
             image:
               featuredImageBySlug[product.slug] ??
               "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80",
