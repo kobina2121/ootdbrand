@@ -44,9 +44,9 @@ const values = [
 ] as const;
 
 const ownerProfile = {
-  name: "Kobina",
+  name: "Adeline",
   title: "Creative Director",
-  image: "/images/about/owner.jpg",
+  image: "/images/about/adeline-owner.jpeg",
 };
 
 export default function AboutPage() {
@@ -93,10 +93,6 @@ export default function AboutPage() {
               The brand blends modern elegance with everyday wearability, so every customer can wear something that
               feels personal and timeless.
             </p>
-            <div className="rounded-xl border border-black/10 bg-[#f7f5f1] px-4 py-3">
-              <p className="text-xs tracking-[0.16em] text-muted-foreground">OWNER PHOTO PATH</p>
-              <p className="mt-1 text-sm text-[#1f1b18]">{ownerProfile.image}</p>
-            </div>
           </CardContent>
         </Card>
       </section>
