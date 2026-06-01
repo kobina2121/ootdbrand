@@ -76,10 +76,13 @@ const presetColorOptions: ColorOption[] = [
 
 const fieldClassName =
   "h-11 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25";
+const numericFieldClassName =
+  `${fieldClassName} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`;
 const selectClassName =
   "h-11 w-full rounded-xl border border-black/15 bg-white px-3 text-[15px] shadow-none outline-none transition focus:border-black/30 focus:ring-1 focus:ring-black/25";
 const textAreaClassName =
   "min-h-28 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25";
+const fieldHelperClassName = "min-h-5 text-xs text-muted-foreground";
 
 const defaultValues: ProductEditorValues = {
   name: "",
@@ -435,16 +438,17 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               )}
             />
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid items-start gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="slug"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
+                  <FormItem className="space-y-2 sm:min-h-[118px]">
                     <FormLabel>Slug</FormLabel>
                     <FormControl>
                       <Input placeholder="cloud-tee" className={fieldClassName} {...field} />
                     </FormControl>
+                    <p className={fieldHelperClassName}>Use lowercase and hyphens only (example: cloud-tee).</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -453,18 +457,18 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 control={form.control}
                 name="basePrice"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
+                  <FormItem className="space-y-2 sm:min-h-[118px]">
                     <FormLabel>Fixed price</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         placeholder="42000"
-                        className={fieldClassName}
+                        className={numericFieldClassName}
                         value={field.value}
                         onChange={(event) => field.onChange(Number(event.target.value))}
                       />
                     </FormControl>
-                    <p className="text-xs text-muted-foreground">One price applies to every size and color variant.</p>
+                    <p className={fieldHelperClassName}>One price applies to every size and color variant.</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -493,37 +497,22 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                   <FormItem className="space-y-2">
                     <FormLabel>Category</FormLabel>
                     <FormControl>
-                      <div className="space-y-2">
-                        <select
-                          className={selectClassName}
-                          value={field.value}
-                          onChange={(event) => field.onChange(event.target.value)}
-                        >
-                          <option value="" disabled>
-                            Select category
+                      <select
+                        className={selectClassName}
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      >
+                        <option value="" disabled>
+                          Select category
+                        </option>
+                        {categoryOptions.map((categoryOption) => (
+                          <option key={categoryOption} value={categoryOption}>
+                            {categoryOption}
                           </option>
-                          {categoryOptions.map((categoryOption) => (
-                            <option key={categoryOption} value={categoryOption}>
-                              {categoryOption}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="flex flex-wrap gap-2">
-                          {productCategories.map((categoryOption) => (
-                            <Button
-                              key={`quick-category-${categoryOption}`}
-                              type="button"
-                              size="sm"
-                              variant={field.value === categoryOption ? "default" : "outline"}
-                              className="h-8"
-                              onClick={() => field.onChange(categoryOption)}
-                            >
-                              {categoryOption}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
+                        ))}
+                      </select>
                     </FormControl>
+                    <p className={fieldHelperClassName}>Pick where this product appears in shop sections.</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -544,10 +533,29 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                         <option value="draft">Draft</option>
                       </select>
                     </FormControl>
+                    <p className={fieldHelperClassName}>Active products are visible in the storefront.</p>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Quick category picks</p>
+              <div className="flex flex-wrap gap-2">
+                {productCategories.map((categoryOption) => (
+                  <Button
+                    key={`quick-category-${categoryOption}`}
+                    type="button"
+                    size="sm"
+                    variant={selectedCategory === categoryOption ? "default" : "outline"}
+                    className="h-8 rounded-lg"
+                    onClick={() => form.setValue("category", categoryOption, { shouldValidate: true, shouldDirty: true })}
+                  >
+                    {categoryOption}
+                  </Button>
+                ))}
+              </div>
             </div>
 
             <FormField
@@ -845,7 +853,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                           <Input
                             type="number"
                             placeholder="10"
-                            className={fieldClassName}
+                            className={numericFieldClassName}
                             value={variantField.value}
                             onChange={(event) => handleVariantStockInput(event.target.value, variantField.onChange)}
                           />
