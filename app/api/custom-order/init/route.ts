@@ -62,6 +62,8 @@ export async function POST(request: Request) {
         customOrderId: customOrder.id,
         orderType: "custom",
         paymentMethod,
+        productSlug: customOrderPayload.productSlug,
+        variantSku: customOrderPayload.variantSku,
       },
     });
 
@@ -105,6 +107,13 @@ export async function POST(request: Request) {
 
     if (error instanceof Error && error.message.includes("timed out")) {
       return NextResponse.json(failure("Could not initialize payment in time. Please retry."), { status: 504 });
+    }
+
+    if (
+      error instanceof Error &&
+      (error.message === "Selected product was not found." || error.message === "Selected product option was not found.")
+    ) {
+      return NextResponse.json(failure(error.message), { status: 404 });
     }
 
     if (error instanceof Error && error.message.toLowerCase().includes("paystack")) {

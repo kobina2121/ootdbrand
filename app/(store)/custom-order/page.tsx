@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Clock3, CreditCard, ImagePlus, MapPin, Ruler, Shirt, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 
@@ -8,12 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { formatPriceNgn } from "@/lib/products";
 
 const typeOptions = ["Dress", "Top", "Skirt", "Set", "Jumpsuit"] as const;
-const categoryOptions = ["MAXI", "MIDI", "MINI", "TOPS"] as const;
-const sizeOptions = ["XS", "S", "M", "L", "XL"] as const;
-const colorOptions = ["Black", "White", "Wine", "Brown", "Navy", "Olive", "Custom"] as const;
-const customOrderDepositGhs = process.env.NEXT_PUBLIC_CUSTOM_ORDER_DEPOSIT_GHS?.trim() || "150";
 
 type DeliveryAddress = {
   addressLine: string;
@@ -22,15 +20,41 @@ type DeliveryAddress = {
   country: string;
 };
 
+type CatalogVariant = {
+  sku: string;
+  size: string;
+  color: string;
+  colorCode: string;
+  image: string;
+  price: number;
+  stock: number;
+};
+
+type CatalogProduct = {
+  slug: string;
+  name: string;
+  category: string;
+  description: string;
+  basePrice: number;
+  image: string;
+  variants: CatalogVariant[];
+};
+
 export default function CustomOrderPage() {
+  const searchParams = useSearchParams();
+  const preferredProductSlug = searchParams.get("product")?.toLowerCase() ?? "";
+  const preferredVariantSku = searchParams.get("variant")?.trim() ?? "";
+
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [isCatalogLoading, setIsCatalogLoading] = useState(true);
+  const [selectedProductSlug, setSelectedProductSlug] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"card" | "mobile_money">("card");
   const [type, setType] = useState("");
-  const [category, setCategory] = useState("");
-  const [size, setSize] = useState("");
-  const [color, setColor] = useState("");
   const [measurements, setMeasurements] = useState("");
   const [notes, setNotes] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -42,11 +66,58 @@ export default function CustomOrderPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const selectedProduct = useMemo(
+    () => products.find((product) => product.slug === selectedProductSlug) ?? null,
+    [products, selectedProductSlug],
+  );
+
+  const availableColors = useMemo(() => {
+    if (!selectedProduct) {
+      return [];
+    }
+
+    const colorMap = new Map<string, { color: string; colorCode: string }>();
+    selectedProduct.variants.forEach((variant) => {
+      if (!colorMap.has(variant.color)) {
+        colorMap.set(variant.color, {
+          color: variant.color,
+          colorCode: variant.colorCode,
+        });
+      }
+    });
+    return Array.from(colorMap.values());
+  }, [selectedProduct]);
+
+  const variantsForColor = useMemo(() => {
+    if (!selectedProduct || !selectedColor) {
+      return [];
+    }
+
+    return selectedProduct.variants.filter((variant) => variant.color === selectedColor);
+  }, [selectedColor, selectedProduct]);
+
+  const availableSizes = useMemo(
+    () => Array.from(new Set(variantsForColor.map((variant) => variant.size))),
+    [variantsForColor],
+  );
+
+  const selectedVariant = useMemo(() => {
+    if (!selectedProduct) {
+      return null;
+    }
+
+    const exact = selectedProduct.variants.find((variant) => variant.color === selectedColor && variant.size === selectedSize);
+    if (exact) {
+      return exact;
+    }
+
+    return selectedProduct.variants[0] ?? null;
+  }, [selectedColor, selectedProduct, selectedSize]);
+
   const photoPreview = useMemo(() => {
     if (!photoFile) {
       return "";
     }
-
     return URL.createObjectURL(photoFile);
   }, [photoFile]);
 
@@ -57,6 +128,56 @@ export default function CustomOrderPage() {
       }
     };
   }, [photoPreview]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadCatalog = async () => {
+      setIsCatalogLoading(true);
+      try {
+        const response = await fetch("/api/products/custom-catalog", { cache: "no-store" });
+        const json = (await response.json()) as {
+          ok: boolean;
+          data?: { products?: CatalogProduct[] };
+          message?: string;
+        };
+
+        if (!response.ok || !json.ok || !json.data?.products?.length) {
+          throw new Error(json.message || "Could not load catalog.");
+        }
+
+        if (!isMounted) {
+          return;
+        }
+
+        const catalog = json.data.products;
+        setProducts(catalog);
+
+        const preferred = catalog.find((entry) => entry.slug === preferredProductSlug) ?? catalog[0];
+
+        if (preferred) {
+          setSelectedProductSlug(preferred.slug);
+          const initialVariant =
+            preferred.variants.find((variant) => variant.sku === preferredVariantSku) ?? preferred.variants[0];
+          setSelectedColor(initialVariant?.color ?? "");
+          setSelectedSize(initialVariant?.size ?? "");
+        }
+      } catch (error) {
+        if (isMounted) {
+          toast.error(error instanceof Error ? error.message : "Could not load products.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsCatalogLoading(false);
+        }
+      }
+    };
+
+    void loadCatalog();
+    return () => {
+      isMounted = false;
+    };
+  }, [preferredProductSlug, preferredVariantSku]);
 
   const uploadReferenceImage = async () => {
     if (!photoFile) {
@@ -83,16 +204,33 @@ export default function CustomOrderPage() {
     return json.data.imagePath;
   };
 
+  const handleProductChange = (slug: string) => {
+    setSelectedProductSlug(slug);
+    const product = products.find((entry) => entry.slug === slug);
+    if (!product) {
+      return;
+    }
+    const firstVariant = product.variants[0];
+    if (firstVariant) {
+      setSelectedColor(firstVariant.color);
+      setSelectedSize(firstVariant.size);
+    } else {
+      setSelectedColor("");
+      setSelectedSize("");
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (
+      !selectedProduct ||
+      !selectedVariant ||
       !name ||
       !email ||
       !phone ||
-      !category ||
-      !size ||
-      !color ||
+      !selectedVariant.size ||
+      !selectedVariant.color ||
       !measurements ||
       !deliveryAddress.addressLine ||
       !deliveryAddress.city ||
@@ -113,14 +251,16 @@ export default function CustomOrderPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          productSlug: selectedProduct.slug,
+          variantSku: selectedVariant.sku,
           fullName: name.trim(),
           email: email.trim(),
           phone: phone.trim(),
           paymentMethod,
           type: type.trim() || undefined,
-          category,
-          size,
-          color,
+          category: selectedProduct.category,
+          size: selectedVariant.size,
+          color: selectedVariant.color,
           measurements: measurements.trim(),
           notes: notes.trim() || undefined,
           referenceImage,
@@ -160,9 +300,6 @@ export default function CustomOrderPage() {
           <div>
             <p className="text-sm font-medium text-[#1f1b18]">Production timeline</p>
             <p className="text-sm text-[#6b655f]">Custom orders take 7-14 business days to complete.</p>
-            <p className="mt-2 text-sm text-[#1f1b18]">
-              Secure custom order slot with a <span className="font-semibold">GHS {customOrderDepositGhs}</span> payment.
-            </p>
           </div>
         </CardContent>
       </Card>
@@ -170,13 +307,58 @@ export default function CustomOrderPage() {
       <Card className="border-black/10 bg-white/90 shadow-sm">
         <CardHeader>
           <p className="form-section-title">Custom Atelier</p>
-          <CardTitle className="font-heading text-3xl text-[#1f1b18]">Custom Order Request</CardTitle>
+          <CardTitle className="font-heading text-3xl text-[#1f1b18]">Customize From Catalog</CardTitle>
           <p className="text-sm text-[#6b655f]">
-            Select your preferred style details, add delivery address, and proceed to secure payment.
+            Choose a shop product first, then customize it. Product name, price, images, and specs auto-fill from catalog.
           </p>
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
+            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+              <p className="form-section-title">Selected Product *</p>
+              <select
+                className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                value={selectedProductSlug}
+                disabled={isCatalogLoading}
+                onChange={(event) => handleProductChange(event.target.value)}
+              >
+                {isCatalogLoading ? <option>Loading products...</option> : null}
+                {!isCatalogLoading ? (
+                  <>
+                    <option value="" disabled>
+                      Select a product
+                    </option>
+                    {products.map((product) => (
+                      <option key={product.slug} value={product.slug}>
+                        {product.name} · {formatPriceNgn(product.basePrice)}
+                      </option>
+                    ))}
+                  </>
+                ) : null}
+              </select>
+
+              {selectedProduct ? (
+                <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[120px_1fr]">
+                  <img
+                    src={selectedVariant?.image || selectedProduct.image}
+                    alt={selectedProduct.name}
+                    className="h-32 w-full rounded-lg object-cover"
+                  />
+                  <div className="space-y-1">
+                    <p className="text-base font-semibold text-[#1f1b18]">{selectedProduct.name}</p>
+                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{selectedProduct.category}</p>
+                    <p className="text-sm text-[#6b655f]">{selectedProduct.description}</p>
+                    <p className="text-sm font-medium text-[#1f1b18]">
+                      Custom price: {formatPriceNgn(selectedVariant?.price ?? selectedProduct.basePrice)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      SKU: {selectedVariant?.sku ?? "Select color and size"}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
             <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
               <p className="form-section-title">Customer Details</p>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -213,7 +395,7 @@ export default function CustomOrderPage() {
             </div>
 
             <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
-              <p className="form-section-title">Style Details</p>
+              <p className="form-section-title">Customization</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Type</p>
@@ -233,21 +415,8 @@ export default function CustomOrderPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Category *</p>
-                  <select
-                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                    value={category}
-                    onChange={(event) => setCategory(event.target.value)}
-                  >
-                    <option value="" disabled>
-                      Select category
-                    </option>
-                    {categoryOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
+                  <p className="text-sm font-medium">Category</p>
+                  <Input value={selectedProduct?.category ?? ""} disabled className="rounded-xl border-black/15 bg-white" />
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -255,13 +424,14 @@ export default function CustomOrderPage() {
                   <p className="text-sm font-medium">Size *</p>
                   <select
                     className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                    value={size}
-                    onChange={(event) => setSize(event.target.value)}
+                    value={selectedSize}
+                    disabled={!selectedProduct}
+                    onChange={(event) => setSelectedSize(event.target.value)}
                   >
                     <option value="" disabled>
                       Select size
                     </option>
-                    {sizeOptions.map((option) => (
+                    {availableSizes.map((option) => (
                       <option key={option} value={option}>
                         {option}
                       </option>
@@ -272,15 +442,21 @@ export default function CustomOrderPage() {
                   <p className="text-sm font-medium">Color *</p>
                   <select
                     className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
-                    value={color}
-                    onChange={(event) => setColor(event.target.value)}
+                    value={selectedColor}
+                    disabled={!selectedProduct}
+                    onChange={(event) => {
+                      const nextColor = event.target.value;
+                      setSelectedColor(nextColor);
+                      const firstSize = selectedProduct?.variants.find((variant) => variant.color === nextColor)?.size ?? "";
+                      setSelectedSize(firstSize);
+                    }}
                   >
                     <option value="" disabled>
                       Select color
                     </option>
-                    {colorOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
+                    {availableColors.map((option) => (
+                      <option key={`${option.color}-${option.colorCode}`} value={option.color}>
+                        {option.color}
                       </option>
                     ))}
                   </select>
@@ -404,7 +580,7 @@ export default function CustomOrderPage() {
             <p className="text-xs text-muted-foreground">
               Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).
             </p>
-            <Button type="submit" className="rounded-full px-7" disabled={isSubmitting}>
+            <Button type="submit" className="rounded-full px-7" disabled={isSubmitting || !selectedVariant}>
               {isSubmitting
                 ? "Preparing Payment..."
                 : paymentMethod === "card"

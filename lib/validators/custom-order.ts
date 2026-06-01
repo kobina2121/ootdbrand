@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 export const customOrderInitSchema = z.object({
+  productSlug: z.string().min(2),
+  variantSku: z.string().min(2),
   fullName: z.string().min(2),
   email: z.string().email(),
   phone: z.string().min(7),

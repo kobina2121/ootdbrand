@@ -4,9 +4,12 @@ import { Types } from "mongoose";
 
 import { CustomOrderModel } from "@/lib/db/models/custom-order";
 import { connectToDatabase } from "@/lib/db/mongoose";
+import { ProductModel } from "@/lib/db/models/product";
 import type { AppUser } from "@/lib/services/user-service";
 
 export type CreatePendingCustomOrderInput = {
+  productSlug: string;
+  variantSku: string;
   fullName: string;
   email: string;
   phone: string;
@@ -49,25 +52,32 @@ function toValidDate(value?: string | null) {
   return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
-function getCustomOrderDepositAmount() {
-  const raw = process.env.CUSTOM_ORDER_DEPOSIT_GHS?.trim() ?? "150";
-  const parsed = Number(raw);
-
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return 150;
-  }
-
-  return Math.round(parsed);
-}
-
 export async function createPendingCustomOrder(input: CreatePendingCustomOrderInput, user?: AppUser | null) {
   await connectToDatabase();
 
   const paymentReference = `CUS-${randomUUID().slice(0, 10).toUpperCase()}`;
-  const amountTotal = getCustomOrderDepositAmount();
+  const product = await ProductModel.findOne({ slug: input.productSlug.toLowerCase(), isActive: true }).lean();
+
+  if (!product) {
+    throw new Error("Selected product was not found.");
+  }
+
+  const variant = product.variants.find((entry) => entry.sku === input.variantSku);
+
+  if (!variant) {
+    throw new Error("Selected product option was not found.");
+  }
+
+  const amountTotal = variant.priceOverride ?? product.basePrice;
 
   const customOrder = await CustomOrderModel.create({
     userId: user && Types.ObjectId.isValid(user.id) ? new Types.ObjectId(user.id) : undefined,
+    productId: product._id,
+    productSlug: product.slug,
+    productNameSnapshot: product.name,
+    productImageSnapshot: variant.image ?? product.images?.[0] ?? "",
+    variantSkuSnapshot: variant.sku,
+    variantUnitPriceSnapshot: amountTotal,
     fullName: input.fullName,
     email: input.email,
     phone: input.phone,
@@ -214,6 +224,11 @@ export async function listCustomOrders(filters: { status?: "Pending" | "Success"
 
     return docs.map((doc) => ({
       id: String(doc._id),
+      productSlug: doc.productSlug,
+      productName: doc.productNameSnapshot,
+      productImage: doc.productImageSnapshot ?? "",
+      variantSku: doc.variantSkuSnapshot,
+      variantUnitPrice: doc.variantUnitPriceSnapshot,
       paymentReference: doc.paymentReference,
       fullName: doc.fullName,
       email: doc.email,

@@ -13,6 +13,12 @@ const deliveryAddressSchema = new Schema(
 const customOrderSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: false },
+    productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    productSlug: { type: String, required: true, trim: true },
+    productNameSnapshot: { type: String, required: true, trim: true },
+    productImageSnapshot: { type: String, required: false, trim: true },
+    variantSkuSnapshot: { type: String, required: true, trim: true },
+    variantUnitPriceSnapshot: { type: Number, required: true, min: 0 },
     fullName: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
     phone: { type: String, required: true, trim: true },

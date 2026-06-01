@@ -28,6 +28,8 @@ const mockFailPendingCustomOrderByReference = vi.mocked(failPendingCustomOrderBy
 const mockInitializePaystackTransaction = vi.mocked(initializePaystackTransaction);
 
 const validPayload = {
+  productSlug: "arc-hoodie",
+  variantSku: "AH-CRM-S",
   fullName: "Custom Buyer",
   email: "custom@example.com",
   phone: "+233536477207",
