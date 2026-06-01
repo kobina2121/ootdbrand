@@ -145,8 +145,12 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                       <div className="space-y-2">
                         <div className="flex items-start gap-3 rounded-md border border-black/10 p-2">
                           <div className="h-16 w-16 overflow-hidden rounded-md border border-black/10 bg-muted/40">
-                            {order.productImage ? (
-                              <img src={order.productImage} alt={order.productName} className="h-full w-full object-cover" />
+                            {order.referenceImage || order.productImage ? (
+                              <img
+                                src={order.referenceImage || order.productImage}
+                                alt={order.referenceImage ? `${order.productName} reference` : order.productName}
+                                className="h-full w-full object-cover"
+                              />
                             ) : (
                               <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
                                 No image
@@ -186,18 +190,10 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                           <p className="mt-1 text-xs text-muted-foreground">
                             <span className="font-medium text-foreground">Notes:</span> {order.notes || "No notes"}
                           </p>
-                          {order.referenceImage ? (
-                            <a
-                              href={order.referenceImage}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="mt-1 inline-block text-xs text-[#1f1b18] underline"
-                            >
-                              View uploaded reference image
-                            </a>
-                          ) : (
-                            <p className="mt-1 text-xs text-muted-foreground">Reference image: None</p>
-                          )}
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Reference image:</span>{" "}
+                            {order.referenceImage ? "Uploaded" : "None"}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
