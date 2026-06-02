@@ -12,7 +12,7 @@ const defaultDevAdmin = {
   name: "Store Admin",
 } as const;
 
-function getAdminAuthConfig() {
+function getAdminBootstrapConfig() {
   const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || "";
   const adminPassword = process.env.ADMIN_PASSWORD || "";
   const adminName = process.env.ADMIN_NAME?.trim() || "Store Admin";
@@ -73,8 +73,8 @@ export async function findUserByEmail(email: string) {
   };
 }
 
-export async function ensureAdminUserFromEnv() {
-  const { adminEmail, adminPassword, adminName } = getAdminAuthConfig();
+export async function ensureAdminUserBootstrap() {
+  const { adminEmail, adminPassword, adminName } = getAdminBootstrapConfig();
 
   if (!adminEmail || !adminPassword) {
     return null;
@@ -82,26 +82,21 @@ export async function ensureAdminUserFromEnv() {
 
   await connectToDatabase();
 
-  const existing = await UserModel.findOne({ email: adminEmail });
+  const existingAdmin = await UserModel.findOne({ role: "admin" });
+
+  if (existingAdmin) {
+    return toAppUser(existingAdmin);
+  }
+
+  const existingUser = await UserModel.findOne({ email: adminEmail });
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 
-  if (existing) {
-    const hasPassword = Boolean(existing.passwordHash);
-    const isAdmin = existing.role === "admin";
-    let samePassword = false;
-
-    if (hasPassword && existing.passwordHash) {
-      samePassword = await bcrypt.compare(adminPassword, existing.passwordHash);
-    }
-
-    if (existing.name !== adminName || !isAdmin || !samePassword) {
-      existing.name = adminName;
-      existing.role = "admin";
-      existing.passwordHash = passwordHash;
-      await existing.save();
-    }
-
-    return toAppUser(existing);
+  if (existingUser) {
+    existingUser.name = existingUser.name || adminName;
+    existingUser.role = "admin";
+    existingUser.passwordHash = passwordHash;
+    await existingUser.save();
+    return toAppUser(existingUser);
   }
 
   const created = await UserModel.create({
@@ -116,27 +111,8 @@ export async function ensureAdminUserFromEnv() {
 
 export async function verifyUserCredentials(email: string, password: string) {
   const normalizedEmail = email.toLowerCase().trim();
-  const { adminEmail, adminPassword, adminName } = getAdminAuthConfig();
 
-  if (adminEmail && adminPassword && normalizedEmail === adminEmail && password === adminPassword) {
-    try {
-      const adminUser = await ensureAdminUserFromEnv();
-      if (adminUser) {
-        return adminUser;
-      }
-    } catch {
-      // DB can be temporarily unavailable; still allow env-based admin access.
-    }
-
-    return {
-      id: "env-admin",
-      name: adminName,
-      email: adminEmail,
-      role: "admin",
-    } satisfies AppUser;
-  }
-
-  await ensureAdminUserFromEnv();
+  await ensureAdminUserBootstrap();
   const user = await findUserByEmail(normalizedEmail);
 
   if (!user || !user.passwordHash) {
@@ -163,13 +139,9 @@ export async function createCustomerUser(input: {
   password: string;
 }) {
   await connectToDatabase();
+  await ensureAdminUserBootstrap();
 
   const normalizedEmail = input.email.trim().toLowerCase();
-  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-
-  if (adminEmail && normalizedEmail === adminEmail) {
-    throw new DuplicateUserError("This email is reserved for admin access.");
-  }
 
   const existing = await UserModel.findOne({ email: normalizedEmail }).lean();
 
@@ -198,21 +170,18 @@ export async function upsertOAuthCustomerUser(input: {
   email: string;
 }) {
   await connectToDatabase();
+  await ensureAdminUserBootstrap();
 
   const normalizedEmail = input.email.trim().toLowerCase();
-  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const existingAdmin = await UserModel.findOne({ email: normalizedEmail, role: "admin" });
 
-  if (adminEmail && normalizedEmail === adminEmail) {
-    const adminUser = await UserModel.findOne({ email: normalizedEmail });
-
-    if (adminUser) {
-      return {
-        id: String(adminUser._id),
-        name: adminUser.name,
-        email: adminUser.email,
-        role: adminUser.role,
-      } satisfies AppUser;
-    }
+  if (existingAdmin) {
+    return {
+      id: String(existingAdmin._id),
+      name: existingAdmin.name,
+      email: existingAdmin.email,
+      role: existingAdmin.role,
+    } satisfies AppUser;
   }
 
   const displayName = input.name?.trim() || "Customer";

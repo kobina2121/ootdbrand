@@ -42,10 +42,6 @@ export async function POST(request: Request) {
     return NextResponse.json(failure("Unauthorized"), { status: 401 });
   }
 
-  if (session.user.id === "env-admin") {
-    return NextResponse.json(failure("Default env admin password is managed in environment variables."), { status: 400 });
-  }
-
   try {
     const json = await request.json();
     const parsed = changePasswordSchema.safeParse(json);
