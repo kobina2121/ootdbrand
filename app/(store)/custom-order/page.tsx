@@ -303,7 +303,7 @@ export default function CustomOrderPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
+    <div className="mx-auto w-full max-w-4xl space-y-4">
       <Card className="border-black/10 bg-[#f4f3ef] shadow-sm">
         <CardContent className="flex items-start gap-3 p-4 sm:p-5">
           <Clock3 className="mt-0.5 size-5 text-[#3f3a35]" />
@@ -372,14 +372,14 @@ export default function CustomOrderPage() {
               </select>
 
               {selectedProduct ? (
-                <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[120px_1fr]">
+                <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[140px_1fr]">
                   <Image
                     src={selectedProduct.image}
                     alt={selectedProduct.name}
-                    width={120}
-                    height={128}
+                    width={140}
+                    height={160}
                     unoptimized
-                    className="h-32 w-full rounded-lg object-cover"
+                    className="h-40 w-full rounded-lg object-cover"
                   />
                   <div className="space-y-1">
                     <p className="text-base font-semibold text-[#1f1b18]">{selectedProduct.name}</p>
@@ -524,11 +524,11 @@ export default function CustomOrderPage() {
                   disabled={!selectedProduct}
                 />
               </div>
-              <div className="space-y-2">
-                <p className="inline-flex items-center gap-2 text-sm font-medium">
-                  <ImagePlus className="size-4" />
-                  Upload a Picture
-                </p>
+            <div className="space-y-2">
+              <p className="inline-flex items-center gap-2 text-sm font-medium">
+                <ImagePlus className="size-4" />
+                Upload a Picture
+              </p>
                 <Input
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/avif"
@@ -536,9 +536,30 @@ export default function CustomOrderPage() {
                   className="rounded-xl border-black/15"
                 />
                 {photoPreview ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Image
+                      src={photoPreview}
+                      alt="Reference preview"
+                      width={288}
+                      height={192}
+                      unoptimized
+                      className="h-48 w-full rounded-xl border border-black/10 object-cover"
+                    />
+                    {selectedProduct ? (
+                      <Image
+                        src={selectedProduct.image}
+                        alt={`${selectedProduct.name} product preview`}
+                        width={288}
+                        height={192}
+                        unoptimized
+                        className="h-48 w-full rounded-xl border border-black/10 object-cover"
+                      />
+                    ) : null}
+                  </div>
+                ) : selectedProduct ? (
                   <Image
-                    src={photoPreview}
-                    alt="Reference preview"
+                    src={selectedProduct.image}
+                    alt={`${selectedProduct.name} product preview`}
                     width={288}
                     height={192}
                     unoptimized

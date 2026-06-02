@@ -168,9 +168,9 @@ export default function CartPage() {
         <p className="section-subtitle mt-2">Review your picks and continue to secure checkout.</p>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
         <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
             <CardTitle>Cart Items</CardTitle>
             <Button variant="ghost" className="rounded-full" onClick={() => void handleClearCart()}>
               Clear cart
@@ -211,7 +211,7 @@ export default function CartPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm lg:sticky lg:top-24">
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm xl:sticky xl:top-24">
           <CardHeader>
             <CardTitle>Summary</CardTitle>
           </CardHeader>
@@ -236,7 +236,7 @@ export default function CartPage() {
       </div>
 
       <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
           <h2 className="text-2xl font-semibold">You May Also Like</h2>
           <Link
             href="/products"

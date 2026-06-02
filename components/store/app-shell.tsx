@@ -51,8 +51,8 @@ export function AppShell({ children, user }: AppShellProps) {
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)]">
       <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur">
-        <div className="page-container flex items-center justify-between py-3 sm:py-4">
-          <Link href="/" className="shrink-0 pr-3 text-xl font-semibold tracking-tight text-[#1f1b18] lg:pr-6">
+        <div className="page-container flex items-center justify-between gap-3 py-3 sm:py-4">
+          <Link href="/" className="shrink-0 pr-2 text-[1.75rem] font-semibold tracking-tight text-[#1f1b18] sm:text-[1.9rem] lg:pr-6">
             theootd.brand
           </Link>
 
@@ -138,10 +138,10 @@ export function AppShell({ children, user }: AppShellProps) {
             </div>
 
             <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <DialogTrigger className="inline-flex md:hidden">
-                <Menu className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
-              </DialogTrigger>
+            <DialogTrigger className="inline-flex rounded-full border border-black/10 bg-white/80 p-2 shadow-sm md:hidden">
+              <Menu className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Navigation</DialogTitle>
@@ -197,12 +197,12 @@ export function AppShell({ children, user }: AppShellProps) {
         </div>
       </header>
 
-      <main className="page-container flex flex-1 flex-col py-8 pb-24 md:pb-10">{children}</main>
+      <main className="page-container flex flex-1 flex-col py-6 pb-24 sm:py-8 md:pb-10">{children}</main>
 
       <footer className="border-t border-black/10 bg-white">
         <div className="page-container py-12 sm:py-16">
           <div className="pb-10 sm:pb-12">
-            <h2 className="font-heading text-6xl leading-none tracking-tight text-[#1c1b1a] sm:text-7xl">theootd.brand</h2>
+            <h2 className="font-heading text-5xl leading-none tracking-tight text-[#1c1b1a] sm:text-6xl lg:text-7xl">theootd.brand</h2>
             <p className="mt-4 text-xs tracking-[0.28em] text-[#7d7771]">
               ELEVATED WOMENSWEAR FOR EVERY STORY - MADE IN GHANA
             </p>

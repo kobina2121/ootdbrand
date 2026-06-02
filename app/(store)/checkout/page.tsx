@@ -132,7 +132,7 @@ export default function CheckoutPage() {
         <p className="section-subtitle mt-2">Complete your details and continue to secure payment.</p>
       </section>
 
-      <form className="grid gap-6 lg:grid-cols-[2fr_1fr]" onSubmit={onSubmit}>
+      <form className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]" onSubmit={onSubmit}>
         <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
           <CardHeader className="border-b border-black/10 pb-4">
             <div className="inline-flex items-center gap-2 text-[#1f1b18]">
@@ -192,7 +192,7 @@ export default function CheckoutPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm lg:sticky lg:top-24">
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm xl:sticky xl:top-24">
           <CardHeader>
             <div className="inline-flex items-center gap-2">
               <CreditCard className="size-4" />

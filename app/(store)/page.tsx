@@ -102,14 +102,14 @@ export default async function HomePage() {
       <div className="pointer-events-none absolute -left-20 top-20 hidden h-52 w-52 rounded-full bg-[#c8d4bc]/40 blur-3xl md:block animate-drift-x" />
       <div className="pointer-events-none absolute -right-16 top-[28rem] hidden h-64 w-64 rounded-full bg-[#d8c8ba]/35 blur-3xl md:block animate-drift-x-reverse" />
 
-      <section className="animate-fade-up relative h-[68svh] min-h-[500px] overflow-hidden rounded-3xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] lg:h-[88svh] lg:min-h-[780px]">
+      <section className="animate-fade-up relative h-[66svh] min-h-[460px] overflow-hidden rounded-3xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] lg:h-[88svh] lg:min-h-[780px]">
         {heroImages.map((image, index) => (
           <Image
             key={image}
             src={image}
             alt={`theootd.brand hero ${index + 1}`}
             fill
-            sizes="100vw"
+            sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), 1440px"
             className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"
             style={{ animationDelay: `${index * 4}s` }}
             priority={index === 0}
@@ -118,7 +118,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/45 lg:from-black/10 lg:to-black/30" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.26),transparent_36%)]" />
 
-        <div className="animate-fade-up-delay-1 absolute bottom-24 left-1/2 z-10 w-full max-w-4xl -translate-x-1/2 px-4 text-center text-white sm:bottom-28 lg:bottom-20">
+        <div className="animate-fade-up-delay-1 absolute bottom-24 left-1/2 z-10 w-full max-w-4xl -translate-x-1/2 px-5 text-center text-white sm:bottom-28 lg:bottom-20">
           <p className="mb-2 text-xs tracking-[0.35em] text-white/85 sm:text-sm">NEW COLLECTION</p>
           <h1 className="font-heading text-[clamp(2.2rem,8vw,5.7rem)] font-semibold leading-[0.95] drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
             Wear Your Story
@@ -128,7 +128,7 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <div className="animate-fade-up-delay-2 absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 sm:bottom-10 sm:gap-3 animate-soft-float">
+        <div className="animate-fade-up-delay-2 absolute bottom-8 left-1/2 z-10 flex w-[calc(100%-2.5rem)] max-w-max -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-10 sm:w-auto sm:gap-3 animate-soft-float">
           <Link
             href="/products"
             className={cn(

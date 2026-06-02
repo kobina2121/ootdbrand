@@ -97,8 +97,8 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
       </Card>
 
       <Card className="border-black/10 bg-white/90 shadow-sm">
-        <CardContent className="p-0">
-          <Table>
+        <CardContent className="overflow-x-auto p-0">
+          <Table className="min-w-[1080px]">
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead>Reference</TableHead>

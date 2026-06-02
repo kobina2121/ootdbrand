@@ -100,8 +100,8 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
       </Card>
 
       <Card className="border-black/10 bg-white/90 shadow-sm">
-        <CardContent className="p-0">
-          <Table>
+        <CardContent className="overflow-x-auto p-0">
+          <Table className="min-w-[1180px]">
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead>Reference</TableHead>
@@ -144,22 +144,50 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                     </TableCell>
                     <TableCell className="align-top">
                       <div className="space-y-2">
-                        <div className="flex items-start gap-3 rounded-md border border-black/10 p-2">
-                          <div className="h-16 w-16 overflow-hidden rounded-md border border-black/10 bg-muted/40">
-                            {order.referenceImage || order.productImage ? (
-                              <Image
-                                src={order.referenceImage || order.productImage}
-                                alt={order.referenceImage ? `${order.productName} reference` : order.productName}
-                                width={64}
-                                height={64}
-                                unoptimized
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
-                                No image
+                        <div className="space-y-3 rounded-md border border-black/10 p-2">
+                          <div className="grid gap-2 sm:grid-cols-2">
+                            <div className="space-y-1">
+                              <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                                Product image
+                              </p>
+                              <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40">
+                                {order.productImage ? (
+                                  <Image
+                                    src={order.productImage}
+                                    alt={order.productName}
+                                    width={240}
+                                    height={180}
+                                    unoptimized
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
+                                    No product image
+                                  </div>
+                                )}
                               </div>
-                            )}
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                                Uploaded reference
+                              </p>
+                              <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40">
+                                {order.referenceImage ? (
+                                  <Image
+                                    src={order.referenceImage}
+                                    alt={`${order.productName} reference`}
+                                    width={240}
+                                    height={180}
+                                    unoptimized
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
+                                    No uploaded reference
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
                           <div className="space-y-1">
                             <p className="text-sm font-medium">{order.productName}</p>
@@ -195,8 +223,9 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                             <span className="font-medium text-foreground">Notes:</span> {order.notes || "No notes"}
                           </p>
                           <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Reference image:</span>{" "}
-                            {order.referenceImage ? "Uploaded" : "None"}
+                            <span className="font-medium text-foreground">Images:</span>{" "}
+                            {order.productImage ? "Product image saved" : "No product image"}
+                            {order.referenceImage ? " + uploaded reference" : " + no uploaded reference"}
                           </p>
                         </div>
                       </div>
