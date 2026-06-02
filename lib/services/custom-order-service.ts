@@ -26,6 +26,7 @@ export type CreatePendingCustomOrderInput = {
   additionalMeasurements?: string;
   notes?: string;
   referenceImage?: string;
+  referenceImages?: string[];
   deliveryAddress: {
     addressLine: string;
     city: string;
@@ -85,6 +86,14 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     .join(" | ");
   const variantSkuSnapshot = leadVariant?.sku ?? `CUSTOM-${product.slug.toUpperCase()}`;
   const productImageSnapshot = leadVariant?.image ?? product.images?.[0] ?? "";
+  const normalizedReferenceImages = Array.from(
+    new Set(
+      (input.referenceImages ?? [])
+        .map((image) => image.trim())
+        .filter(Boolean),
+    ),
+  );
+  const primaryReferenceImage = normalizedReferenceImages[0] ?? input.referenceImage?.trim() ?? undefined;
 
   const customOrder = await CustomOrderModel.create({
     userId: user && Types.ObjectId.isValid(user.id) ? new Types.ObjectId(user.id) : undefined,
@@ -110,7 +119,8 @@ export async function createPendingCustomOrder(input: CreatePendingCustomOrderIn
     hipSize: input.hipSize.trim(),
     additionalMeasurements: input.additionalMeasurements?.trim() || undefined,
     notes: input.notes || undefined,
-    referenceImage: input.referenceImage || undefined,
+    referenceImage: primaryReferenceImage,
+    referenceImages: normalizedReferenceImages,
     deliveryAddress: input.deliveryAddress,
     amountTotal,
     currency: "GHS",
@@ -280,6 +290,12 @@ export async function listCustomOrders(filters: { status?: "Pending" | "Success"
       additionalMeasurements: doc.additionalMeasurements ?? "",
       notes: doc.notes ?? "",
       referenceImage: doc.referenceImage ?? "",
+      referenceImages:
+        doc.referenceImages?.length
+          ? doc.referenceImages
+          : doc.referenceImage
+            ? [doc.referenceImage]
+            : [],
       paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
       paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
       paidAt: doc.paidAt ?? null,
@@ -335,6 +351,12 @@ export async function getCustomOrdersByUserId(userId: string) {
     additionalMeasurements: doc.additionalMeasurements ?? "",
     notes: doc.notes ?? "",
     referenceImage: doc.referenceImage ?? "",
+    referenceImages:
+      doc.referenceImages?.length
+        ? doc.referenceImages
+        : doc.referenceImage
+          ? [doc.referenceImage]
+          : [],
     paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
     paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
     paidAt: doc.paidAt ?? null,

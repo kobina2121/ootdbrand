@@ -131,7 +131,14 @@ export default async function AccountOrdersPage() {
               No custom orders yet.
             </p>
           ) : (
-            customOrders.map((order) => (
+            customOrders.map((order) => {
+              const uploadedReferences = order.referenceImages?.length
+                ? order.referenceImages
+                : order.referenceImage
+                  ? [order.referenceImage]
+                  : [];
+
+              return (
               <article key={order.id} className="space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-5">
                 <header className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -150,7 +157,7 @@ export default async function AccountOrdersPage() {
                 </header>
 
                 <div className="space-y-3 rounded-xl border border-black/10 p-3">
-                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,2fr)]">
+                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,2fr)] xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,2fr)]">
                     <div className="space-y-1">
                       <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">Product image</p>
                       {order.productImage ? (
@@ -159,14 +166,21 @@ export default async function AccountOrdersPage() {
                         <div className="flex h-24 w-full items-center justify-center rounded-lg bg-black/5 text-xs text-muted-foreground">No product image</div>
                       )}
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">Uploaded reference</p>
-                      {order.referenceImage ? (
-                        <Image src={order.referenceImage} alt="Custom order reference" width={220} height={220} unoptimized className="h-40 w-full rounded-lg object-cover lg:h-24" />
-                      ) : (
+                    {uploadedReferences.length > 0 ? (
+                      uploadedReferences.map((image, index) => (
+                        <div key={`${order.id}-reference-${index}`} className="space-y-1">
+                          <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            Uploaded reference {index + 1}
+                          </p>
+                          <Image src={image} alt={`Custom order reference ${index + 1}`} width={220} height={220} unoptimized className="h-40 w-full rounded-lg object-cover lg:h-24" />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="space-y-1">
+                        <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">Uploaded reference</p>
                         <div className="flex h-24 w-full items-center justify-center rounded-lg bg-black/5 text-xs text-muted-foreground">No uploaded reference</div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1 self-center">
                       <p className="truncate font-medium">{order.productName}</p>
                       <p className="text-xs text-muted-foreground">
@@ -204,7 +218,8 @@ export default async function AccountOrdersPage() {
                   <span className="text-muted-foreground">Admin update:</span> {order.adminUpdate || "No update yet."}
                 </p>
               </article>
-            ))
+              );
+            })
           )}
         </div>
       </section>

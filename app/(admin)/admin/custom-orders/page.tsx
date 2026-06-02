@@ -143,9 +143,17 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                       </div>
                     </TableCell>
                     <TableCell className="align-top">
+                      {(() => {
+                        const uploadedReferences = order.referenceImages?.length
+                          ? order.referenceImages
+                          : order.referenceImage
+                            ? [order.referenceImage]
+                            : [];
+
+                        return (
                       <div className="space-y-2">
                         <div className="space-y-3 rounded-md border border-black/10 p-2">
-                          <div className="grid gap-2 sm:grid-cols-2">
+                          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                             <div className="space-y-1">
                               <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                                 Product image
@@ -167,27 +175,34 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                                 )}
                               </div>
                             </div>
-                            <div className="space-y-1">
-                              <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                                Uploaded reference
-                              </p>
-                              <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40">
-                                {order.referenceImage ? (
-                                  <Image
-                                    src={order.referenceImage}
-                                    alt={`${order.productName} reference`}
-                                    width={240}
-                                    height={180}
-                                    unoptimized
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
-                                    No uploaded reference
+                            {uploadedReferences.length > 0 ? (
+                              uploadedReferences.map((image, index) => (
+                                <div key={`${order.id}-reference-${index}`} className="space-y-1">
+                                  <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                                    Uploaded reference {index + 1}
+                                  </p>
+                                  <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40">
+                                    <Image
+                                      src={image}
+                                      alt={`${order.productName} reference ${index + 1}`}
+                                      width={240}
+                                      height={180}
+                                      unoptimized
+                                      className="h-full w-full object-cover"
+                                    />
                                   </div>
-                                )}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="space-y-1">
+                                <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                                  Uploaded reference
+                                </p>
+                                <div className="flex h-28 items-center justify-center rounded-md border border-black/10 bg-muted/40 text-[0.65rem] text-muted-foreground">
+                                  No uploaded reference
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
                           <div className="space-y-1">
                             <p className="text-sm font-medium">{order.productName}</p>
@@ -225,10 +240,12 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                           <p className="mt-1 text-xs text-muted-foreground">
                             <span className="font-medium text-foreground">Images:</span>{" "}
                             {order.productImage ? "Product image saved" : "No product image"}
-                            {order.referenceImage ? " + uploaded reference" : " + no uploaded reference"}
+                            {uploadedReferences.length > 0 ? ` + ${uploadedReferences.length} uploaded reference image${uploadedReferences.length > 1 ? "s" : ""}` : " + no uploaded reference"}
                           </p>
                         </div>
                       </div>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell className="align-top">
                       <div className="space-y-1">

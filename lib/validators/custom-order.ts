@@ -15,6 +15,7 @@ export const customOrderInitSchema = z.object({
   additionalMeasurements: z.string().trim().optional(),
   notes: z.string().trim().optional(),
   referenceImage: z.string().trim().optional(),
+  referenceImages: z.array(z.string().trim()).max(6).optional(),
   deliveryAddress: z.object({
     addressLine: z.string().min(5),
     city: z.string().min(2),

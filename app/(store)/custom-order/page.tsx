@@ -65,7 +65,7 @@ export default function CustomOrderPage() {
   const [paymentMethod, setPaymentMethod] = useState<"card" | "mobile_money">("card");
   const [type, setType] = useState("");
   const [notes, setNotes] = useState("");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>({
     addressLine: "",
     city: "",
@@ -96,20 +96,20 @@ export default function CustomOrderPage() {
   const transactionFee = resolveTransactionFeeGhs();
   const selectedCustomOrderTotal = calculateCustomOrderTotal(selectedProductUnitPrice, customizationFee, transactionFee);
 
-  const photoPreview = useMemo(() => {
-    if (!photoFile) {
-      return "";
-    }
-    return URL.createObjectURL(photoFile);
-  }, [photoFile]);
+  const photoPreviews = useMemo(
+    () =>
+      photoFiles.map((file) => ({
+        name: file.name,
+        url: URL.createObjectURL(file),
+      })),
+    [photoFiles],
+  );
 
   useEffect(() => {
     return () => {
-      if (photoPreview) {
-        URL.revokeObjectURL(photoPreview);
-      }
+      photoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
     };
-  }, [photoPreview]);
+  }, [photoPreviews]);
 
   useEffect(() => {
     let isMounted = true;
@@ -159,35 +159,41 @@ export default function CustomOrderPage() {
     };
   }, [preferredProductSlug]);
 
-  const uploadReferenceImage = async () => {
-    if (!photoFile) {
-      return undefined;
+  const uploadReferenceImages = async () => {
+    if (photoFiles.length === 0) {
+      return [];
     }
 
     try {
-      const formData = new FormData();
-      formData.append("file", photoFile);
+      const uploadedImages: string[] = [];
 
-      const response = await fetch("/api/uploads/custom-order-image", {
-        method: "POST",
-        body: formData,
-      });
+      for (const file of photoFiles) {
+        const formData = new FormData();
+        formData.append("file", file);
 
-      const json = (await response.json()) as {
-        ok: boolean;
-        message: string;
-        data: { imagePath?: string };
-      };
+        const response = await fetch("/api/uploads/custom-order-image", {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!response.ok || !json.ok || !json.data.imagePath) {
-        toast.error(json.message || "Could not upload image. Continuing without image.");
-        return undefined;
+        const json = (await response.json()) as {
+          ok: boolean;
+          message: string;
+          data: { imagePath?: string };
+        };
+
+        if (!response.ok || !json.ok || !json.data.imagePath) {
+          toast.error(json.message || "Could not upload image. Continuing without image.");
+          return uploadedImages;
+        }
+
+        uploadedImages.push(json.data.imagePath);
       }
 
-      return json.data.imagePath;
+      return uploadedImages;
     } catch {
       toast.error("Could not upload image. Continuing without image.");
-      return undefined;
+      return [];
     }
   };
 
@@ -237,7 +243,7 @@ export default function CustomOrderPage() {
     setIsSubmitting(true);
 
     try {
-      const referenceImage = await uploadReferenceImage();
+      const referenceImages = await uploadReferenceImages();
       const response = await fetch("/api/custom-order/init", {
         method: "POST",
         headers: {
@@ -257,7 +263,8 @@ export default function CustomOrderPage() {
           hipSize: hipSize.trim(),
           additionalMeasurements: additionalMeasurements.trim() || undefined,
           notes: notes.trim() || undefined,
-          referenceImage,
+          referenceImage: referenceImages[0],
+          referenceImages,
           deliveryAddress: {
             addressLine: deliveryAddress.addressLine.trim(),
             city: deliveryAddress.city.trim(),
@@ -524,47 +531,64 @@ export default function CustomOrderPage() {
                   disabled={!selectedProduct}
                 />
               </div>
-            <div className="space-y-2">
-              <p className="inline-flex items-center gap-2 text-sm font-medium">
-                <ImagePlus className="size-4" />
-                Upload a Picture
-              </p>
+              <div className="space-y-2">
+                <p className="inline-flex items-center gap-2 text-sm font-medium">
+                  <ImagePlus className="size-4" />
+                  Upload Reference Images
+                </p>
                 <Input
                   type="file"
-                  accept="image/jpeg,image/png,image/webp,image/avif"
-                  onChange={(event) => setPhotoFile(event.target.files?.[0] ?? null)}
+                  accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif"
+                  multiple
+                  onChange={(event) => {
+                    const nextFiles = Array.from(event.target.files ?? []).slice(0, 6);
+                    if ((event.target.files?.length ?? 0) > 6) {
+                      toast.error("You can upload up to 6 reference images.");
+                    }
+                    setPhotoFiles(nextFiles);
+                  }}
                   className="rounded-xl border-black/15"
                 />
-                {photoPreview ? (
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <Image
-                      src={photoPreview}
-                      alt="Reference preview"
-                      width={288}
-                      height={192}
-                      unoptimized
-                      className="h-48 w-full rounded-xl border border-black/10 object-cover"
-                    />
-                    {selectedProduct ? (
-                      <Image
-                        src={selectedProduct.image}
-                        alt={`${selectedProduct.name} product preview`}
-                        width={288}
-                        height={192}
-                        unoptimized
-                        className="h-48 w-full rounded-xl border border-black/10 object-cover"
-                      />
-                    ) : null}
+                {selectedProduct || photoPreviews.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                      {selectedProduct ? (
+                        <div className="space-y-1">
+                          <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            Product image
+                          </p>
+                          <Image
+                            src={selectedProduct.image}
+                            alt={`${selectedProduct.name} product preview`}
+                            width={288}
+                            height={192}
+                            unoptimized
+                            className="h-48 w-full rounded-xl border border-black/10 object-cover"
+                          />
+                        </div>
+                      ) : null}
+                      {photoPreviews.map((preview, index) => (
+                        <div key={`${preview.name}-${index}`} className="space-y-1">
+                          <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            Uploaded reference {index + 1}
+                          </p>
+                          <Image
+                            src={preview.url}
+                            alt={`Reference preview ${index + 1}`}
+                            width={288}
+                            height={192}
+                            unoptimized
+                            className="h-48 w-full rounded-xl border border-black/10 object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {photoPreviews.length > 0
+                        ? `${photoPreviews.length} reference image${photoPreviews.length > 1 ? "s" : ""} will be sent with this custom order.`
+                        : "Select one or more reference images if you want to show the exact finish you prefer."}
+                    </p>
                   </div>
-                ) : selectedProduct ? (
-                  <Image
-                    src={selectedProduct.image}
-                    alt={`${selectedProduct.name} product preview`}
-                    width={288}
-                    height={192}
-                    unoptimized
-                    className="h-48 w-full rounded-xl border border-black/10 object-cover sm:w-72"
-                  />
                 ) : null}
               </div>
             </div>

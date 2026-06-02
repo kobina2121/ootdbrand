@@ -41,6 +41,10 @@ const validPayload = {
   additionalMeasurements: "Length 62in",
   notes: "Sleeveless neckline.",
   referenceImage: "/uploads/custom-orders/sample.jpg",
+  referenceImages: [
+    "/uploads/custom-orders/sample.jpg",
+    "/uploads/custom-orders/sample-2.jpg",
+  ],
   deliveryAddress: {
     addressLine: "12 Liberation Road",
     city: "Accra",

@@ -36,6 +36,7 @@ const customOrderSchema = new Schema(
     additionalMeasurements: { type: String, required: false, trim: true },
     notes: { type: String, required: false, trim: true },
     referenceImage: { type: String, required: false, trim: true },
+    referenceImages: [{ type: String, trim: true }],
     deliveryAddress: { type: deliveryAddressSchema, required: true },
     amountTotal: { type: Number, required: true, min: 0 },
     currency: { type: String, required: true, default: "GHS", trim: true },
