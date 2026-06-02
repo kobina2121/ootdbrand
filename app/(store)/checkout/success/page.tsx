@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ClearCartOnSuccess } from "@/components/store/clear-cart-on-success";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
@@ -67,6 +68,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
           <CardTitle className="font-heading text-5xl leading-none">Payment Successful</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <ClearCartOnSuccess />
           <p className="text-sm text-muted-foreground">Your order has been placed and is being prepared.</p>
           <Link href="/orders">
             <Button className="rounded-full">View Orders</Button>
