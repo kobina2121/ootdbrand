@@ -52,11 +52,11 @@ export function AppShell({ children, user }: AppShellProps) {
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)]">
       <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur">
         <div className="page-container flex items-center justify-between gap-3 py-3 sm:py-4">
-          <Link href="/" className="shrink-0 pr-2 text-[1.75rem] font-semibold tracking-tight text-[#1f1b18] sm:text-[1.9rem] lg:pr-6">
+          <Link href="/" className="shrink-0 pr-2 text-[1.5rem] font-semibold tracking-tight text-[#1f1b18] sm:text-[1.75rem] xl:pr-6">
             theootd.brand
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 md:flex lg:gap-6 xl:gap-8">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-5 xl:flex xl:gap-6 2xl:gap-8">
             {visibleNavLinks.map((link) => (
               <Link
                 key={link.href}
@@ -68,13 +68,13 @@ export function AppShell({ children, user }: AppShellProps) {
             ))}
           </nav>
 
-          <div className={`ml-auto flex shrink-0 items-center gap-1.5 lg:gap-2 ${isAdminLoginView ? "md:hidden" : ""}`}>
+          <div className={`ml-auto flex shrink-0 items-center gap-1.5 lg:gap-2 ${isAdminLoginView ? "xl:hidden" : ""}`}>
             {isAdminLoginView ? (
-              <div className="hidden rounded-full border border-black/15 bg-black/[0.03] px-4 py-1.5 md:block">
+              <div className="hidden rounded-full border border-black/15 bg-black/[0.03] px-4 py-1.5 xl:block">
                 <p className="whitespace-nowrap text-[11px] tracking-[0.2em] text-[#3d3732] uppercase">Admin Access</p>
               </div>
             ) : null}
-            <div className="hidden items-center gap-2 lg:flex xl:gap-3">
+            <div className="hidden items-center gap-2 xl:flex xl:gap-3">
               {user ? (
                 <div className="flex items-center gap-2">
                   {user.role === "admin" ? (
@@ -84,12 +84,12 @@ export function AppShell({ children, user }: AppShellProps) {
                       </Button>
                     </Link>
                   ) : (
-                    <span className="max-w-[170px] truncate whitespace-nowrap text-[11px] tracking-[0.14em] uppercase text-muted-foreground xl:max-w-[210px]">
+                    <span className="max-w-[170px] truncate whitespace-nowrap text-[11px] tracking-[0.14em] uppercase text-muted-foreground 2xl:max-w-[210px]">
                       Hi, {user.name || "User"}
                     </span>
                   )}
                   <Link href="/account/security">
-                    <Button variant="ghost" size="sm" className="hidden rounded-full xl:inline-flex">
+                    <Button variant="ghost" size="sm" className="hidden rounded-full 2xl:inline-flex">
                       Change Password
                     </Button>
                   </Link>
@@ -106,7 +106,7 @@ export function AppShell({ children, user }: AppShellProps) {
                 </>
               )}
             </div>
-            <div className="hidden items-center gap-0.5 md:flex lg:gap-1">
+            <div className="hidden items-center gap-0.5 sm:flex lg:gap-1 xl:hidden">
               <Link href="/products">
                 <Button size="icon" variant="ghost">
                   <Search className="h-4 w-4" />
@@ -138,7 +138,7 @@ export function AppShell({ children, user }: AppShellProps) {
             </div>
 
             <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <DialogTrigger className="inline-flex rounded-full border border-black/10 bg-white/80 p-2 shadow-sm md:hidden">
+            <DialogTrigger className="inline-flex rounded-full border border-black/10 bg-white/80 p-2 shadow-sm xl:hidden">
               <Menu className="h-4 w-4" />
               <span className="sr-only">Open menu</span>
             </DialogTrigger>
