@@ -9,13 +9,22 @@ import { failure, success } from "@/lib/api-response";
 export const runtime = "nodejs";
 
 const MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024;
-const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/heic",
+  "image/heif",
+]);
 
 const extensionByMimeType: Record<string, string> = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
   "image/webp": ".webp",
   "image/avif": ".avif",
+  "image/heic": ".heic",
+  "image/heif": ".heif",
 };
 
 export async function POST(request: Request) {
