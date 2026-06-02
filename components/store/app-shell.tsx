@@ -199,7 +199,7 @@ export function AppShell({ children, user }: AppShellProps) {
 
       <main className="page-container flex flex-1 flex-col py-8 pb-24 md:pb-10">{children}</main>
 
-      <footer className="border-t border-black/10 bg-[#f3f1ee]">
+      <footer className="border-t border-black/10 bg-white">
         <div className="page-container py-12 sm:py-16">
           <div className="pb-10 sm:pb-12">
             <h2 className="font-heading text-6xl leading-none tracking-tight text-[#1c1b1a] sm:text-7xl">theootd.brand</h2>
