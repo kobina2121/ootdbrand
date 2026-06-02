@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
@@ -179,7 +180,7 @@ export default function CartPage() {
             {items.map((item) => (
               <div key={item.sku} className="flex flex-col gap-3 rounded-xl border border-black/10 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
-                  <img src={item.image} alt={item.name} className="h-16 w-16 rounded-md object-cover" />
+                  <Image src={item.image} alt={item.name} width={64} height={64} unoptimized className="h-16 w-16 rounded-md object-cover" />
                   <div>
                     <p className="font-medium">{item.name}</p>
                     <p className="text-sm text-muted-foreground">

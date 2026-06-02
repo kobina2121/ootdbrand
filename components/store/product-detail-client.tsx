@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import { AddToCartForm } from "@/components/store/add-to-cart-form";
@@ -54,8 +55,15 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   return (
     <div className="grid gap-8 rounded-3xl border border-black/10 bg-white/85 p-4 shadow-sm lg:grid-cols-2 lg:p-6">
-      <div className="overflow-hidden rounded-2xl">
-        <img src={displayImage} alt={product.name} className="h-[520px] w-full object-cover object-center" />
+      <div className="relative overflow-hidden rounded-2xl">
+        <Image
+          src={displayImage}
+          alt={product.name}
+          width={1200}
+          height={1440}
+          unoptimized
+          className="h-[520px] w-full object-cover object-center"
+        />
       </div>
 
       <section className="space-y-5">

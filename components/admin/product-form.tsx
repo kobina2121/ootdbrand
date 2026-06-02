@@ -1,10 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { DefaultValues } from "react-hook-form";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 
@@ -130,8 +131,8 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   });
 
   const isSubmitting = form.formState.isSubmitting;
-  const uploadedImages = form.watch("images") ?? [];
-  const selectedCategory = form.watch("category");
+  const uploadedImages = useWatch({ control: form.control, name: "images" }) ?? [];
+  const selectedCategory = useWatch({ control: form.control, name: "category" });
   const categoryOptions = productCategories.includes(selectedCategory as (typeof productCategories)[number])
     ? productCategories
     : selectedCategory
@@ -595,9 +596,12 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                         {uploadedImages.map((imagePath, index) => (
                           <div key={`${imagePath}-${index}`} className="space-y-1">
-                            <img
+                            <Image
                               src={imagePath}
                               alt={`Uploaded preview ${index + 1}`}
+                              width={240}
+                              height={112}
+                              unoptimized
                               className="h-28 w-full rounded-md border object-cover"
                             />
                             <Button

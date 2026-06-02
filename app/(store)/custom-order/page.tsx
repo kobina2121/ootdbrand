@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Clock3, CreditCard, ImagePlus, MapPin, Ruler, Shirt, Smartphone } from "lucide-react";
@@ -372,9 +373,12 @@ export default function CustomOrderPage() {
 
               {selectedProduct ? (
                 <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[120px_1fr]">
-                  <img
+                  <Image
                     src={selectedProduct.image}
                     alt={selectedProduct.name}
+                    width={120}
+                    height={128}
+                    unoptimized
                     className="h-32 w-full rounded-lg object-cover"
                   />
                   <div className="space-y-1">
@@ -394,7 +398,7 @@ export default function CustomOrderPage() {
                       Total to pay: {formatPriceNgn(selectedCustomOrderTotal)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Custom order links directly to this product's catalog pricing.
+                      Custom order links directly to this product catalog pricing.
                     </p>
                   </div>
                 </div>
@@ -532,9 +536,12 @@ export default function CustomOrderPage() {
                   className="rounded-xl border-black/15"
                 />
                 {photoPreview ? (
-                  <img
+                  <Image
                     src={photoPreview}
                     alt="Reference preview"
+                    width={288}
+                    height={192}
+                    unoptimized
                     className="h-48 w-full rounded-xl border border-black/10 object-cover sm:w-72"
                   />
                 ) : null}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Ruler } from "lucide-react";
 
@@ -146,9 +147,12 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                         <div className="flex items-start gap-3 rounded-md border border-black/10 p-2">
                           <div className="h-16 w-16 overflow-hidden rounded-md border border-black/10 bg-muted/40">
                             {order.referenceImage || order.productImage ? (
-                              <img
+                              <Image
                                 src={order.referenceImage || order.productImage}
                                 alt={order.referenceImage ? `${order.productName} reference` : order.productName}
+                                width={64}
+                                height={64}
+                                unoptimized
                                 className="h-full w-full object-cover"
                               />
                             ) : (

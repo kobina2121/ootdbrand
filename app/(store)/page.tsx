@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -103,12 +104,15 @@ export default async function HomePage() {
 
       <section className="animate-fade-up relative h-[68svh] min-h-[500px] overflow-hidden rounded-3xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] lg:h-[88svh] lg:min-h-[780px]">
         {heroImages.map((image, index) => (
-          <img
+          <Image
             key={image}
             src={image}
             alt={`theootd.brand hero ${index + 1}`}
+            fill
+            sizes="100vw"
             className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"
             style={{ animationDelay: `${index * 4}s` }}
+            priority={index === 0}
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/45 lg:from-black/10 lg:to-black/30" />
@@ -195,11 +199,7 @@ export default async function HomePage() {
               playsInline
               className="h-full w-full object-cover object-center animate-hero-zoom"
             >
-              <img
-                src={editorialShowcase.image}
-                alt={editorialShowcase.title}
-                className="h-full w-full object-cover object-center animate-hero-zoom"
-              />
+              Your browser does not support the video preview.
             </video>
           </div>
         </div>

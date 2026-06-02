@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ReceiptText } from "lucide-react";
 
@@ -142,7 +143,7 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
                             <div className="flex items-start gap-3">
                               <div className="h-14 w-14 overflow-hidden rounded-md border border-black/10 bg-muted/40">
                                 {item.image ? (
-                                  <img src={item.image} alt={item.productName} className="h-full w-full object-cover" />
+                                  <Image src={item.image} alt={item.productName} width={56} height={56} unoptimized className="h-full w-full object-cover" />
                                 ) : (
                                   <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
                                     No image

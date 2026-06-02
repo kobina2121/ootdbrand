@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -101,10 +102,13 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
               className="min-w-[88%] snap-center sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] xl:min-w-[calc(25%-12px)]"
             >
               <Card className="group h-full overflow-hidden border-[#cfd3d8] bg-white shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-                <div className="aspect-[4/3] overflow-hidden bg-[#dedede] p-6">
-                  <img
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#dedede] p-6">
+                  <Image
                     src={product.image}
                     alt={product.name}
+                    fill
+                    sizes="(max-width: 639px) 88vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
+                    unoptimized
                     className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>

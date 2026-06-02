@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
@@ -77,7 +78,7 @@ export default async function AccountOrdersPage() {
                   {order.items.map((item, itemIndex) => (
                     <div key={`${order.id}-${item.productId}-${itemIndex}`} className="flex items-center gap-3 rounded-xl border border-black/10 p-3">
                       {item.image ? (
-                        <img src={item.image} alt={item.productName} className="h-16 w-16 rounded-lg object-cover" />
+                        <Image src={item.image} alt={item.productName} width={64} height={64} unoptimized className="h-16 w-16 rounded-lg object-cover" />
                       ) : (
                         <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-black/5 text-xs text-muted-foreground">No image</div>
                       )}
@@ -150,7 +151,7 @@ export default async function AccountOrdersPage() {
 
                 <div className="flex items-center gap-3 rounded-xl border border-black/10 p-3">
                   {order.productImage ? (
-                    <img src={order.productImage} alt={order.productName} className="h-16 w-16 rounded-lg object-cover" />
+                    <Image src={order.productImage} alt={order.productName} width={64} height={64} unoptimized className="h-16 w-16 rounded-lg object-cover" />
                   ) : (
                     <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-black/5 text-xs text-muted-foreground">No image</div>
                   )}
@@ -184,7 +185,7 @@ export default async function AccountOrdersPage() {
                 {order.referenceImage ? (
                   <div className="space-y-1">
                     <p className="text-xs tracking-[0.14em] text-muted-foreground">REFERENCE IMAGE</p>
-                    <img src={order.referenceImage} alt="Custom order reference" className="h-40 w-full rounded-xl object-cover sm:w-60" />
+                    <Image src={order.referenceImage} alt="Custom order reference" width={480} height={320} unoptimized className="h-40 w-full rounded-xl object-cover sm:w-60" />
                   </div>
                 ) : null}
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -83,9 +84,11 @@ export function TopSellingCarousel({ items }: { items: Slide[] }) {
               }}
               className="group relative h-[520px] min-w-full snap-center overflow-hidden rounded-xl bg-[#efefef] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:min-w-[calc(50%-8px)] md:h-[620px] lg:min-w-[calc(33.333%-11px)]"
             >
-              <img
+              <Image
                 src={item.image}
                 alt={item.title}
+                fill
+                sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
                 className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/14 via-transparent to-transparent" />

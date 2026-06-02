@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
@@ -24,10 +25,13 @@ export function ProductGrid({ products }: { products: Product[] }) {
           className="group hover-lift overflow-hidden rounded-2xl border-black/10 bg-white/90"
         >
           <CardHeader className="space-y-3 p-3 sm:p-4">
-            <div className="overflow-hidden rounded-xl">
-              <img
+            <div className="relative overflow-hidden rounded-xl">
+              <Image
                 src={product.image}
                 alt={product.name}
+                width={900}
+                height={900}
+                unoptimized
                 className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
