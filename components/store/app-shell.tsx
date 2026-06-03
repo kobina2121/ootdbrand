@@ -118,11 +118,6 @@ export function AppShell({ children, user }: AppShellProps) {
                       </Button>
                     </Link>
                   ) : null}
-                  <Link href="/profile" className="hidden xl:block">
-                    <Button variant="ghost" size="sm" className="rounded-full px-4 text-[11px] tracking-[0.14em] uppercase">
-                      Profile
-                    </Button>
-                  </Link>
                 </div>
               ) : (
                 <>
