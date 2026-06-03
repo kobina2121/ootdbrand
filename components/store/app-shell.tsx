@@ -126,9 +126,6 @@ export function AppShell({ children, user }: AppShellProps) {
                 </div>
               ) : (
                 <>
-                  <Link href="/login" className="hidden xl:block">
-                    <Button variant="ghost" size="sm">Login</Button>
-                  </Link>
                   <Link href="/signup" className="hidden xl:block">
                     <Button size="sm">Sign Up</Button>
                   </Link>
