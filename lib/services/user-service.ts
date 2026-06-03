@@ -45,6 +45,10 @@ type PasswordChangeResult =
   | { ok: true }
   | { ok: false; reason: "invalid-user" | "password-not-set" | "invalid-current-password" | "same-password" };
 
+type ProfileUpdateResult =
+  | { ok: true; user: AppUser; emailChanged: boolean }
+  | { ok: false; reason: "invalid-user" | "duplicate-email" };
+
 function toAppUser(doc: {
   _id: unknown;
   name: string;
@@ -298,4 +302,51 @@ export async function changePasswordForUser(input: {
   await user.save();
 
   return { ok: true };
+}
+
+export async function updateProfileForUser(input: {
+  userId: string;
+  name: string;
+  email: string;
+}): Promise<ProfileUpdateResult> {
+  if (!Types.ObjectId.isValid(input.userId)) {
+    return { ok: false, reason: "invalid-user" };
+  }
+
+  await connectToDatabase();
+
+  const user = await UserModel.findById(input.userId);
+
+  if (!user) {
+    return { ok: false, reason: "invalid-user" };
+  }
+
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const trimmedName = input.name.trim();
+
+  const duplicate = await UserModel.findOne({
+    email: normalizedEmail,
+    _id: { $ne: user._id },
+  }).lean();
+
+  if (duplicate) {
+    return { ok: false, reason: "duplicate-email" };
+  }
+
+  const emailChanged = user.email !== normalizedEmail;
+
+  user.name = trimmedName;
+  user.email = normalizedEmail;
+  await user.save();
+
+  return {
+    ok: true,
+    user: {
+      id: String(user._id),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+    emailChanged,
+  };
 }

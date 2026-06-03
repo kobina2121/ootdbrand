@@ -12,7 +12,11 @@ type ChangePasswordResponse = {
   message: string;
 };
 
-export function ChangePasswordForm() {
+type ChangePasswordFormProps = {
+  cardClassName?: string;
+};
+
+export function ChangePasswordForm({ cardClassName }: ChangePasswordFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,7 +69,7 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm">
+    <Card className={`mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ${cardClassName ?? ""}`}>
       <CardHeader className="space-y-2 border-b border-black/10">
         <p className="text-xs tracking-[0.24em] text-muted-foreground">ACCOUNT SECURITY</p>
         <CardTitle className="font-heading text-5xl leading-none">Change Password</CardTitle>

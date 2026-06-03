@@ -23,7 +23,7 @@ const mobileTabs = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/products", icon: Search, label: "Search" },
   { href: "/cart", icon: ShoppingBag, label: "Cart" },
-  { href: "/orders", icon: UserRound, label: "Account" },
+  { href: "/profile", icon: UserRound, label: "Profile" },
 ];
 
 type AppShellProps = {
@@ -43,6 +43,7 @@ export function AppShell({ children, user }: AppShellProps) {
   const nextPath = searchParams.get("next") ?? "";
   const isAdminLoginView = pathname === "/login" && nextPath.startsWith("/admin");
   const isAdminUser = user?.role === "admin";
+  const profileHref = user ? "/profile" : "/login?next=/profile";
   const visibleNavLinks =
     isAdminLoginView
       ? [{ href: "/", label: "Store Home" }]
@@ -56,12 +57,12 @@ export function AppShell({ children, user }: AppShellProps) {
             theootd.brand
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-5 xl:flex xl:gap-6 2xl:gap-8">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 lg:flex xl:gap-6 2xl:gap-8">
             {visibleNavLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative whitespace-nowrap text-[11px] tracking-[0.16em] uppercase transition lg:text-xs ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1f1b18] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:bg-[#1f1b18]" : "text-muted-foreground hover:text-foreground"}`}
+                className={`relative whitespace-nowrap text-[11px] tracking-[0.14em] uppercase transition xl:text-xs ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1f1b18] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:bg-[#1f1b18]" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {link.label}
               </Link>
@@ -74,46 +75,74 @@ export function AppShell({ children, user }: AppShellProps) {
                 <p className="whitespace-nowrap text-[11px] tracking-[0.2em] text-[#3d3732] uppercase">Admin Access</p>
               </div>
             ) : null}
-            <div className="hidden items-center gap-2 xl:flex xl:gap-3">
+            <div className="hidden items-center gap-2 lg:flex xl:gap-3">
+              {!isAdminLoginView ? (
+                <div className="flex items-center gap-0.5 lg:gap-1">
+                  <Link href="/products">
+                    <Button size="icon" variant="ghost">
+                      <Search className="h-4 w-4" />
+                      <span className="sr-only">Search</span>
+                    </Button>
+                  </Link>
+                  <Link href={profileHref}>
+                    <Button size="icon" variant="ghost">
+                      <UserRound className="h-4 w-4" />
+                      <span className="sr-only">Profile</span>
+                    </Button>
+                  </Link>
+                  <Link href="/cart">
+                    <Button size="icon" variant="ghost" className="relative">
+                      <ShoppingBag className="h-4 w-4" />
+                      {!isAdminUser ? (
+                        <span
+                          suppressHydrationWarning
+                          className={`absolute -right-1 -top-1 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground ${
+                            itemCount > 0 ? "opacity-100" : "opacity-0"
+                          }`}
+                        >
+                          {itemCount > 0 ? itemCount : ""}
+                        </span>
+                      ) : null}
+                      <span className="sr-only">Cart</span>
+                    </Button>
+                  </Link>
+                </div>
+              ) : null}
               {user ? (
                 <div className="flex items-center gap-2">
                   {user.role === "admin" ? (
                     <Link href="/admin/products">
-                      <Button variant="outline" size="sm" className="h-9 rounded-full border-black/20 bg-white/90 px-4">
-                        Admin Panel
+                      <Button variant="outline" size="sm" className="h-9 rounded-full border-black/20 bg-white/90 px-3 xl:px-4">
+                        <span className="xl:hidden">Admin</span>
+                        <span className="hidden xl:inline">Admin Panel</span>
                       </Button>
                     </Link>
-                  ) : (
-                    <span className="max-w-[170px] truncate whitespace-nowrap text-[11px] tracking-[0.14em] uppercase text-muted-foreground 2xl:max-w-[210px]">
-                      Hi, {user.name || "User"}
-                    </span>
-                  )}
-                  <Link href="/account/security">
-                    <Button variant="ghost" size="sm" className="hidden rounded-full 2xl:inline-flex">
-                      Change Password
+                  ) : null}
+                  <Link href="/profile" className="hidden xl:block">
+                    <Button variant="ghost" size="sm" className="rounded-full px-4 text-[11px] tracking-[0.14em] uppercase">
+                      Profile
                     </Button>
                   </Link>
-                  <UserLogoutButton className="h-9 rounded-full border-black/15 bg-white" />
                 </div>
               ) : (
                 <>
-                  <Link href="/login">
+                  <Link href="/login" className="hidden xl:block">
                     <Button variant="ghost" size="sm">Login</Button>
                   </Link>
-                  <Link href="/signup">
+                  <Link href="/signup" className="hidden xl:block">
                     <Button size="sm">Sign Up</Button>
                   </Link>
                 </>
               )}
             </div>
-            <div className="hidden items-center gap-0.5 sm:flex lg:gap-1 xl:hidden">
+            <div className="hidden items-center gap-0.5 sm:flex lg:hidden">
               <Link href="/products">
                 <Button size="icon" variant="ghost">
                   <Search className="h-4 w-4" />
                   <span className="sr-only">Search</span>
                 </Button>
               </Link>
-              <Link href="/orders">
+              <Link href={profileHref}>
                 <Button size="icon" variant="ghost">
                   <UserRound className="h-4 w-4" />
                   <span className="sr-only">Profile</span>
@@ -138,7 +167,7 @@ export function AppShell({ children, user }: AppShellProps) {
             </div>
 
             <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <DialogTrigger className="inline-flex rounded-full border border-black/10 bg-white/80 p-2 shadow-sm xl:hidden">
+            <DialogTrigger className="inline-flex rounded-full border border-black/10 bg-white/80 p-2 shadow-sm lg:hidden">
               <Menu className="h-4 w-4" />
               <span className="sr-only">Open menu</span>
             </DialogTrigger>
@@ -165,9 +194,9 @@ export function AppShell({ children, user }: AppShellProps) {
                           </Button>
                         </Link>
                       ) : null}
-                      <Link href="/account/security" onClick={() => setMobileMenuOpen(false)}>
+                      <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
                         <Button variant="ghost" className="w-full justify-start rounded-full">
-                          Change Password
+                          Profile & Security
                         </Button>
                       </Link>
                       <UserLogoutButton
