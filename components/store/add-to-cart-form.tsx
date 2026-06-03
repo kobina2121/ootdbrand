@@ -78,12 +78,12 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
       <div className="grid gap-3 sm:grid-cols-2">
         {hideVariantSelect ? null : (
           <div>
-            <p className="mb-2 text-sm font-medium">Variant</p>
+            <p className="mb-2 text-sm font-medium text-[#1f1b18] dark:text-white">Variant</p>
             <Select value={activeSku} onValueChange={(value) => setSku(value ?? product.variants[0]?.sku ?? "")}>
-              <SelectTrigger className="h-10 rounded-xl border-black/15 bg-white">
-                <SelectValue placeholder="Select variant" />
-              </SelectTrigger>
-              <SelectContent>
+            <SelectTrigger className="h-11 rounded-xl border-black/15 bg-white dark:border-white/15 dark:bg-[#26211d] dark:text-[#f8f2ec]">
+              <SelectValue placeholder="Select variant" />
+            </SelectTrigger>
+              <SelectContent className="dark:border-white/10 dark:bg-[#171412] dark:text-[#f8f2ec]">
                 {product.variants.map((entry) => (
                   <SelectItem key={entry.sku} value={entry.sku}>
                     {entry.size} · {entry.color} ({entry.stock} left)
@@ -95,7 +95,7 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
         )}
 
         <div>
-          <p className="mb-2 text-sm font-medium">Quantity</p>
+          <p className="mb-2 text-sm font-medium text-[#1f1b18] dark:text-white">Quantity</p>
           <Input
             type="number"
             min={1}
@@ -103,12 +103,12 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
             value={quantity}
             onChange={(event) => setQuantity(Math.min(variant.stock, Math.max(1, Number(event.target.value) || 1)))}
             onFocus={(event) => event.currentTarget.select()}
-            className="h-10 w-28 rounded-xl border-black/15 bg-white"
+            className="h-11 w-28 rounded-xl border-black/15 bg-white dark:border-white/15 dark:bg-[#26211d] dark:text-[#f8f2ec]"
           />
         </div>
       </div>
 
-      <Button size="lg" className="w-full rounded-full sm:w-auto" onClick={onAddToCart} disabled={isAdminUser}>
+      <Button size="lg" className="w-full rounded-full dark:border dark:border-white/10 sm:w-auto" onClick={onAddToCart} disabled={isAdminUser}>
         {isAdminUser
           ? "Admin cannot add to cart"
           : `Add to Cart · ${new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(unitPrice)}`}

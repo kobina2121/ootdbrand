@@ -54,8 +54,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const displayImage = selectedVariant?.image ?? product.image;
 
   return (
-    <div className="grid gap-8 rounded-3xl border border-black/10 bg-white/85 p-4 shadow-sm lg:grid-cols-2 lg:p-6">
-      <div className="relative overflow-hidden rounded-2xl">
+    <div className="grid gap-8 rounded-3xl border border-black/10 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-[#181513]/90 lg:grid-cols-2 lg:p-6">
+      <div className="relative overflow-hidden rounded-2xl border border-black/5 dark:border-white/10 dark:bg-[#221d19]">
         <Image
           src={displayImage}
           alt={product.name}
@@ -67,24 +67,27 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       </div>
 
       <section className="space-y-5">
-        <Badge variant={inStock ? "default" : "destructive"} className="rounded-full">
+        <Badge
+          variant={inStock ? "default" : "destructive"}
+          className="rounded-full dark:border dark:border-white/10 dark:bg-white/10 dark:text-white"
+        >
           {inStock ? "In Stock" : "Out of Stock"}
         </Badge>
 
-        <h1 className="font-heading text-5xl leading-none text-[#1f1b18]">{product.name}</h1>
-        <p className="text-sm text-[#6c655f] sm:text-base">{product.description}</p>
+        <h1 className="font-heading text-5xl leading-none text-[#1f1b18] dark:text-white">{product.name}</h1>
+        <p className="text-sm text-[#6c655f] dark:text-[#d0c7be] sm:text-base">{product.description}</p>
 
-        <div className="space-y-2">
-          <p className="text-sm tracking-[0.18em] text-muted-foreground">SELECT COLOR</p>
+        <div className="space-y-3">
+          <p className="text-sm tracking-[0.18em] text-muted-foreground dark:text-[#bdb0a4]">SELECT COLOR</p>
           <div className="flex flex-wrap gap-2">
             {colorOptions.map((colorOption) => (
               <button
                 key={`color-${colorOption.name}`}
                 type="button"
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${
+                className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
                   selectedColor === colorOption.name
-                    ? "border-black bg-black text-white"
-                    : "border-black/20 bg-white text-black hover:border-black/40"
+                    ? "border-black bg-black text-white shadow-sm dark:border-[#f6eee7] dark:bg-[#f6eee7] dark:text-[#171412]"
+                    : "border-black/20 bg-white text-black hover:border-black/40 dark:border-white/20 dark:bg-[#26211d] dark:text-[#f8f2ec] dark:hover:border-white/40 dark:hover:bg-[#2f2925]"
                 }`}
                 onClick={() => {
                   setSelectedColor(colorOption.name);
@@ -102,19 +105,24 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               </button>
             ))}
           </div>
+          {selectedColor ? (
+            <p className="text-sm text-[#6c655f] dark:text-[#d0c7be]">
+              Selected color: <span className="font-medium text-[#1f1b18] dark:text-[#fff7ef]">{selectedColor}</span>
+            </p>
+          ) : null}
         </div>
 
-        <div className="space-y-2">
-          <p className="text-sm tracking-[0.18em] text-muted-foreground">AVAILABLE SIZES</p>
+        <div className="space-y-3">
+          <p className="text-sm tracking-[0.18em] text-muted-foreground dark:text-[#bdb0a4]">AVAILABLE SIZES</p>
           <div className="flex flex-wrap gap-2">
             {availableSizes.map((size) => (
               <button
                 key={`size-${size}`}
                 type="button"
-                className={`rounded-full border px-3 py-1 text-sm transition ${
+                className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition ${
                   selectedSize === size
-                    ? "border-black bg-black text-white"
-                    : "border-black/20 bg-white text-black hover:border-black/40"
+                    ? "border-black bg-black text-white shadow-sm dark:border-[#f6eee7] dark:bg-[#f6eee7] dark:text-[#171412]"
+                    : "border-black/20 bg-white text-black hover:border-black/40 dark:border-white/20 dark:bg-[#26211d] dark:text-[#f8f2ec] dark:hover:border-white/40 dark:hover:bg-[#2f2925]"
                 }`}
                 onClick={() => setSelectedSize(size)}
               >
@@ -124,14 +132,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           </div>
         </div>
 
-        <p className="text-2xl font-semibold">
+        <p className="text-2xl font-semibold text-[#1f1b18] dark:text-[#fff7ef]">
           {new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(
             product.basePrice,
           )}
         </p>
 
         {inStock && selectedVariant ? (
-          <div className="rounded-2xl border border-black/10 bg-[#f8f6f2] p-4">
+          <div className="rounded-2xl border border-black/10 bg-[#f8f6f2] p-4 dark:border-white/10 dark:bg-[#11100f]">
             <AddToCartForm product={product} sku={selectedVariant.sku} hideVariantSelect />
           </div>
         ) : (

@@ -22,7 +22,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
       {products.map((product) => (
         <Card
           key={product.slug}
-          className="group hover-lift overflow-hidden rounded-2xl border-black/10 bg-white/90"
+          className="group hover-lift overflow-hidden rounded-2xl border-black/10 bg-white/90 dark:border-white/10 dark:bg-[#181513]/90"
         >
           <CardHeader className="space-y-3 p-3 sm:p-4">
             <div className="relative overflow-hidden rounded-xl">
@@ -36,14 +36,14 @@ export function ProductGrid({ products }: { products: Product[] }) {
               />
             </div>
             <div className="space-y-1">
-              <Badge variant="secondary" className="rounded-full bg-black/5 text-[#5c554f]">
+              <Badge variant="secondary" className="rounded-full bg-black/5 text-[#5c554f] dark:bg-white/10 dark:text-[#e0d7cf]">
                 {product.category}
               </Badge>
-              <CardTitle className="text-xl">{product.name}</CardTitle>
+              <CardTitle className="text-xl text-[#1f1b18] dark:text-white">{product.name}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-2 px-3 pb-3 sm:px-4 sm:pb-4">
-            <p className="text-lg font-semibold">{formatPriceNgn(product.price)}</p>
+            <p className="text-lg font-semibold text-[#1f1b18] dark:text-white">{formatPriceNgn(product.price)}</p>
             <p className="text-sm tracking-wide text-[#a47531]">{"★★★★★"} ({(product.rating ?? 5).toFixed(1)})</p>
             {product.sizes.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-1.5">
@@ -51,7 +51,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
                   <Badge
                     key={`${product.slug}-${size}`}
                     variant="outline"
-                    className="rounded-full border-black/20 bg-white px-2.5 text-[0.68rem]"
+                    className="rounded-full border-black/20 bg-white px-2.5 text-[0.68rem] text-[#4f4841] dark:border-white/20 dark:bg-white/10 dark:text-[#f3ece5]"
                   >
                     {size}
                   </Badge>

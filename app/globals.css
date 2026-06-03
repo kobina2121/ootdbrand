@@ -172,15 +172,15 @@
   }
 
   .surface-soft {
-    @apply rounded-3xl border border-black/10 bg-white/85 shadow-sm;
+    @apply rounded-3xl border border-black/10 bg-white/85 shadow-sm dark:border-white/10 dark:bg-[#181513]/85;
   }
 
   .surface-strong {
-    @apply rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] shadow-sm;
+    @apply rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,#1a1715_0%,#100f0e_100%)];
   }
 
   .section-card {
-    @apply rounded-3xl border border-black/10 bg-white/85 shadow-sm;
+    @apply rounded-3xl border border-black/10 bg-white/85 shadow-sm dark:border-white/10 dark:bg-[#181513]/85;
   }
 
   .section-header-label {
@@ -188,11 +188,11 @@
   }
 
   .section-subtitle {
-    @apply text-sm text-[#6e6761] sm:text-base;
+    @apply text-sm text-[#6e6761] dark:text-[#d6cec6] sm:text-base;
   }
 
   .form-section-title {
-    @apply text-sm tracking-[0.22em] text-[#5f5954] uppercase;
+    @apply text-sm tracking-[0.22em] text-[#5f5954] dark:text-[#d4cbc2] uppercase;
   }
 
   .heading-kicker {

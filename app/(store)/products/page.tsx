@@ -67,11 +67,11 @@ export default async function ProductListPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-5 shadow-sm sm:p-7">
+      <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-5 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,#171412_0%,#0f0d0c_100%)] sm:p-7">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
             <p className="text-xs tracking-[0.26em] text-muted-foreground">THEOOTD SHOP</p>
-            <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">All Products</h1>
+            <h1 className="font-heading text-5xl leading-none text-[#1f1b18] dark:text-white sm:text-6xl">All Products</h1>
             <p className="section-subtitle max-w-xl">
               Discover signature silhouettes crafted for confidence, comfort, and timeless elegance.
             </p>
@@ -84,7 +84,7 @@ export default async function ProductListPage({ searchParams }: PageProps) {
               defaultValue={q}
               placeholder="Search products..."
               aria-label="Search products"
-              className="h-10 rounded-full border-black/15 bg-white/90"
+              className="h-10 rounded-full border-black/15 bg-white/90 dark:border-white/15 dark:bg-white/[0.04]"
             />
             <Button type="submit" className="h-10 rounded-full px-5">
               Search
@@ -93,7 +93,7 @@ export default async function ProductListPage({ searchParams }: PageProps) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-black/10 bg-white/80 p-4 shadow-sm">
+      <section className="rounded-2xl border border-black/10 bg-white/80 p-4 shadow-sm dark:border-white/10 dark:bg-[#181513]/80">
         <div className="mb-3 flex items-center justify-between gap-3">
           <p className="text-xs tracking-[0.22em] text-muted-foreground uppercase">
             {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"} available
@@ -140,8 +140,8 @@ export default async function ProductListPage({ searchParams }: PageProps) {
             }))}
           />
         ) : (
-          <div className="rounded-2xl border border-dashed border-black/25 bg-white/70 p-10 text-center">
-            <p className="text-lg font-medium">No products found</p>
+          <div className="rounded-2xl border border-dashed border-black/25 bg-white/70 p-10 text-center dark:border-white/15 dark:bg-[#181513]/75">
+            <p className="text-lg font-medium text-[#1f1b18] dark:text-white">No products found</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {q ? `No match for "${q}". Try another search or clear filters.` : "Try a different category or clear filters."}
             </p>

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { ProfileSettingsForm } from "@/components/account/profile-settings-form";
+import { ThemePreferenceCard } from "@/components/account/theme-preference-card";
 import { ChangePasswordForm } from "@/components/auth/change-password-form";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
 
@@ -15,8 +16,10 @@ export default async function ProfilePage() {
     <div className="mx-auto w-full max-w-5xl space-y-6">
       <section className="surface-strong p-5 sm:p-7">
         <p className="heading-kicker">MY PROFILE</p>
-        <h1 className="mt-2 font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Account Settings</h1>
-        <p className="mt-3 max-w-2xl text-sm text-[#6d6660] sm:text-base">
+        <h1 className="mt-2 font-heading text-5xl leading-none text-[#1f1b18] dark:text-white sm:text-6xl">
+          Account Settings
+        </h1>
+        <p className="mt-3 max-w-2xl text-sm text-[#6d6660] dark:text-[#d6cec6] sm:text-base">
           Manage your account details, keep your password secure, and sign out safely whenever you need to.
         </p>
       </section>
@@ -28,6 +31,7 @@ export default async function ProfilePage() {
           role={session.user.role}
         />
         <div className="space-y-6">
+          <ThemePreferenceCard />
           <ChangePasswordForm cardClassName="max-w-none" />
         </div>
       </div>

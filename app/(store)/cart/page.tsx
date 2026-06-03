@@ -87,12 +87,12 @@ export default function CartPage() {
 
   if (!isHydrated) {
     return (
-      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#171310] dark:text-[#f7efe8]">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Loading cart...</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-white">Loading cart...</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Preparing your cart details.</p>
+          <p className="text-sm text-muted-foreground dark:text-[#cdbfb4]">Preparing your cart details.</p>
         </CardContent>
       </Card>
     );
@@ -100,12 +100,12 @@ export default function CartPage() {
 
   if (userRole === "admin") {
     return (
-      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#171310] dark:text-[#f7efe8]">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Admin Shopping Disabled</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-white">Admin Shopping Disabled</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">Admin accounts cannot place store orders or manage cart items.</p>
+          <p className="text-sm text-muted-foreground dark:text-[#cdbfb4]">Admin accounts cannot place store orders or manage cart items.</p>
           <Link href="/admin/products">
             <Button className="rounded-full">Go to Admin Dashboard</Button>
           </Link>
@@ -116,12 +116,12 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#171310] dark:text-[#f7efe8]">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Your cart is empty</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-white">Your cart is empty</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">Add products to your cart to continue checkout.</p>
+          <p className="text-sm text-muted-foreground dark:text-[#cdbfb4]">Add products to your cart to continue checkout.</p>
           <Link href="/products">
             <Button className="rounded-full">Browse Products</Button>
           </Link>
@@ -163,30 +163,30 @@ export default function CartPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede6_100%)] p-5 shadow-sm sm:p-7">
-        <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Shopping Cart</h1>
-        <p className="section-subtitle mt-2">Review your picks and continue to secure checkout.</p>
+      <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede6_100%)] p-5 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,#171310_0%,#0f0c0a_100%)] sm:p-7">
+        <h1 className="font-heading text-5xl leading-none text-[#1f1b18] dark:text-[#faf3eb] sm:text-6xl">Shopping Cart</h1>
+        <p className="section-subtitle mt-2 dark:text-[#cdbfb4]">Review your picks and continue to secure checkout.</p>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#171310] dark:text-[#f7efe8]">
           <CardHeader className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-            <CardTitle>Cart Items</CardTitle>
-            <Button variant="ghost" className="rounded-full" onClick={() => void handleClearCart()}>
+            <CardTitle className="dark:text-[#fff7ef]">Cart Items</CardTitle>
+            <Button variant="ghost" className="rounded-full dark:text-[#f6eee7] dark:hover:bg-white/10" onClick={() => void handleClearCart()}>
               Clear cart
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             {items.map((item) => (
-              <div key={item.sku} className="flex flex-col gap-3 rounded-xl border border-black/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div key={item.sku} className="flex flex-col gap-3 rounded-xl border border-black/10 p-3 dark:border-white/10 dark:bg-[#211b17] sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <Image src={item.image} alt={item.name} width={64} height={64} unoptimized className="h-16 w-16 rounded-md object-cover" />
                   <div>
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-[#1f1b18] dark:text-[#faf3eb]">{item.name}</p>
+                    <p className="text-sm text-muted-foreground dark:text-[#d4c8bd]">
                       {item.size} · {item.color}
                     </p>
-                    <p className="text-sm text-muted-foreground">{formatPriceNgn(item.unitPrice)}</p>
+                    <p className="text-sm font-medium text-[#4b433c] dark:text-[#f1e7de]">{formatPriceNgn(item.unitPrice)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -194,37 +194,37 @@ export default function CartPage() {
                     value={item.quantity}
                     type="number"
                     min={1}
-                    className="h-9 w-20 rounded-lg border-black/15"
+                    className="h-9 w-20 rounded-lg border-black/15 dark:border-white/15 dark:bg-[#2a241f] dark:text-[#fff6ef]"
                     onFocus={(event) => event.currentTarget.select()}
                     onChange={(event) => {
                       const value = Number(event.target.value) || 1;
                       void handleQuantityUpdate(item.sku, value);
                     }}
                   />
-                  <Button variant="outline" className="rounded-full" onClick={() => void handleRemoveItem(item.sku)}>
+                  <Button variant="outline" className="rounded-full dark:border-white/15 dark:bg-transparent dark:text-[#f6eee7] dark:hover:bg-white/10" onClick={() => void handleRemoveItem(item.sku)}>
                     Remove
                   </Button>
                 </div>
-                {pendingSku === item.sku ? <span className="text-xs text-muted-foreground">Syncing...</span> : null}
+                {pendingSku === item.sku ? <span className="text-xs text-muted-foreground dark:text-[#cdbfb4]">Syncing...</span> : null}
               </div>
             ))}
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm xl:sticky xl:top-24">
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#171310] dark:text-[#f7efe8] xl:sticky xl:top-24">
           <CardHeader>
-            <CardTitle>Summary</CardTitle>
+            <CardTitle className="dark:text-[#fff7ef]">Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm text-[#4f4944] dark:text-[#efe5db]">
               <span>Subtotal</span>
               <span>{formatPriceNgn(subtotal)}</span>
             </div>
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm text-[#4f4944] dark:text-[#efe5db]">
               <span>Transaction fee</span>
               <span>{formatPriceNgn(transactionFee)}</span>
             </div>
-            <div className="flex items-center justify-between font-semibold">
+            <div className="flex items-center justify-between font-semibold text-[#1f1b18] dark:text-[#fff7ef]">
               <span>Total</span>
               <span>{formatPriceNgn(total)}</span>
             </div>
@@ -235,22 +235,22 @@ export default function CartPage() {
         </Card>
       </div>
 
-      <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
+      <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-[#171310] sm:p-6">
         <div className="mb-5 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
-          <h2 className="text-2xl font-semibold">You May Also Like</h2>
+          <h2 className="text-2xl font-semibold text-[#1f1b18] dark:text-[#fff7ef]">You May Also Like</h2>
           <Link
             href="/products"
-            className="text-sm text-muted-foreground transition hover:text-foreground"
+            className="text-sm text-muted-foreground transition hover:text-foreground dark:text-[#cdbfb4] dark:hover:text-white"
           >
             Browse all
           </Link>
         </div>
         {isLoadingSuggestions ? (
-          <p className="text-sm text-muted-foreground">Loading suggestions...</p>
+          <p className="text-sm text-muted-foreground dark:text-[#cdbfb4]">Loading suggestions...</p>
         ) : suggestedProducts.length > 0 ? (
           <ProductGrid products={suggestedProducts} />
         ) : (
-          <p className="text-sm text-muted-foreground">More styles are coming soon.</p>
+          <p className="text-sm text-muted-foreground dark:text-[#cdbfb4]">More styles are coming soon.</p>
         )}
       </section>
     </div>

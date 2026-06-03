@@ -150,12 +150,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="animate-fade-up-delay-1 rounded-2xl border border-black/10 bg-[linear-gradient(125deg,#f7f5f1_0%,#f0ece6_100%)] px-6 py-6 shadow-sm sm:px-10 sm:py-8">
-        <div className="grid gap-5 text-center sm:grid-cols-3 sm:divide-x sm:divide-black/10">
+      <section className="animate-fade-up-delay-1 rounded-2xl border border-black/10 bg-[linear-gradient(125deg,#f7f5f1_0%,#f0ece6_100%)] px-6 py-6 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(125deg,#191512_0%,#100e0d_100%)] sm:px-10 sm:py-8">
+        <div className="grid gap-5 text-center sm:grid-cols-3 sm:divide-x sm:divide-black/10 dark:sm:divide-white/10">
           {brandStats.map((item) => (
             <div key={item.label} className="space-y-1 sm:px-6">
-              <p className="animate-soft-float font-heading text-4xl leading-none tracking-wide text-[#1f1b18] sm:text-5xl">{item.value}</p>
-              <p className="text-[0.68rem] tracking-[0.22em] text-[#6e6761] uppercase sm:text-xs">{item.label}</p>
+              <p className="animate-soft-float font-heading text-4xl leading-none tracking-wide text-[#1f1b18] dark:text-[#faf4ed] sm:text-5xl">{item.value}</p>
+              <p className="text-[0.68rem] tracking-[0.22em] text-[#6e6761] uppercase dark:text-[#cdbfb4] sm:text-xs">{item.label}</p>
             </div>
           ))}
         </div>
@@ -169,19 +169,19 @@ export default async function HomePage() {
         <TopSellingCarousel items={categoryHighlights} />
       </section>
 
-      <section className="animate-fade-up overflow-hidden rounded-3xl border border-black/10 bg-[#f4f3ef] shadow-sm">
+      <section className="animate-fade-up overflow-hidden rounded-3xl border border-black/10 bg-[#f4f3ef] shadow-sm dark:border-white/10 dark:bg-[#151210]">
         <div className="grid lg:grid-cols-2">
-          <div className="relative flex items-center p-7 sm:p-10 lg:p-14">
-            <div className="pointer-events-none absolute right-0 top-0 h-28 w-28 rounded-full bg-[#d9ccc0]/45 blur-3xl" />
+          <div className="relative flex items-center p-7 sm:p-10 lg:p-14 dark:bg-[radial-gradient(circle_at_top_right,rgba(186,160,137,0.14),transparent_34%),linear-gradient(135deg,#151210_0%,#120f0d_100%)]">
+            <div className="pointer-events-none absolute right-0 top-0 h-28 w-28 rounded-full bg-[#d9ccc0]/45 blur-3xl dark:bg-[#8d6c53]/20" />
             <div className="max-w-md space-y-6">
-              <p className="text-xs tracking-[0.3em] text-muted-foreground">{editorialShowcase.label}</p>
-              <h3 className="font-heading text-5xl leading-[0.95] text-[#1d1b1a] sm:text-6xl whitespace-pre-line">
+              <p className="text-xs tracking-[0.3em] text-muted-foreground dark:text-[#cabeb2]">{editorialShowcase.label}</p>
+              <h3 className="font-heading whitespace-pre-line text-5xl leading-[0.95] text-[#1d1b1a] dark:text-[#fbf4ec] sm:text-6xl">
                 {editorialShowcase.title}
               </h3>
-              <p className="text-base leading-relaxed text-[#6e6761]">{editorialShowcase.description}</p>
+              <p className="text-base leading-relaxed text-[#6e6761] dark:text-[#d8ccc1]">{editorialShowcase.description}</p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 border-b border-black/40 pb-1 text-sm tracking-[0.22em] text-[#222]"
+                className="inline-flex items-center gap-2 border-b border-black/40 pb-1 text-sm tracking-[0.22em] text-[#222] transition-colors hover:text-black dark:border-white/35 dark:text-[#f8efe6] dark:hover:text-white"
               >
                 {editorialShowcase.cta}
                 <ArrowRight className="size-4" />
@@ -189,7 +189,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="relative min-h-[420px]">
+          <div className="relative min-h-[420px] border-t border-black/5 dark:border-white/5 lg:border-l lg:border-t-0">
             <video
               src={editorialShowcase.video}
               poster={editorialShowcase.image}
@@ -205,18 +205,21 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="animate-fade-up rounded-2xl border border-black/10 bg-white px-4 py-9 shadow-sm sm:px-6 sm:py-12">
+      <section className="animate-fade-up rounded-2xl border border-black/10 bg-white px-4 py-9 shadow-sm dark:border-white/10 dark:bg-[#151210] sm:px-6 sm:py-12">
         <div className="mx-auto max-w-6xl space-y-8 sm:space-y-10">
           <div className="space-y-4 text-center">
-            <p className="text-[0.7rem] tracking-[0.42em] text-[#5e5e5e]">Products</p>
-            <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f2937] sm:text-5xl">Our Products</h2>
-            <p className="mx-auto max-w-xl text-sm text-[#646464] sm:text-lg">
+            <p className="text-[0.7rem] tracking-[0.42em] text-[#5e5e5e] dark:text-[#c9c0b7]">Products</p>
+            <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f2937] dark:text-[#f8f3ed] sm:text-5xl">Our Products</h2>
+            <p className="mx-auto max-w-xl text-sm text-[#646464] dark:text-[#d2c9c1] sm:text-lg">
               Discover timeless pieces designed for confidence, elegance, and everyday luxury.
             </p>
           </div>
 
           <div className="flex items-center justify-center">
-            <Link href="/products" className="text-xl font-semibold text-[#161616] underline-offset-4 hover:underline">
+            <Link
+              href="/products"
+              className="text-xl font-semibold text-[#161616] underline-offset-4 hover:underline dark:text-[#f7f1ea]"
+            >
               View all
             </Link>
           </div>

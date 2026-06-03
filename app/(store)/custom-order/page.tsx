@@ -295,9 +295,9 @@ export default function CustomOrderPage() {
 
   if (userRole === "admin") {
     return (
-      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Custom Orders Disabled for Admin</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none text-[#1f1b18] dark:text-white">Custom Orders Disabled for Admin</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">Admin accounts cannot place customer custom orders.</p>
@@ -311,32 +311,32 @@ export default function CustomOrderPage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4">
-      <Card className="border-black/10 bg-[#f4f3ef] shadow-sm">
+      <Card className="border-black/10 bg-[#f4f3ef] shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardContent className="flex items-start gap-3 p-4 sm:p-5">
-          <Clock3 className="mt-0.5 size-5 text-[#3f3a35]" />
+          <Clock3 className="mt-0.5 size-5 text-[#3f3a35] dark:text-[#ddd4cb]" />
           <div>
-            <p className="text-sm font-medium text-[#1f1b18]">Production timeline</p>
-            <p className="text-sm text-[#6b655f]">Custom orders take 7-14 business days to complete.</p>
+            <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Production timeline</p>
+            <p className="text-sm text-[#6b655f] dark:text-[#cec5bd]">Custom orders take 7-14 business days to complete.</p>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="border-black/10 bg-white/90 shadow-sm">
+      <Card className="border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
           <p className="form-section-title">Custom Atelier</p>
-          <CardTitle className="font-heading text-3xl text-[#1f1b18]">Customize From Catalog</CardTitle>
-          <p className="text-sm text-[#6b655f]">
+          <CardTitle className="font-heading text-3xl text-[#1f1b18] dark:text-white">Customize From Catalog</CardTitle>
+          <p className="text-sm text-[#6b655f] dark:text-[#cec5bd]">
             Choose a shop product first, then customize it. Product name, price, images, and specs auto-fill from catalog.
           </p>
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
-            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 dark:border-white/10 dark:bg-[#11100f] sm:p-5">
               <p className="form-section-title">Selected Product *</p>
               <div className="space-y-2">
-                <p className="text-sm font-medium">Category *</p>
+                <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Category *</p>
                 <select
-                  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] dark:border-white/15 dark:bg-white/[0.05] dark:text-white"
                   value={selectedCategory}
                   disabled={isCatalogLoading}
                   onChange={(event) => handleCategoryChange(event.target.value)}
@@ -358,7 +358,7 @@ export default function CustomOrderPage() {
               </div>
 
               <select
-                className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] dark:border-white/15 dark:bg-white/[0.05] dark:text-white"
                 value={selectedProductSlug}
                 disabled={isCatalogLoading || !selectedCategory}
                 onChange={(event) => handleProductChange(event.target.value)}
@@ -379,7 +379,7 @@ export default function CustomOrderPage() {
               </select>
 
               {selectedProduct ? (
-                <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[140px_1fr]">
+                <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 dark:border-white/10 dark:bg-white/[0.04] sm:grid-cols-[140px_1fr]">
                   <Image
                     src={selectedProduct.image}
                     alt={selectedProduct.name}
@@ -389,19 +389,19 @@ export default function CustomOrderPage() {
                     className="h-40 w-full rounded-lg object-cover"
                   />
                   <div className="space-y-1">
-                    <p className="text-base font-semibold text-[#1f1b18]">{selectedProduct.name}</p>
+                    <p className="text-base font-semibold text-[#1f1b18] dark:text-white">{selectedProduct.name}</p>
                     <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{selectedProduct.category}</p>
-                    <p className="text-sm text-[#6b655f]">{selectedProduct.description}</p>
-                    <p className="text-sm font-medium text-[#1f1b18]">
+                    <p className="text-sm text-[#6b655f] dark:text-[#cec5bd]">{selectedProduct.description}</p>
+                    <p className="text-sm font-medium text-[#1f1b18] dark:text-white">
                       Product price: {formatPriceNgn(selectedProductUnitPrice)}
                     </p>
-                    <p className="text-sm text-[#6b655f]">
+                    <p className="text-sm text-[#6b655f] dark:text-[#cec5bd]">
                       Customization fee: {formatPriceNgn(customizationFee)}
                     </p>
-                    <p className="text-sm text-[#6b655f]">
+                    <p className="text-sm text-[#6b655f] dark:text-[#cec5bd]">
                       Transaction fee: {formatPriceNgn(transactionFee)}
                     </p>
-                    <p className="text-sm font-semibold text-[#1f1b18]">
+                    <p className="text-sm font-semibold text-[#1f1b18] dark:text-white">
                       Total to pay: {formatPriceNgn(selectedCustomOrderTotal)}
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -412,48 +412,48 @@ export default function CustomOrderPage() {
               ) : null}
             </div>
 
-            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 dark:border-white/10 dark:bg-[#11100f] sm:p-5">
               <p className="form-section-title">Customer Details</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Full Name *</p>
+                  <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Full Name *</p>
                   <Input
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder="Your full name"
-                    className="rounded-xl border-black/15"
+                    className="rounded-xl border-black/15 dark:border-white/15"
                   />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Email *</p>
+                  <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Email *</p>
                   <Input
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@example.com"
-                    className="rounded-xl border-black/15"
+                    className="rounded-xl border-black/15 dark:border-white/15"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium">Telephone Number *</p>
+                <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Telephone Number *</p>
                 <Input
                   type="tel"
                   value={phone}
                   onChange={(event) => setPhone(event.target.value)}
                   placeholder="+233 53 647 7207"
-                  className="rounded-xl border-black/15"
+                  className="rounded-xl border-black/15 dark:border-white/15"
                 />
               </div>
             </div>
 
-            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+            <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 dark:border-white/10 dark:bg-[#11100f] sm:p-5">
               <p className="form-section-title">Customization</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Type</p>
+                  <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Type</p>
                   <select
-                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm"
+                    className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] dark:border-white/15 dark:bg-white/[0.05] dark:text-white"
                     value={type}
                     onChange={(event) => setType(event.target.value)}
                   >
@@ -468,34 +468,34 @@ export default function CustomOrderPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Category</p>
-                  <Input value={selectedProduct?.category ?? ""} disabled className="rounded-xl border-black/15 bg-white" />
+                  <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Category</p>
+                  <Input value={selectedProduct?.category ?? ""} disabled className="rounded-xl border-black/15 bg-white dark:border-white/15 dark:bg-white/[0.05] dark:text-white" />
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Size *</p>
+                  <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Size *</p>
                   <Input
                     value={preferredSize}
                     onChange={(event) => setPreferredSize(event.target.value)}
                     placeholder="e.g. XS, S, M, L, XL or custom size"
-                    className="rounded-xl border-black/15"
+                    className="rounded-xl border-black/15 dark:border-white/15"
                     disabled={!selectedProduct}
                   />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Color *</p>
+                  <p className="text-sm font-medium text-[#1f1b18] dark:text-white">Color *</p>
                   <Input
                     value={preferredColor}
                     onChange={(event) => setPreferredColor(event.target.value)}
                     placeholder="e.g. Wine, Ivory, Sage Green, Custom Mix"
-                    className="rounded-xl border-black/15"
+                    className="rounded-xl border-black/15 dark:border-white/15"
                     disabled={!selectedProduct}
                   />
                 </div>
               </div>
               <div className="space-y-3">
-                <p className="inline-flex items-center gap-2 text-sm font-medium">
+                <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] dark:text-white">
                   <Ruler className="size-4" />
                   Body Measurements *
                 </p>
@@ -504,21 +504,21 @@ export default function CustomOrderPage() {
                     value={bustSize}
                     onChange={(event) => setBustSize(event.target.value)}
                     placeholder="Bust size (in/cm)"
-                    className="rounded-xl border-black/15"
+                    className="rounded-xl border-black/15 dark:border-white/15"
                     disabled={!selectedProduct}
                   />
                   <Input
                     value={waistSize}
                     onChange={(event) => setWaistSize(event.target.value)}
                     placeholder="Waist size (in/cm)"
-                    className="rounded-xl border-black/15"
+                    className="rounded-xl border-black/15 dark:border-white/15"
                     disabled={!selectedProduct}
                   />
                   <Input
                     value={hipSize}
                     onChange={(event) => setHipSize(event.target.value)}
                     placeholder="Hip size (in/cm)"
-                    className="rounded-xl border-black/15"
+                    className="rounded-xl border-black/15 dark:border-white/15"
                     disabled={!selectedProduct}
                   />
                 </div>
@@ -527,12 +527,12 @@ export default function CustomOrderPage() {
                   value={additionalMeasurements}
                   onChange={(event) => setAdditionalMeasurements(event.target.value)}
                   placeholder="Additional measurements (optional): shoulder, sleeve, dress length, inseam, etc."
-                  className="rounded-xl border-black/15"
+                  className="rounded-xl border-black/15 dark:border-white/15"
                   disabled={!selectedProduct}
                 />
               </div>
               <div className="space-y-2">
-                <p className="inline-flex items-center gap-2 text-sm font-medium">
+                <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] dark:text-white">
                   <ImagePlus className="size-4" />
                   Upload Reference Images
                 </p>
@@ -547,7 +547,7 @@ export default function CustomOrderPage() {
                     }
                     setPhotoFiles(nextFiles);
                   }}
-                  className="rounded-xl border-black/15"
+                  className="rounded-xl border-black/15 dark:border-white/15"
                 />
                 {selectedProduct || photoPreviews.length > 0 ? (
                   <div className="space-y-3">
@@ -563,7 +563,7 @@ export default function CustomOrderPage() {
                             width={288}
                             height={192}
                             unoptimized
-                            className="h-48 w-full rounded-xl border border-black/10 object-cover"
+                            className="h-48 w-full rounded-xl border border-black/10 object-cover dark:border-white/10"
                           />
                         </div>
                       ) : null}
@@ -578,7 +578,7 @@ export default function CustomOrderPage() {
                             width={288}
                             height={192}
                             unoptimized
-                            className="h-48 w-full rounded-xl border border-black/10 object-cover"
+                            className="h-48 w-full rounded-xl border border-black/10 object-cover dark:border-white/10"
                           />
                         </div>
                       ))}
@@ -593,8 +593,8 @@ export default function CustomOrderPage() {
               </div>
             </div>
 
-            <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
-              <p className="inline-flex items-center gap-2 text-sm font-medium">
+            <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 dark:border-white/10 dark:bg-[#11100f] sm:p-5">
+              <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] dark:text-white">
                 <MapPin className="size-4" />
                 Delivery Address *
               </p>
@@ -604,14 +604,14 @@ export default function CustomOrderPage() {
                   setDeliveryAddress((previous) => ({ ...previous, addressLine: event.target.value }))
                 }
                 placeholder="Street address / House number"
-                className="rounded-xl border-black/15"
+                className="rounded-xl border-black/15 dark:border-white/15"
               />
               <div className="grid gap-3 sm:grid-cols-2">
                 <Input
                   value={deliveryAddress.city}
                   onChange={(event) => setDeliveryAddress((previous) => ({ ...previous, city: event.target.value }))}
                   placeholder="City"
-                  className="rounded-xl border-black/15"
+                  className="rounded-xl border-black/15 dark:border-white/15"
                 />
                 <Input
                   value={deliveryAddress.stateRegion}
@@ -619,19 +619,19 @@ export default function CustomOrderPage() {
                     setDeliveryAddress((previous) => ({ ...previous, stateRegion: event.target.value }))
                   }
                   placeholder="State / Region"
-                  className="rounded-xl border-black/15"
+                  className="rounded-xl border-black/15 dark:border-white/15"
                 />
               </div>
               <Input
                 value={deliveryAddress.country}
                 onChange={(event) => setDeliveryAddress((previous) => ({ ...previous, country: event.target.value }))}
                 placeholder="Country"
-                className="rounded-xl border-black/15"
+                className="rounded-xl border-black/15 dark:border-white/15"
               />
             </div>
 
             <div className="space-y-2">
-              <p className="inline-flex items-center gap-2 text-sm font-medium">
+              <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] dark:text-white">
                 <Shirt className="size-4" />
                 Extra Notes
               </p>
@@ -640,22 +640,22 @@ export default function CustomOrderPage() {
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
                 placeholder="Any extra request? Sleeve style, neckline, lining, delivery timeline, etc."
-                className="rounded-xl border-black/15"
+                className="rounded-xl border-black/15 dark:border-white/15"
               />
             </div>
 
-            <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+            <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 dark:border-white/10 dark:bg-[#11100f] sm:p-5">
               <p className="form-section-title">Payment Method</p>
-              <div className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-[#1f1b18]">
+              <div className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-[#1f1b18] dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
                 <p className="flex items-center justify-between">
                   <span>Product price</span>
                   <span>{formatPriceNgn(selectedProductUnitPrice)}</span>
                 </p>
-                <p className="mt-1 flex items-center justify-between text-[#6b655f]">
+                <p className="mt-1 flex items-center justify-between text-[#6b655f] dark:text-[#cec5bd]">
                   <span>Customization fee</span>
                   <span>{formatPriceNgn(customizationFee)}</span>
                 </p>
-                <p className="mt-1 flex items-center justify-between text-[#6b655f]">
+                <p className="mt-1 flex items-center justify-between text-[#6b655f] dark:text-[#cec5bd]">
                   <span>Transaction fee</span>
                   <span>{formatPriceNgn(transactionFee)}</span>
                 </p>
@@ -670,8 +670,8 @@ export default function CustomOrderPage() {
                   onClick={() => setPaymentMethod("card")}
                   className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
                     paymentMethod === "card"
-                      ? "border-black bg-black text-white"
-                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50"
+                      ? "border-black bg-black text-white shadow-sm dark:border-white dark:bg-white dark:text-[#171412]"
+                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50 dark:border-white/20 dark:bg-white/[0.05] dark:text-white dark:hover:border-white/40"
                   }`}
                 >
                   <CreditCard className="size-4" />
@@ -682,8 +682,8 @@ export default function CustomOrderPage() {
                   onClick={() => setPaymentMethod("mobile_money")}
                   className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
                     paymentMethod === "mobile_money"
-                      ? "border-black bg-black text-white"
-                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50"
+                      ? "border-black bg-black text-white shadow-sm dark:border-white dark:bg-white dark:text-[#171412]"
+                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50 dark:border-white/20 dark:bg-white/[0.05] dark:text-white dark:hover:border-white/40"
                   }`}
                 >
                   <Smartphone className="size-4" />

@@ -57,23 +57,23 @@ export function ForgotPasswordForm() {
   };
 
   return (
-    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm">
-      <CardHeader className="space-y-2 border-b border-black/10">
+    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
+      <CardHeader className="space-y-2 border-b border-black/10 dark:border-white/10">
         <p className="text-xs tracking-[0.24em] text-muted-foreground">ACCOUNT RECOVERY</p>
-        <CardTitle className="font-heading text-5xl leading-none">Forgot Password</CardTitle>
+        <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Forgot Password</CardTitle>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={onSubmit}>
-          <Input name="email" type="email" placeholder="Enter your email" className="h-11 rounded-xl border-black/15" required />
+          <Input name="email" type="email" placeholder="Enter your email" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
-          {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
+          {successMessage ? <p className="text-sm text-emerald-700 dark:text-emerald-300">{successMessage}</p> : null}
           <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Please wait..." : "Send Reset Link"}
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Remembered your password?{" "}
-          <Link href="/login" className="font-medium text-foreground underline underline-offset-4">
+          <Link href="/login" className="font-medium text-foreground underline underline-offset-4 dark:text-[#faf3eb]">
             Back to login
           </Link>
         </p>

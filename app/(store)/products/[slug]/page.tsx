@@ -78,9 +78,9 @@ export default async function ProductDetailPage({
         }))}
       />
 
-      <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
+      <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-[#181513]/90 sm:p-6">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold">You May Also Like</h2>
+          <h2 className="text-2xl font-semibold text-[#1f1b18] dark:text-white">You May Also Like</h2>
           <Link
             href="/products"
             className="text-sm text-muted-foreground transition hover:text-foreground"

@@ -86,10 +86,10 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
   };
 
   return (
-    <section className="space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
+    <section className="space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-[#181513]/90 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold">Customer Reviews</h2>
+          <h2 className="text-2xl font-semibold text-[#1f1b18] dark:text-white">Customer Reviews</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {reviews.length > 0
               ? `${averageRating.toFixed(1)} / 5 from ${reviews.length} review${reviews.length > 1 ? "s" : ""}`
@@ -99,9 +99,9 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
       </div>
 
       {reviewEligibility === "can_review" ? (
-        <Card className="border-black/10 bg-[#faf9f7]">
+        <Card className="border-black/10 bg-[#faf9f7] dark:border-white/10 dark:bg-[#11100f]">
           <CardHeader>
-            <CardTitle className="text-lg">Leave a Review</CardTitle>
+            <CardTitle className="text-lg text-[#1f1b18] dark:text-white">Leave a Review</CardTitle>
           </CardHeader>
           <CardContent>
             <form className="space-y-3" onSubmit={(event) => void submitReview(event)}>
@@ -151,7 +151,7 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
           <p className="text-sm text-muted-foreground">No reviews yet.</p>
         ) : (
           reviews.map((review) => (
-            <article key={review.id} className="rounded-xl border border-black/10 bg-white p-4">
+            <article key={review.id} className="rounded-xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-medium text-foreground">{review.userName}</p>
                 <p className="text-xs text-muted-foreground">

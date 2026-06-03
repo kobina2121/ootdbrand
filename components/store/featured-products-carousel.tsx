@@ -101,8 +101,8 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
               }}
               className="min-w-[88%] snap-center sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] xl:min-w-[calc(25%-12px)]"
             >
-              <Card className="group h-full overflow-hidden border-[#cfd3d8] bg-white shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#dedede] p-6">
+              <Card className="group h-full overflow-hidden border-[#cfd3d8] bg-white shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-white/10 dark:bg-[#1d1916] dark:shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#dedede] p-6 dark:bg-[#2a2521]">
                   <Image
                     src={product.image}
                     alt={product.name}
@@ -115,26 +115,44 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
                 <CardContent className="space-y-3 p-5 text-center">
                   <Link
                     href={`/products?category=${encodeURIComponent(product.category)}`}
-                    className="inline-flex text-[0.7rem] uppercase tracking-[0.2em] text-[#6b7280] underline-offset-4 transition hover:text-[#1f2937] hover:underline"
+                    className="inline-flex text-[0.7rem] uppercase tracking-[0.2em] text-[#6b7280] underline-offset-4 transition hover:text-[#1f2937] hover:underline dark:text-[#bfb5ab] dark:hover:text-white"
                   >
                     {product.category}
                   </Link>
-                  <h3 className="font-heading text-[1.7rem] leading-tight text-[#1f2937]">{product.name}</h3>
+                  <h3 className="font-heading text-[1.7rem] leading-tight text-[#1f2937] dark:text-[#f8f3ed]">{product.name}</h3>
                   {product.description ? (
-                    <p className="min-h-[3rem] text-sm leading-relaxed text-[#6b7280]">{product.description}</p>
+                    <p className="min-h-[3rem] text-sm leading-relaxed text-[#6b7280] dark:text-[#d2c9c1]">{product.description}</p>
                   ) : null}
-                  <div className="space-y-1 text-sm text-[#5f6368]">
-                    {product.sizes && product.sizes.length > 0 ? <p>Sizes: {product.sizes.join(", ")}</p> : null}
-                    {product.colors && product.colors.length > 0 ? <p>Colors: {product.colors.join(", ")}</p> : null}
+                  <div className="space-y-2 text-sm text-[#5f6368] dark:text-[#d8cfc7]">
+                    {product.sizes && product.sizes.length > 0 ? (
+                      <div className="space-y-1">
+                        <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[#7a7f85] dark:text-[#b6aba1]">
+                          Available Sizes
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-1.5">
+                          {product.sizes.map((size) => (
+                            <span
+                              key={`${product.slug}-featured-size-${size}`}
+                              className="inline-flex min-w-9 items-center justify-center rounded-full border border-black/10 bg-[#f8f5f1] px-2.5 py-1 text-[0.68rem] font-medium text-[#3d3731] dark:border-white/15 dark:bg-[#26211d] dark:text-[#f5ede5]"
+                            >
+                              {size}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                    {product.colors && product.colors.length > 0 ? (
+                      <p className="text-xs text-[#6b6b6b] dark:text-[#beb4ab]">Colors: {product.colors.join(", ")}</p>
+                    ) : null}
                   </div>
                   <p className="text-sm tracking-wide text-[#a47531]">{"★★★★★"} {product.rating ? `(${product.rating.toFixed(1)})` : "(5.0)"}</p>
-                  <p className="pt-2 text-center text-2xl font-semibold text-[#111827]">{product.price}</p>
+                  <p className="pt-2 text-center text-2xl font-semibold text-[#111827] dark:text-[#fff7ef]">{product.price}</p>
                   <div className="pt-1 text-center">
                     <Link
                       href={`/products/${product.slug}`}
                       className={cn(
                         buttonVariants({ variant: "outline", size: "sm" }),
-                        "rounded-full border-black/20 px-5 text-[#1f2937] hover:border-black hover:bg-black hover:text-white",
+                        "rounded-full border-black/20 px-5 text-[#1f2937] hover:border-black hover:bg-black hover:text-white dark:border-white/20 dark:bg-transparent dark:text-[#f6eee7] dark:hover:border-[#f6eee7] dark:hover:bg-[#f6eee7] dark:hover:text-[#15120f]",
                       )}
                     >
                       View Product
@@ -152,10 +170,10 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
           type="button"
           size="icon"
           variant="ghost"
-          className="justify-self-start rounded-full"
+          className="justify-self-start rounded-full dark:text-[#f4ede5] dark:hover:bg-white/10"
           onClick={prev}
         >
-          <ChevronLeft className="size-6 text-[#374151]" />
+          <ChevronLeft className="size-6 text-[#374151] dark:text-[#f4ede5]" />
           <span className="sr-only">Previous featured products</span>
         </Button>
 
@@ -165,10 +183,12 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
               key={dot}
               type="button"
               onClick={() => goTo(dot)}
-              className={`rounded-full transition-all ${activeIndex === dot ? "h-4 w-4 border border-[#1f2937] bg-transparent" : "h-2.5 w-2.5 bg-[#1f2937]/80"}`}
+              className={`rounded-full transition-all ${activeIndex === dot ? "h-4 w-4 border border-[#1f2937] bg-transparent dark:border-[#f4ede5]" : "h-2.5 w-2.5 bg-[#1f2937]/80 dark:bg-[#f4ede5]/70"}`}
               aria-label={`Go to featured product ${dot + 1}`}
             >
-              {activeIndex === dot ? <span className="mx-auto mt-[4px] block h-1.5 w-1.5 rounded-full bg-[#1f2937]" /> : null}
+              {activeIndex === dot ? (
+                <span className="mx-auto mt-[4px] block h-1.5 w-1.5 rounded-full bg-[#1f2937] dark:bg-[#f4ede5]" />
+              ) : null}
             </button>
           ))}
         </div>
@@ -177,10 +197,10 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
           type="button"
           size="icon"
           variant="ghost"
-          className="justify-self-end rounded-full"
+          className="justify-self-end rounded-full dark:text-[#f4ede5] dark:hover:bg-white/10"
           onClick={next}
         >
-          <ChevronRight className="size-6 text-[#374151]" />
+          <ChevronRight className="size-6 text-[#374151] dark:text-[#f4ede5]" />
           <span className="sr-only">Next featured products</span>
         </Button>
       </div>

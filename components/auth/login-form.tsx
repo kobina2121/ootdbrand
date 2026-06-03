@@ -119,12 +119,12 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
   };
 
   return (
-    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm">
-      <CardHeader className="space-y-2 border-b border-black/10">
+    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
+      <CardHeader className="space-y-2 border-b border-black/10 dark:border-white/10">
         <p className="text-xs tracking-[0.24em] text-muted-foreground">
           {nextPath.startsWith("/admin") ? "ADMIN ACCESS" : "WELCOME BACK"}
         </p>
-        <CardTitle className="font-heading text-5xl leading-none">
+        <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">
           {nextPath.startsWith("/admin") ? "Admin Login" : "Login"}
         </CardTitle>
       </CardHeader>
@@ -135,7 +135,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
               <Button
                 type="button"
                 variant="outline"
-                className="mb-4 h-11 w-full rounded-full border-black/20"
+                className="mb-4 h-11 w-full rounded-full border-black/20 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:hover:bg-white/10"
                 onClick={onGoogleSignIn}
                 disabled={isGoogleSubmitting || isSubmitting}
               >
@@ -160,15 +160,15 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
                 {isGoogleSubmitting ? "Redirecting..." : "Continue with Google"}
               </Button>
             ) : googleStatusChecked ? (
-              <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
                 Google sign-in is currently unavailable. Please use email and password.
               </p>
             ) : null}
             {showGoogleOption ? (
               <div className="mb-4 flex items-center gap-3">
-                <div className="h-px flex-1 bg-black/10" />
+                <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
                 <span className="text-xs tracking-[0.2em] text-muted-foreground">OR</span>
-                <div className="h-px flex-1 bg-black/10" />
+                <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
               </div>
             ) : null}
           </>
@@ -178,13 +178,19 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
             name="email"
             type="email"
             placeholder={nextPath.startsWith("/admin") ? "admin@theootd.brand" : "you@example.com"}
-            className="h-11 rounded-xl border-black/15"
+            className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]"
             required
           />
-          <Input name="password" type="password" placeholder="Password" className="h-11 rounded-xl border-black/15" required />
+          <Input
+            name="password"
+            type="password"
+            placeholder="Password"
+            className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]"
+            required
+          />
           {!nextPath.startsWith("/admin") ? (
             <div className="text-center">
-              <Link href="/forgot-password" className="text-sm font-medium text-foreground underline underline-offset-4">
+              <Link href="/forgot-password" className="text-sm font-medium text-foreground underline underline-offset-4 dark:text-[#faf3eb]">
                 Forgot password?
               </Link>
             </div>
@@ -201,7 +207,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
         ) : (
           <p className="mt-4 text-center text-sm text-muted-foreground">
             New here?{" "}
-            <Link href="/signup" className="font-medium text-foreground underline underline-offset-4">
+            <Link href="/signup" className="font-medium text-foreground underline underline-offset-4 dark:text-[#faf3eb]">
               Create account
             </Link>
           </p>

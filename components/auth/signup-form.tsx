@@ -133,17 +133,17 @@ export function SignupForm() {
   };
 
   return (
-    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm">
-      <CardHeader className="space-y-2 border-b border-black/10">
+    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
+      <CardHeader className="space-y-2 border-b border-black/10 dark:border-white/10">
         <p className="text-xs tracking-[0.24em] text-muted-foreground">CREATE ACCOUNT</p>
-        <CardTitle className="font-heading text-5xl leading-none">Create Customer Account</CardTitle>
+        <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Create Customer Account</CardTitle>
       </CardHeader>
       <CardContent>
         {showGoogleOption ? (
           <Button
             type="button"
             variant="outline"
-            className="mb-4 h-11 w-full rounded-full border-black/20"
+            className="mb-4 h-11 w-full rounded-full border-black/20 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:hover:bg-white/10"
             onClick={onGoogleSignup}
             disabled={isGoogleSubmitting || isSubmitting}
           >
@@ -168,29 +168,29 @@ export function SignupForm() {
             {isGoogleSubmitting ? "Redirecting..." : "Continue with Google"}
           </Button>
         ) : googleStatusChecked ? (
-          <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
             Google sign-up is currently unavailable. Please continue with email and password.
           </p>
         ) : null}
         {showGoogleOption ? (
           <div className="mb-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-black/10" />
+            <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
             <span className="text-xs tracking-[0.2em] text-muted-foreground">OR</span>
-            <div className="h-px flex-1 bg-black/10" />
+            <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
           </div>
         ) : null}
         <form className="space-y-4" onSubmit={onSubmit}>
           <div className="space-y-2">
-            <label htmlFor="signup-name" className="text-sm font-medium">Full name</label>
-            <Input id="signup-name" name="name" type="text" placeholder="Your full name" className="h-11 rounded-xl border-black/15" required />
+            <label htmlFor="signup-name" className="text-sm font-medium dark:text-[#faf3eb]">Full name</label>
+            <Input id="signup-name" name="name" type="text" placeholder="Your full name" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
           </div>
           <div className="space-y-2">
-            <label htmlFor="signup-email" className="text-sm font-medium">Email</label>
-            <Input id="signup-email" name="email" type="email" placeholder="Enter your email address" className="h-11 rounded-xl border-black/15" required />
+            <label htmlFor="signup-email" className="text-sm font-medium dark:text-[#faf3eb]">Email</label>
+            <Input id="signup-email" name="email" type="email" placeholder="Enter your email address" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
           </div>
           <div className="space-y-2">
-            <label htmlFor="signup-password" className="text-sm font-medium">Password</label>
-            <Input id="signup-password" name="password" type="password" placeholder="Create a password (min 8 characters)" className="h-11 rounded-xl border-black/15" required />
+            <label htmlFor="signup-password" className="text-sm font-medium dark:text-[#faf3eb]">Password</label>
+            <Input id="signup-password" name="password" type="password" placeholder="Create a password (min 8 characters)" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
           </div>
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
           <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
@@ -199,9 +199,9 @@ export function SignupForm() {
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-foreground underline underline-offset-4">
-            Login
-          </Link>
+            <Link href="/login" className="font-medium text-foreground underline underline-offset-4 dark:text-[#faf3eb]">
+              Login
+            </Link>
         </p>
       </CardContent>
     </Card>

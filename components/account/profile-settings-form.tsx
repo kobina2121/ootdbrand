@@ -87,16 +87,18 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-3xl border-black/10 bg-white/90 shadow-sm">
-        <CardHeader className="space-y-2 border-b border-black/10">
+      <Card className="rounded-3xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
+        <CardHeader className="space-y-2 border-b border-black/10 dark:border-white/10">
           <p className="text-xs tracking-[0.24em] text-muted-foreground">PROFILE</p>
-          <CardTitle className="font-heading text-5xl leading-none">Account Details</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none text-[#1f1b18] dark:text-white">
+            Account Details
+          </CardTitle>
           <p className="text-sm text-muted-foreground">
             Update your name and email while keeping your account secure.
           </p>
         </CardHeader>
         <CardContent className="space-y-5 pt-6">
-          <div className="grid gap-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 text-sm text-[#4c443d] sm:grid-cols-3">
+          <div className="grid gap-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 text-sm text-[#4c443d] dark:border-white/10 dark:bg-white/[0.04] dark:text-[#d7cec5] sm:grid-cols-3">
             <div>
               <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">Current role</p>
               <p className="mt-1 font-medium capitalize">{role}</p>
@@ -119,7 +121,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
                   id="profile-name"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  className="h-11 rounded-xl border-black/15"
+                  className="h-11 rounded-xl border-black/15 dark:border-white/15"
                   placeholder="Your name"
                 />
               </div>
@@ -130,7 +132,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="h-11 rounded-xl border-black/15"
+                  className="h-11 rounded-xl border-black/15 dark:border-white/15"
                   placeholder="you@example.com"
                 />
               </div>
@@ -138,7 +140,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
             {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
             {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
             {emailChangedNotice ? (
-              <p className="text-sm text-[#6b655f]">
+              <p className="text-sm text-[#6b655f] dark:text-[#d0c7bd]">
                 Your email was updated. Sign out and sign back in to refresh it across the whole site.
               </p>
             ) : null}
@@ -156,16 +158,18 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
         </CardContent>
       </Card>
 
-      <Card className="rounded-3xl border-black/10 bg-white/90 shadow-sm">
-        <CardHeader className="space-y-2 border-b border-black/10">
+      <Card className="rounded-3xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
+        <CardHeader className="space-y-2 border-b border-black/10 dark:border-white/10">
           <p className="text-xs tracking-[0.24em] text-muted-foreground">SESSION</p>
-          <CardTitle className="font-heading text-4xl leading-none">Logout</CardTitle>
+          <CardTitle className="font-heading text-4xl leading-none text-[#1f1b18] dark:text-white">
+            Logout
+          </CardTitle>
           <p className="text-sm text-muted-foreground">
             Use this if you are on a shared device or want to switch accounts safely.
           </p>
         </CardHeader>
         <CardContent className="pt-6">
-          <UserLogoutButton className="h-11 rounded-full border-black/15 bg-white px-6" />
+          <UserLogoutButton className="h-11 rounded-full border-black/15 bg-white px-6 dark:border-white/15 dark:bg-white/10" />
         </CardContent>
       </Card>
     </div>

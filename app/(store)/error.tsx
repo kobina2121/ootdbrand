@@ -10,8 +10,8 @@ export default function StorefrontError({
   reset: () => void;
 }) {
   return (
-    <div className="rounded-3xl border border-dashed border-black/25 bg-white/75 p-10 text-center shadow-sm">
-      <h2 className="font-heading text-5xl leading-none">Something went wrong</h2>
+    <div className="rounded-3xl border border-dashed border-black/25 bg-white/75 p-10 text-center shadow-sm dark:border-white/15 dark:bg-[#181513]/90">
+      <h2 className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Something went wrong</h2>
       <p className="mt-2 text-sm text-muted-foreground">
         {error.message || "We could not load this storefront section."}
       </p>

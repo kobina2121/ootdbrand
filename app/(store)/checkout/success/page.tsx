@@ -63,9 +63,9 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
   if (state === "success") {
     return (
-      <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Payment Successful</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Payment Successful</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <ClearCartOnSuccess />
@@ -80,9 +80,9 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
   if (state === "failed") {
     return (
-      <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Payment Failed</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Payment Failed</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">Your payment was not confirmed. You can retry checkout.</p>
@@ -96,9 +96,9 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
   if (state === "missing-reference") {
     return (
-      <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Payment Reference Missing</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Payment Reference Missing</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">We could not verify this payment because no reference was provided.</p>
@@ -112,9 +112,9 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
   if (state === "error") {
     return (
-      <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Verification Error</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Verification Error</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">We could not verify your payment at the moment. Please check your orders shortly.</p>
@@ -127,9 +127,9 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
   }
 
   return (
-    <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+    <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
       <CardHeader>
-        <CardTitle className="font-heading text-5xl leading-none">Payment Pending</CardTitle>
+        <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Payment Pending</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">We are still awaiting confirmation from the payment gateway.</p>

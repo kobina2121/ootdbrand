@@ -69,22 +69,26 @@ export function ChangePasswordForm({ cardClassName }: ChangePasswordFormProps) {
   };
 
   return (
-    <Card className={`mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ${cardClassName ?? ""}`}>
-      <CardHeader className="space-y-2 border-b border-black/10">
+    <Card
+      className={`mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90 ${cardClassName ?? ""}`}
+    >
+      <CardHeader className="space-y-2 border-b border-black/10 dark:border-white/10">
         <p className="text-xs tracking-[0.24em] text-muted-foreground">ACCOUNT SECURITY</p>
-        <CardTitle className="font-heading text-5xl leading-none">Change Password</CardTitle>
+        <CardTitle className="font-heading text-5xl leading-none text-[#1f1b18] dark:text-white">
+          Change Password
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={onSubmit}>
-          <Input name="currentPassword" type="password" placeholder="Current password" className="h-11 rounded-xl border-black/15" required />
+          <Input name="currentPassword" type="password" placeholder="Current password" className="h-11 rounded-xl border-black/15 dark:border-white/15" required />
           <Input
             name="newPassword"
             type="password"
             placeholder="New password (min 8 chars, letters + numbers)"
-            className="h-11 rounded-xl border-black/15"
+            className="h-11 rounded-xl border-black/15 dark:border-white/15"
             required
           />
-          <Input name="confirmPassword" type="password" placeholder="Confirm new password" className="h-11 rounded-xl border-black/15" required />
+          <Input name="confirmPassword" type="password" placeholder="Confirm new password" className="h-11 rounded-xl border-black/15 dark:border-white/15" required />
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
           {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
           <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>

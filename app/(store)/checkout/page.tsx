@@ -25,9 +25,9 @@ export default function CheckoutPage() {
 
   if (!isClientReady) {
     return (
-      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Loading checkout</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Loading checkout</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Preparing your cart...</p>
@@ -38,9 +38,9 @@ export default function CheckoutPage() {
 
   if (userRole === "admin") {
     return (
-      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">Checkout Disabled for Admin</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Checkout Disabled for Admin</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">Admin accounts cannot complete customer checkout.</p>
@@ -54,9 +54,9 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm">
+      <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
         <CardHeader>
-          <CardTitle className="font-heading text-5xl leading-none">No items to checkout</CardTitle>
+          <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">No items to checkout</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Your cart is empty. Add products before checkout.</p>
@@ -127,39 +127,39 @@ export default function CheckoutPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-5 shadow-sm sm:p-7">
-        <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Checkout</h1>
+      <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-5 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,#191512_0%,#100e0d_100%)] sm:p-7">
+        <h1 className="font-heading text-5xl leading-none text-[#1f1b18] dark:text-[#faf3eb] sm:text-6xl">Checkout</h1>
         <p className="section-subtitle mt-2">Complete your details and continue to secure payment.</p>
       </section>
 
       <form className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]" onSubmit={onSubmit}>
-        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm">
-          <CardHeader className="border-b border-black/10 pb-4">
-            <div className="inline-flex items-center gap-2 text-[#1f1b18]">
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
+          <CardHeader className="border-b border-black/10 pb-4 dark:border-white/10">
+            <div className="inline-flex items-center gap-2 text-[#1f1b18] dark:text-[#faf3eb]">
               <MapPin className="size-4" />
               <p className="form-section-title">Shipping Information</p>
             </div>
-            <p className="text-sm text-[#6e6761]">Use the same format as your delivery address for fast dispatch.</p>
+            <p className="text-sm text-[#6e6761] dark:text-[#d5c8bd]">Use the same format as your delivery address for fast dispatch.</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Input name="fullName" placeholder="Full name" required className="rounded-xl border-black/15" />
-            <Input name="email" placeholder="Email" type="email" required className="rounded-xl border-black/15" />
-            <Input name="phone" placeholder="Phone" required className="rounded-xl border-black/15" />
-            <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
+            <Input name="fullName" placeholder="Full name" required className="rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" />
+            <Input name="email" placeholder="Email" type="email" required className="rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" />
+            <Input name="phone" placeholder="Phone" required className="rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" />
+            <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 dark:border-white/10 dark:bg-[#100f0d] sm:p-4">
               <p className="form-section-title">Delivery Address</p>
               <Input
                 name="addressLine"
                 placeholder="Street address / House number"
                 required
-                className="rounded-xl border-black/15"
+                className="rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]"
               />
               <div className="grid gap-3 sm:grid-cols-2">
-                <Input name="city" placeholder="City" required className="rounded-xl border-black/15" />
-                <Input name="stateRegion" placeholder="State / Region" required className="rounded-xl border-black/15" />
+                <Input name="city" placeholder="City" required className="rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" />
+                <Input name="stateRegion" placeholder="State / Region" required className="rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" />
               </div>
-              <Input name="country" placeholder="Country" defaultValue="Ghana" required className="rounded-xl border-black/15" />
+              <Input name="country" placeholder="Country" defaultValue="Ghana" required className="rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" />
             </div>
-            <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
+            <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 dark:border-white/10 dark:bg-[#100f0d] sm:p-4">
               <p className="form-section-title">Payment Method</p>
               <div className="grid gap-2 sm:grid-cols-2">
                 <button
@@ -167,8 +167,8 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("card")}
                   className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
                     paymentMethod === "card"
-                      ? "border-black bg-black text-white"
-                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50"
+                      ? "border-black bg-black text-white dark:border-[#f6eee7] dark:bg-[#f6eee7] dark:text-[#171412]"
+                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:hover:border-white/40"
                   }`}
                 >
                   <CreditCard className="size-4" />
@@ -179,8 +179,8 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("mobile_money")}
                   className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
                     paymentMethod === "mobile_money"
-                      ? "border-black bg-black text-white"
-                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50"
+                      ? "border-black bg-black text-white dark:border-[#f6eee7] dark:bg-[#f6eee7] dark:text-[#171412]"
+                      : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:hover:border-white/40"
                   }`}
                 >
                   <Smartphone className="size-4" />
@@ -192,24 +192,24 @@ export default function CheckoutPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm xl:sticky xl:top-24">
+        <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90 xl:sticky xl:top-24">
           <CardHeader>
-            <div className="inline-flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 dark:text-[#faf3eb]">
               <CreditCard className="size-4" />
               <CardTitle>Order Summary</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">{items.length} item(s) in cart</p>
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm dark:text-[#f4ebe4]">
               <span>Subtotal</span>
               <span>{formatPriceNgn(subtotal)}</span>
             </div>
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm dark:text-[#f4ebe4]">
               <span>Transaction fee</span>
               <span>{formatPriceNgn(transactionFee)}</span>
             </div>
-            <div className="flex items-center justify-between font-semibold">
+            <div className="flex items-center justify-between font-semibold dark:text-[#faf3eb]">
               <span>Total</span>
               <span>{formatPriceNgn(total)}</span>
             </div>
