@@ -133,10 +133,13 @@ export default async function ProductListPage({ searchParams }: PageProps) {
               slug: product.slug,
               name: product.name,
               category: product.category,
+              description: product.description,
               image: product.image,
               price: product.basePrice,
               sizes: [...new Set(product.variants.map((variant) => variant.size))],
+              stockStatus: resolveStockStatus(product.variants.map((variant) => variant.stock)),
               rating: 5,
+              reviewCount: 0,
             }))}
           />
         ) : (
@@ -175,4 +178,18 @@ export default async function ProductListPage({ searchParams }: PageProps) {
       ) : null}
     </div>
   );
+}
+
+function resolveStockStatus(stocks: number[]) {
+  const totalStock = stocks.reduce((sum, stock) => sum + stock, 0);
+
+  if (totalStock <= 0) {
+    return "Out of Stock" as const;
+  }
+
+  if (totalStock <= 5) {
+    return "Low Stock" as const;
+  }
+
+  return "In Stock" as const;
 }
