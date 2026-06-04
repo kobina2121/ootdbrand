@@ -12,6 +12,11 @@ type ProductDetailClientProps = {
 };
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
+  const baseImages = useMemo(() => {
+    const uploaded = product.images?.filter(Boolean) ?? [];
+    return uploaded.length > 0 ? uploaded : [product.image].filter(Boolean);
+  }, [product.image, product.images]);
+
   const colorOptions = useMemo(() => {
     const colorMap = new Map<string, { name: string; code: string }>();
 
@@ -51,19 +56,64 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   }, [product.variants, selectedSize, variantsForColor]);
 
   const inStock = product.variants.some((variant) => variant.stock > 0);
-  const displayImage = selectedVariant?.image ?? product.image;
+  const galleryImages = useMemo(() => {
+    const ordered = [
+      selectedVariant?.image,
+      ...variantsForColor.map((variant) => variant.image),
+      ...baseImages,
+      product.image,
+    ].filter((value): value is string => Boolean(value));
+
+    return Array.from(new Set(ordered));
+  }, [baseImages, product.image, selectedVariant?.image, variantsForColor]);
+
+  const [selectedImage, setSelectedImage] = useState<string>(firstVariant?.image ?? galleryImages[0] ?? product.image);
 
   return (
-    <div className="grid gap-8 rounded-3xl border border-black/10 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-[#181513]/90 lg:grid-cols-2 lg:p-6">
-      <div className="relative overflow-hidden rounded-2xl border border-black/5 dark:border-white/10 dark:bg-[#221d19]">
-        <Image
-          src={displayImage}
-          alt={product.name}
-          width={1200}
-          height={1440}
-          unoptimized
-          className="h-[520px] w-full object-cover object-center"
-        />
+    <div className="grid gap-8 rounded-3xl border border-black/10 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-[#181513]/90 lg:grid-cols-[1.15fr_0.85fr] lg:p-6">
+      <div className="space-y-4">
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-black/5 bg-[#f7f1eb] shadow-[0_18px_44px_rgba(20,17,15,0.08)] dark:border-white/10 dark:bg-[#221d19] dark:shadow-[0_20px_48px_rgba(0,0,0,0.3)]">
+          <Image
+            src={selectedImage}
+            alt={product.name}
+            width={1200}
+            height={1440}
+            unoptimized
+            className="h-[520px] w-full object-cover object-center lg:h-[620px]"
+          />
+        </div>
+
+        {galleryImages.length > 1 ? (
+          <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
+            {galleryImages.map((image, index) => {
+              const isActive = image === selectedImage;
+
+              return (
+                <button
+                  key={`${image}-${index}`}
+                  type="button"
+                  onClick={() => setSelectedImage(image)}
+                  className={`group relative overflow-hidden rounded-2xl border bg-[#f7f1eb] transition-all ${
+                    isActive
+                      ? "border-black shadow-[0_10px_25px_rgba(20,17,15,0.14)] dark:border-[#fff7ef] dark:shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
+                      : "border-black/10 hover:border-black/30 dark:border-white/10 dark:bg-[#221d19] dark:hover:border-white/30"
+                  }`}
+                  aria-label={`View image ${index + 1} of ${galleryImages.length}`}
+                  aria-pressed={isActive}
+                >
+                  <Image
+                    src={image}
+                    alt={`${product.name} preview ${index + 1}`}
+                    width={220}
+                    height={260}
+                    unoptimized
+                    className="h-24 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
 
       <section className="space-y-5">
@@ -92,9 +142,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 onClick={() => {
                   setSelectedColor(colorOption.name);
                   const firstSizeForColor = product.variants.find((variant) => variant.color === colorOption.name)?.size;
+                  const firstImageForColor = product.variants.find((variant) => variant.color === colorOption.name)?.image;
                   if (firstSizeForColor) {
                     setSelectedSize(firstSizeForColor);
                   }
+                  setSelectedImage(firstImageForColor ?? product.images?.[0] ?? product.image);
                 }}
               >
                 <span
@@ -139,7 +191,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </p>
 
         {inStock && selectedVariant ? (
-          <div className="rounded-2xl border border-black/10 bg-[#f8f6f2] p-4 dark:border-white/10 dark:bg-[#11100f]">
+          <div className="rounded-[1.5rem] border border-black/10 bg-[#f8f6f2] p-4 dark:border-white/10 dark:bg-[#11100f]">
             <AddToCartForm product={product} sku={selectedVariant.sku} hideVariantSelect />
           </div>
         ) : (

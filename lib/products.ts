@@ -15,6 +15,7 @@ export type Product = {
   description: string;
   basePrice: number;
   image: string;
+  images?: string[];
   variants: ProductVariant[];
 };
 

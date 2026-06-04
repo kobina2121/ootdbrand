@@ -50,6 +50,7 @@ function toUiProduct(doc: Awaited<ReturnType<typeof ProductModel.findOne>>) {
     description: doc.description,
     basePrice: doc.basePrice,
     image: doc.images[0] ?? "",
+    images: doc.images ?? [],
     variants: doc.variants.map((variant) => ({
       size: variant.size,
       color: variant.color?.name ?? "Unknown",
@@ -97,6 +98,7 @@ export async function listProducts(filters: ProductFilters = {}) {
       description: doc.description,
       basePrice: doc.basePrice,
       image: doc.images[0] ?? "",
+      images: doc.images ?? [],
       variants: doc.variants.map((variant) => ({
         size: variant.size,
         color: variant.color?.name ?? "Unknown",
