@@ -311,7 +311,7 @@
   }
 
   .animate-hero-carousel {
-    animation: hero-carousel-fade 8s ease-in-out infinite;
+    animation: hero-carousel-fade 4s ease-in-out infinite;
     transform-origin: center center;
     opacity: 0;
     will-change: opacity, transform;

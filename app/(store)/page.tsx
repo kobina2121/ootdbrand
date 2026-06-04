@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 const heroImages = [
   "/images/hero/hero-main.jpg",
   "/images/hero/hero-bench.jpg",
+  "/images/hero/hero-walk.jpg",
+  "/images/hero/hero-pose.jpg",
 ] as const;
 
 const categoryHighlights = [
@@ -111,7 +113,7 @@ export default async function HomePage() {
             fill
             sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), 1440px"
             className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"
-            style={{ animationDelay: `${index * 4}s` }}
+            style={{ animationDelay: `${index}s` }}
             priority={index === 0}
           />
         ))}
@@ -162,9 +164,11 @@ export default async function HomePage() {
       </section>
 
       <section className="animate-fade-up-delay-2 space-y-4">
-        <div className="space-y-1 text-center">
-          <h2 className="text-center font-sans text-[18px] font-normal tracking-[0.12em] text-foreground">TOP SELLING</h2>
-          <p className="text-xs text-muted-foreground sm:text-sm">Curated customer favorites from this season.</p>
+        <div className="space-y-4 text-center">
+          <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f2937] dark:text-[#f8f3ed] sm:text-5xl">Top Selling</h2>
+          <p className="mx-auto max-w-xl text-sm text-[#646464] dark:text-[#d2c9c1] sm:text-lg">
+            Curated customer favorites from this season.
+          </p>
         </div>
         <TopSellingCarousel items={categoryHighlights} />
       </section>
@@ -218,7 +222,7 @@ export default async function HomePage() {
           <div className="flex items-center justify-center">
             <Link
               href="/products"
-              className="text-xl font-semibold text-[#161616] underline-offset-4 hover:underline dark:text-[#f7f1ea]"
+              className="inline-flex items-center justify-center rounded-xl border border-[#161616] px-6 py-3 text-base font-medium text-[#161616] transition-colors hover:bg-[#161616] hover:text-white dark:border-[#f7f1ea] dark:text-[#f7f1ea] dark:hover:bg-[#f7f1ea] dark:hover:text-[#151210]"
             >
               View all
             </Link>
