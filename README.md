@@ -16,6 +16,7 @@ npm run start
 Copy `.env.example` to `.env` and fill values:
 
 - `MONGODB_URI`
+- `MONGODB_DIRECT_URI` (optional fallback if SRV DNS lookup fails locally)
 - `MONGODB_DB_NAME` (optional)
 - `NEXTAUTH_SECRET`
 - `ADMIN_EMAIL`
@@ -53,3 +54,4 @@ https://your-domain.com/api/webhooks/paystack
 
 - Admin routes (`/admin/*`) are protected by `proxy.ts` and server-side auth checks.
 - Order statuses are `Pending`, `Success`, `Failed` and are reconciled idempotently by reference.
+- If `mongodb+srv://` DNS resolution is blocked on your network, set `MONGODB_DIRECT_URI` to the standard Atlas `mongodb://host1:27017,host2:27017,...` string and the app will use it before the SRV URI.

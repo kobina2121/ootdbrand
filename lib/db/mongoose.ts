@@ -22,6 +22,7 @@ const TRANSIENT_DB_ERROR_PATTERNS = [
   "could not connect to any servers in your mongodb atlas cluster",
   "econnrefused",
   "etimedout",
+  "querysrv",
 ];
 
 function isTransientDbError(error: unknown) {
@@ -63,14 +64,40 @@ function buildMongoUri(rawUri: string) {
   return parsed.toString();
 }
 
-export async function connectToDatabase() {
+function getMongoConnectionCandidates() {
+  const directMongoUri = process.env.MONGODB_DIRECT_URI?.trim();
   const rawMongoUri = process.env.MONGODB_URI?.trim();
 
-  if (!rawMongoUri) {
+  const candidates = [
+    directMongoUri ? { kind: "direct" as const, uri: buildMongoUri(directMongoUri) } : null,
+    rawMongoUri ? { kind: "srv" as const, uri: buildMongoUri(rawMongoUri) } : null,
+  ].filter((candidate): candidate is { kind: "direct" | "srv"; uri: string } => Boolean(candidate));
+
+  if (!candidates.length) {
     throw new Error("Missing MONGODB_URI environment variable");
   }
 
-  const mongoUri = buildMongoUri(rawMongoUri);
+  return candidates;
+}
+
+function normalizeMongoError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return new Error("Database connection failed");
+  }
+
+  const message = error.message.toLowerCase();
+
+  if (message.includes("querysrv") && message.includes("econnrefused")) {
+    return new Error(
+      "MongoDB SRV DNS lookup failed. Fix local DNS or set MONGODB_DIRECT_URI to the standard mongodb:// Atlas connection string.",
+    );
+  }
+
+  return error;
+}
+
+export async function connectToDatabase() {
+  const candidates = getMongoConnectionCandidates();
 
   if (cached.conn) {
     return cached.conn;
@@ -80,26 +107,28 @@ export async function connectToDatabase() {
     const attemptConnect = async () => {
       let lastError: unknown;
 
-      for (let attempt = 1; attempt <= 3; attempt += 1) {
-        try {
-          return await mongoose.connect(mongoUri, {
-            dbName: process.env.MONGODB_DB_NAME,
-            serverSelectionTimeoutMS: 10000,
-            socketTimeoutMS: 20000,
-            family: 4,
-          });
-        } catch (error) {
-          lastError = error;
+      for (const candidate of candidates) {
+        for (let attempt = 1; attempt <= 3; attempt += 1) {
+          try {
+            return await mongoose.connect(candidate.uri, {
+              dbName: process.env.MONGODB_DB_NAME,
+              serverSelectionTimeoutMS: 10000,
+              socketTimeoutMS: 20000,
+              family: 4,
+            });
+          } catch (error) {
+            lastError = error;
 
-          if (attempt >= 3 || !isTransientDbError(error)) {
-            throw error;
+            if (attempt >= 3 || !isTransientDbError(error)) {
+              break;
+            }
+
+            await sleep(500 * attempt);
           }
-
-          await sleep(500 * attempt);
         }
       }
 
-      throw lastError instanceof Error ? lastError : new Error("Database connection failed");
+      throw normalizeMongoError(lastError);
     };
 
     cached.promise = attemptConnect().catch((error) => {
