@@ -47,48 +47,48 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
 
   return (
     <div className="space-y-5">
-      <Card className="border-black/10 bg-white/85 shadow-sm">
+      <Card className="border-black/10 bg-white/85 shadow-sm dark:border-white/10 dark:bg-zinc-950/75 dark:shadow-black/30">
         <CardHeader className="space-y-4">
           <div>
             <p className="text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">Transactions</p>
             <CardTitle className="font-sans text-2xl font-semibold">Orders</CardTitle>
           </div>
           <div className="grid gap-3 sm:grid-cols-4">
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Total orders</p>
               <p className="text-lg font-semibold">{allOrders.length}</p>
             </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Success</p>
               <p className="text-lg font-semibold">{successCount}</p>
             </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Pending</p>
               <p className="text-lg font-semibold">{pendingCount}</p>
             </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Failed</p>
               <p className="text-lg font-semibold">{failedCount}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href={buildHref(1, "all")}>
-              <Badge variant={status === "all" ? "default" : "outline"} className="rounded-full px-3 py-1">
+              <Badge variant={status === "all" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
                 All
               </Badge>
             </Link>
             <Link href={buildHref(1, "Pending")}>
-              <Badge variant={status === "Pending" ? "default" : "outline"} className="rounded-full px-3 py-1">
+              <Badge variant={status === "Pending" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
                 Pending
               </Badge>
             </Link>
             <Link href={buildHref(1, "Success")}>
-              <Badge variant={status === "Success" ? "default" : "outline"} className="rounded-full px-3 py-1">
+              <Badge variant={status === "Success" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
                 Success
               </Badge>
             </Link>
             <Link href={buildHref(1, "Failed")}>
-              <Badge variant={status === "Failed" ? "default" : "outline"} className="rounded-full px-3 py-1">
+              <Badge variant={status === "Failed" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
                 Failed
               </Badge>
             </Link>
@@ -96,11 +96,11 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
         </CardHeader>
       </Card>
 
-      <Card className="border-black/10 bg-white/90 shadow-sm">
+      <Card className="border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-black/30">
         <CardContent className="overflow-x-auto p-0">
           <Table className="min-w-[1080px]">
             <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableRow className="bg-muted/50 hover:bg-muted/50 dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/[0.05]">
                 <TableHead>Reference</TableHead>
                 <TableHead>Customer & Contact</TableHead>
                 <TableHead>Items Ordered</TableHead>
@@ -139,9 +139,9 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
                     <TableCell className="align-top">
                       <div className="space-y-1">
                         {order.items.map((item) => (
-                          <div key={`${order.id}-${item.variant.sku}`} className="rounded-md border border-black/10 px-2 py-2">
+                          <div key={`${order.id}-${item.variant.sku}`} className="rounded-md border border-black/10 px-2 py-2 dark:border-white/10 dark:bg-white/[0.03]">
                             <div className="flex items-start gap-3">
-                              <div className="h-14 w-14 overflow-hidden rounded-md border border-black/10 bg-muted/40">
+                              <div className="h-14 w-14 overflow-hidden rounded-md border border-black/10 bg-muted/40 dark:border-white/10 dark:bg-white/[0.04]">
                                 {item.image ? (
                                   <Image src={item.image} alt={item.productName} width={56} height={56} unoptimized className="h-full w-full object-cover" />
                                 ) : (
@@ -206,9 +206,9 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
           aria-disabled={safePage <= 1}
           className={safePage <= 1 ? "pointer-events-none opacity-50" : ""}
         >
-          <Button variant="outline" size="sm" className="rounded-full">Prev</Button>
+          <Button variant="outline" size="sm" className="rounded-full dark:border-white/15 dark:bg-white/[0.03] dark:text-white/80 dark:hover:bg-white/[0.06]">Prev</Button>
         </Link>
-        <Badge variant="outline" className="rounded-full border-black/20">
+        <Badge variant="outline" className="rounded-full border-black/20 dark:border-white/15 dark:bg-white/[0.03] dark:text-white/60">
           Page {safePage} of {totalPages}
         </Badge>
         <Link
@@ -216,7 +216,7 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
           aria-disabled={safePage >= totalPages}
           className={safePage >= totalPages ? "pointer-events-none opacity-50" : ""}
         >
-          <Button variant="outline" size="sm" className="rounded-full">Next</Button>
+          <Button variant="outline" size="sm" className="rounded-full dark:border-white/15 dark:bg-white/[0.03] dark:text-white/80 dark:hover:bg-white/[0.06]">Next</Button>
         </Link>
       </div>
     </div>

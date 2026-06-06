@@ -54,7 +54,7 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
 
   return (
     <div className="space-y-5">
-      <Card className="border-black/10 bg-white/85 shadow-sm">
+      <Card className="border-black/10 bg-white/85 shadow-sm dark:border-white/10 dark:bg-zinc-950/75 dark:shadow-black/30">
         <CardHeader className="space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -69,15 +69,15 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Matching products</p>
               <p className="text-lg font-semibold">{pagination.totalCount}</p>
             </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Active (page)</p>
               <p className="text-lg font-semibold">{activeCount}</p>
             </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Inactive (page)</p>
               <p className="text-lg font-semibold">{draftCount}</p>
             </div>
@@ -88,29 +88,38 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
               <Input
                 name="q"
                 defaultValue={q}
-                className="h-10 rounded-full border-black/15 pl-9"
+                className="h-10 rounded-full border-black/15 pl-9 dark:border-white/10 dark:bg-zinc-950/70 dark:text-white dark:placeholder:text-white/40 dark:focus-visible:ring-white/20"
                 placeholder="Search products..."
               />
             </form>
             <div className="flex flex-wrap gap-2">
               <Link href={buildHref(1, "all")}>
-                <Badge variant={status === "all" ? "default" : "outline"} className="rounded-full px-3 py-1">
+                <Badge
+                  variant={status === "all" ? "default" : "outline"}
+                  className="rounded-full px-3 py-1 dark:border-white/15 dark:bg-white/[0.03] dark:text-white/70 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950"
+                >
                   All
                 </Badge>
               </Link>
               <Link href={buildHref(1, "active")}>
-                <Badge variant={status === "active" ? "default" : "outline"} className="rounded-full px-3 py-1">
+                <Badge
+                  variant={status === "active" ? "default" : "outline"}
+                  className="rounded-full px-3 py-1 dark:border-white/15 dark:bg-white/[0.03] dark:text-white/70 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950"
+                >
                   Active
                 </Badge>
               </Link>
               <Link href={buildHref(1, "inactive")}>
-                <Badge variant={status === "inactive" ? "default" : "outline"} className="rounded-full px-3 py-1">
+                <Badge
+                  variant={status === "inactive" ? "default" : "outline"}
+                  className="rounded-full px-3 py-1 dark:border-white/15 dark:bg-white/[0.03] dark:text-white/70 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950"
+                >
                   Inactive
                 </Badge>
               </Link>
               {q ? (
                 <Link href={buildHref(1, status)}>
-                  <Badge variant="secondary" className="rounded-full px-3 py-1">
+                  <Badge variant="secondary" className="rounded-full px-3 py-1 dark:bg-white/[0.08] dark:text-white/80">
                     Search: {q}
                   </Badge>
                 </Link>
@@ -120,11 +129,11 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
         </CardHeader>
       </Card>
 
-      <Card className="border-black/10 bg-white/90 shadow-sm">
+      <Card className="border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-black/30">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableRow className="bg-muted/50 hover:bg-muted/50 dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/[0.05]">
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Status</TableHead>
@@ -148,7 +157,16 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>
-                      <Badge variant={product.isActive ? "default" : "outline"}>{product.isActive ? "Active" : "Inactive"}</Badge>
+                      <Badge
+                        variant={product.isActive ? "default" : "outline"}
+                        className={
+                          product.isActive
+                            ? "dark:bg-white dark:text-zinc-950"
+                            : "dark:border-white/15 dark:bg-white/[0.03] dark:text-white/70"
+                        }
+                      >
+                        {product.isActive ? "Active" : "Inactive"}
+                      </Badge>
                     </TableCell>
                     <TableCell>{product.variantsCount}</TableCell>
                     <TableCell className="text-right">
@@ -170,7 +188,7 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
         >
           <Button variant="outline" size="sm" className="rounded-full">Prev</Button>
         </Link>
-        <Badge variant="outline" className="rounded-full border-black/20">
+        <Badge variant="outline" className="rounded-full border-black/20 dark:border-white/15 dark:bg-white/[0.03] dark:text-white/60">
           Page {pagination.page} of {pagination.totalPages}
         </Badge>
         <Link

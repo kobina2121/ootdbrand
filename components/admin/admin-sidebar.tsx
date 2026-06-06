@@ -18,8 +18,8 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="h-fit w-full rounded-2xl border border-black/10 bg-white/80 p-4 shadow-sm backdrop-blur md:sticky md:top-6 md:w-64">
-      <div className="mb-4 border-b border-black/10 pb-4">
+    <aside className="h-fit w-full rounded-2xl border border-black/10 bg-white/80 p-4 shadow-sm backdrop-blur transition-colors dark:border-white/10 dark:bg-zinc-950/70 dark:shadow-black/30 md:sticky md:top-6 md:w-64">
+      <div className="mb-4 border-b border-black/10 pb-4 dark:border-white/10">
         <p className="text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">Admin space</p>
         <h2 className="text-xl font-semibold tracking-tight">Control Panel</h2>
       </div>
@@ -36,8 +36,8 @@ export function AdminSidebar() {
               className={cn(
                 "flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors",
                 isActive
-                  ? "bg-black text-white shadow-sm"
-                  : "text-foreground hover:bg-muted",
+                  ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+                  : "text-foreground hover:bg-muted dark:text-zinc-100 dark:hover:bg-white/5",
               )}
             >
               <Icon className="size-4" />

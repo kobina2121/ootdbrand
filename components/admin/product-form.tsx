@@ -77,13 +77,13 @@ const presetColorOptions: ColorOption[] = [
 ];
 
 const fieldClassName =
-  "h-11 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25";
+  "h-11 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25 dark:border-white/10 dark:bg-zinc-950/70 dark:text-white dark:placeholder:text-white/40 dark:focus-visible:ring-white/20";
 const numericFieldClassName =
   `${fieldClassName} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`;
 const selectClassName =
-  "h-11 w-full rounded-xl border border-black/15 bg-white px-3 text-[15px] shadow-none outline-none transition focus:border-black/30 focus:ring-1 focus:ring-black/25";
+  "h-11 w-full rounded-xl border border-black/15 bg-white px-3 text-[15px] shadow-none outline-none transition focus:border-black/30 focus:ring-1 focus:ring-black/25 dark:border-white/10 dark:bg-zinc-950/70 dark:text-white dark:focus:border-white/20 dark:focus:ring-white/20";
 const textAreaClassName =
-  "min-h-28 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25";
+  "min-h-28 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25 dark:border-white/10 dark:bg-zinc-950/70 dark:text-white dark:placeholder:text-white/40 dark:focus-visible:ring-white/20";
 const fieldHelperClassName = "min-h-5 text-xs text-muted-foreground";
 
 const defaultValues: DefaultValues<ProductEditorValues> = {
@@ -416,8 +416,8 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   };
 
   return (
-    <Card className="border-black/10 bg-white/90 shadow-sm">
-      <CardHeader className="border-b border-black/10">
+    <Card className="border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-black/30">
+      <CardHeader className="border-b border-black/10 dark:border-white/10">
         <p className="text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">Catalog editor</p>
         <CardTitle className="font-sans text-2xl font-semibold">
           {mode === "create" ? "Create Product" : "Edit Product"}
@@ -647,7 +647,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               )}
             />
 
-            <div className="space-y-3 rounded-xl border border-black/10 bg-muted/20 p-4">
+            <div className="space-y-3 rounded-xl border border-black/10 bg-muted/20 p-4 dark:border-white/10 dark:bg-white/[0.03]">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm font-medium">Variant Builder (Size + Color)</p>
                 <div className="flex items-center gap-2">
@@ -671,7 +671,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 </div>
               </div>
 
-              <div className="space-y-3 rounded-lg border border-black/10 bg-white p-3">
+              <div className="space-y-3 rounded-lg border border-black/10 bg-white p-3 dark:border-white/10 dark:bg-zinc-950/70">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Quick generate variants
                 </p>
@@ -751,7 +751,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               </div>
 
               {variantFields.map((field, index) => (
-                <div key={field.id} className="grid gap-2 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-3">
+                <div key={field.id} className="grid gap-2 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-3 dark:border-white/10 dark:bg-zinc-950/70">
                   <FormField
                     control={form.control}
                     name={`variants.${index}.sizes`}
@@ -759,7 +759,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                       <FormItem>
                         <FormLabel>Sizes</FormLabel>
                         <FormControl>
-                          <div className="space-y-2 rounded-md border border-black/10 p-2">
+                          <div className="space-y-2 rounded-md border border-black/10 p-2 dark:border-white/10 dark:bg-white/[0.03]">
                             <div className="flex flex-wrap gap-2">
                               {sizeOptions.map((sizeOption) => (
                                 <Button

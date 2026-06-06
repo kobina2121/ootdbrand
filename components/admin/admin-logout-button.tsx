@@ -18,7 +18,13 @@ export function AdminLogoutButton() {
   };
 
   return (
-    <Button variant="outline" size="sm" className="rounded-full border-black/20 bg-white" onClick={handleSignOut} disabled={isPending}>
+    <Button
+      variant="outline"
+      size="sm"
+      className="rounded-full border-black/20 bg-white transition-colors dark:border-white/10 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-white/5"
+      onClick={handleSignOut}
+      disabled={isPending}
+    >
       <LogOut className="mr-2 size-4" />
       {isPending ? "Logging out..." : "Logout"}
     </Button>

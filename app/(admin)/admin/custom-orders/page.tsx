@@ -50,48 +50,48 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
 
   return (
     <div className="space-y-5">
-      <Card className="border-black/10 bg-white/85 shadow-sm">
+      <Card className="border-black/10 bg-white/85 shadow-sm dark:border-white/10 dark:bg-zinc-950/75 dark:shadow-black/30">
         <CardHeader className="space-y-4">
           <div>
             <p className="text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">Tailoring Queue</p>
             <CardTitle className="font-sans text-2xl font-semibold">Custom Orders</CardTitle>
           </div>
           <div className="grid gap-3 sm:grid-cols-4">
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Total requests</p>
               <p className="text-lg font-semibold">{allCustomOrders.length}</p>
             </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Success</p>
               <p className="text-lg font-semibold">{successCount}</p>
             </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Pending</p>
               <p className="text-lg font-semibold">{pendingCount}</p>
             </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2">
+            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Failed</p>
               <p className="text-lg font-semibold">{failedCount}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href={buildHref(1, "all")}>
-              <Badge variant={status === "all" ? "default" : "outline"} className="rounded-full px-3 py-1">
+              <Badge variant={status === "all" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
                 All
               </Badge>
             </Link>
             <Link href={buildHref(1, "Pending")}>
-              <Badge variant={status === "Pending" ? "default" : "outline"} className="rounded-full px-3 py-1">
+              <Badge variant={status === "Pending" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
                 Pending
               </Badge>
             </Link>
             <Link href={buildHref(1, "Success")}>
-              <Badge variant={status === "Success" ? "default" : "outline"} className="rounded-full px-3 py-1">
+              <Badge variant={status === "Success" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
                 Success
               </Badge>
             </Link>
             <Link href={buildHref(1, "Failed")}>
-              <Badge variant={status === "Failed" ? "default" : "outline"} className="rounded-full px-3 py-1">
+              <Badge variant={status === "Failed" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
                 Failed
               </Badge>
             </Link>
@@ -99,11 +99,11 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
         </CardHeader>
       </Card>
 
-      <Card className="border-black/10 bg-white/90 shadow-sm">
+      <Card className="border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-black/30">
         <CardContent className="overflow-x-auto p-0">
           <Table className="min-w-[1180px]">
             <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableRow className="bg-muted/50 hover:bg-muted/50 dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/[0.05]">
                 <TableHead>Reference</TableHead>
                 <TableHead>Customer & Delivery</TableHead>
                 <TableHead>Product & Customization</TableHead>
@@ -151,14 +151,14 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                             : [];
 
                         return (
-                      <div className="space-y-2">
-                        <div className="space-y-3 rounded-md border border-black/10 p-2">
+                        <div className="space-y-2">
+                        <div className="space-y-3 rounded-md border border-black/10 p-2 dark:border-white/10 dark:bg-white/[0.03]">
                           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                             <div className="space-y-1">
                               <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                                 Product image
                               </p>
-                              <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40">
+                              <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40 dark:border-white/10 dark:bg-white/[0.04]">
                                 {order.productImage ? (
                                   <Image
                                     src={order.productImage}
@@ -181,7 +181,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                                   <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                                     Uploaded reference {index + 1}
                                   </p>
-                                  <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40">
+                                  <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40 dark:border-white/10 dark:bg-white/[0.04]">
                                     <Image
                                       src={image}
                                       alt={`${order.productName} reference ${index + 1}`}
@@ -198,7 +198,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                                 <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                                   Uploaded reference
                                 </p>
-                                <div className="flex h-28 items-center justify-center rounded-md border border-black/10 bg-muted/40 text-[0.65rem] text-muted-foreground">
+                                <div className="flex h-28 items-center justify-center rounded-md border border-black/10 bg-muted/40 text-[0.65rem] text-muted-foreground dark:border-white/10 dark:bg-white/[0.04]">
                                   No uploaded reference
                                 </div>
                               </div>
@@ -214,7 +214,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                             {order.type ? <p className="text-xs text-muted-foreground">Type: {order.type}</p> : null}
                           </div>
                         </div>
-                        <div className="rounded-md border border-black/10 p-2">
+                        <div className="rounded-md border border-black/10 p-2 dark:border-white/10 dark:bg-white/[0.03]">
                           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Customization details</p>
                           <p className="mt-1 text-xs text-muted-foreground">
                             <span className="font-medium text-foreground">Preferred size:</span> {order.size}
@@ -262,7 +262,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
                         <p className="text-xs text-muted-foreground">Delivery: {order.deliveryStatus}</p>
                         <p className="text-xs text-muted-foreground">Tracking: {order.trackingNumber || "Pending assignment"}</p>
                         {order.trackingUrl ? (
-                          <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-xs text-[#1f1b18] underline">
+                          <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-xs text-[#1f1b18] underline dark:text-white/80">
                             Open tracking link
                           </a>
                         ) : null}
@@ -296,9 +296,9 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
           aria-disabled={safePage <= 1}
           className={safePage <= 1 ? "pointer-events-none opacity-50" : ""}
         >
-          <Button variant="outline" size="sm" className="rounded-full">Prev</Button>
+          <Button variant="outline" size="sm" className="rounded-full dark:border-white/15 dark:bg-white/[0.03] dark:text-white/80 dark:hover:bg-white/[0.06]">Prev</Button>
         </Link>
-        <Badge variant="outline" className="rounded-full border-black/20">
+        <Badge variant="outline" className="rounded-full border-black/20 dark:border-white/15 dark:bg-white/[0.03] dark:text-white/60">
           Page {safePage} of {totalPages}
         </Badge>
         <Link
@@ -306,7 +306,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
           aria-disabled={safePage >= totalPages}
           className={safePage >= totalPages ? "pointer-events-none opacity-50" : ""}
         >
-          <Button variant="outline" size="sm" className="rounded-full">Next</Button>
+          <Button variant="outline" size="sm" className="rounded-full dark:border-white/15 dark:bg-white/[0.03] dark:text-white/80 dark:hover:bg-white/[0.06]">Next</Button>
         </Link>
       </div>
     </div>
