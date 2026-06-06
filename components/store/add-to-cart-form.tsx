@@ -20,9 +20,16 @@ type AddToCartFormProps = {
   sku?: string;
   onSkuChange?: (sku: string) => void;
   hideVariantSelect?: boolean;
+  centered?: boolean;
 };
 
-export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = false }: AddToCartFormProps) {
+export function AddToCartForm({
+  product,
+  sku,
+  onSkuChange,
+  hideVariantSelect = false,
+  centered = false,
+}: AddToCartFormProps) {
   const [internalSku, setInternalSku] = useState(product.variants[0]?.sku ?? "");
   const [quantity, setQuantity] = useState(1);
   const { addItem, userRole } = useCart();
@@ -74,10 +81,14 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
+    <div className={`space-y-4 ${centered ? "mx-auto flex w-full max-w-[24rem] flex-col items-center" : ""}`}>
+      <div
+        className={`grid gap-3 ${centered ? "w-full justify-items-center" : ""} ${
+          hideVariantSelect ? "" : "sm:grid-cols-2"
+        }`}
+      >
         {hideVariantSelect ? null : (
-          <div>
+          <div className={centered ? "w-full text-center sm:text-left" : ""}>
             <p className="mb-2 text-sm font-medium text-[#1f1b18] dark:text-white">Variant</p>
             <Select value={activeSku} onValueChange={(value) => setSku(value ?? product.variants[0]?.sku ?? "")}>
             <SelectTrigger className="h-11 rounded-xl border-black/15 bg-white dark:border-white/15 dark:bg-[#26211d] dark:text-[#f8f2ec]">
@@ -94,7 +105,7 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
           </div>
         )}
 
-        <div>
+        <div className={centered ? "flex w-full flex-col items-center text-center" : ""}>
           <p className="mb-2 text-sm font-medium text-[#1f1b18] dark:text-white">Quantity</p>
           <Input
             type="number"
@@ -103,12 +114,19 @@ export function AddToCartForm({ product, sku, onSkuChange, hideVariantSelect = f
             value={quantity}
             onChange={(event) => setQuantity(Math.min(variant.stock, Math.max(1, Number(event.target.value) || 1)))}
             onFocus={(event) => event.currentTarget.select()}
-            className="h-11 w-28 rounded-xl border-black/15 bg-white dark:border-white/15 dark:bg-[#26211d] dark:text-[#f8f2ec]"
+            className={`h-11 rounded-xl border-black/15 bg-white text-center dark:border-white/15 dark:bg-[#26211d] dark:text-[#f8f2ec] ${
+              centered ? "mx-auto w-28" : "w-28"
+            }`}
           />
         </div>
       </div>
 
-      <Button size="lg" className="w-full rounded-full dark:border dark:border-white/10 sm:w-auto" onClick={onAddToCart} disabled={isAdminUser}>
+      <Button
+        size="lg"
+        className={`rounded-full dark:border dark:border-white/10 ${centered ? "mx-auto flex w-full max-w-[19rem]" : "w-full sm:w-auto"}`}
+        onClick={onAddToCart}
+        disabled={isAdminUser}
+      >
         {isAdminUser
           ? "Admin cannot add to cart"
           : `Add to Cart · ${new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(unitPrice)}`}

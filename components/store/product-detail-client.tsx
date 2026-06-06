@@ -84,7 +84,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </div>
 
         {galleryImages.length > 1 ? (
-          <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
+          <div className="flex flex-wrap justify-center gap-3">
             {galleryImages.map((image, index) => {
               const isActive = image === selectedImage;
 
@@ -93,7 +93,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   key={`${image}-${index}`}
                   type="button"
                   onClick={() => setSelectedImage(image)}
-                  className={`group relative overflow-hidden rounded-2xl border bg-[#f7f1eb] transition-all ${
+                  className={`group relative w-[7.25rem] overflow-hidden rounded-2xl border bg-[#f7f1eb] transition-all sm:w-[7.75rem] ${
                     isActive
                       ? "border-black shadow-[0_10px_25px_rgba(20,17,15,0.14)] dark:border-[#fff7ef] dark:shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
                       : "border-black/10 hover:border-black/30 dark:border-white/10 dark:bg-[#221d19] dark:hover:border-white/30"
@@ -116,20 +116,22 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         ) : null}
       </div>
 
-      <section className="space-y-5">
+      <section className="mx-auto flex w-full max-w-[34rem] flex-col items-center space-y-5 text-center">
         <Badge
           variant={inStock ? "default" : "destructive"}
-          className="rounded-full dark:border dark:border-white/10 dark:bg-white/10 dark:text-white"
+          className="mx-auto rounded-full dark:border dark:border-white/10 dark:bg-white/10 dark:text-white"
         >
           {inStock ? "In Stock" : "Out of Stock"}
         </Badge>
 
-        <h1 className="font-heading text-5xl leading-none text-[#1f1b18] dark:text-white">{product.name}</h1>
-        <p className="text-sm text-[#6c655f] dark:text-[#d0c7be] sm:text-base">{product.description}</p>
+        <h1 className="max-w-[14ch] font-heading text-5xl leading-none text-[#1f1b18] dark:text-white sm:max-w-[13ch]">
+          {product.name}
+        </h1>
+        <p className="max-w-[28rem] text-sm text-[#6c655f] dark:text-[#d0c7be] sm:text-base">{product.description}</p>
 
         <div className="space-y-3">
           <p className="text-sm tracking-[0.18em] text-muted-foreground dark:text-[#bdb0a4]">SELECT COLOR</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-center gap-2">
             {colorOptions.map((colorOption) => (
               <button
                 key={`color-${colorOption.name}`}
@@ -166,7 +168,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
         <div className="space-y-3">
           <p className="text-sm tracking-[0.18em] text-muted-foreground dark:text-[#bdb0a4]">AVAILABLE SIZES</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-center gap-2">
             {availableSizes.map((size) => (
               <button
                 key={`size-${size}`}
@@ -191,9 +193,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </p>
 
         {inStock && selectedVariant ? (
-          <div className="rounded-[1.5rem] border border-black/10 bg-[#f8f6f2] p-4 dark:border-white/10 dark:bg-[#11100f]">
-            <AddToCartForm product={product} sku={selectedVariant.sku} hideVariantSelect />
-          </div>
+          <AddToCartForm product={product} sku={selectedVariant.sku} hideVariantSelect centered />
         ) : (
           <p className="text-sm text-muted-foreground">This item is currently unavailable.</p>
         )}
