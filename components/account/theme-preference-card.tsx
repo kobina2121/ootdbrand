@@ -1,7 +1,7 @@
 "use client";
 
 import { LaptopMinimal, MoonStar, SunMedium } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/providers/theme-provider";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
