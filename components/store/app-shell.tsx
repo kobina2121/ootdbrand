@@ -53,12 +53,10 @@ export function AppShell({ children, user }: AppShellProps) {
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)] text-foreground transition-colors dark:bg-[radial-gradient(circle_at_top,_#1c1917_0%,_#121110_48%,_#0c0b0a_100%)]">
       <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(18,17,16,0.95),rgba(18,17,16,0.88))]">
         <div className="page-container flex items-center justify-between gap-3 py-3 sm:py-4">
-          <Link href="/" className="shrink-0 pr-2 xl:pr-6" aria-label="TIDE home">
-            <img
-              src="/images/logo/tide-wordmark.png"
-              alt="TIDE"
-              className="h-12 w-auto object-contain sm:h-14"
-            />
+          <Link href="/" className="shrink-0 pr-2 xl:pr-6" aria-label="tideofficial home">
+            <span className="font-heading block text-[2.2rem] leading-[0.82] font-semibold tracking-[-0.035em] text-[#2a170f] sm:text-[2.65rem]">
+              tideofficial
+            </span>
           </Link>
 
           <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 lg:flex xl:gap-6 2xl:gap-8">
