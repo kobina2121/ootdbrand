@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 
 import { ProfileSettingsForm } from "@/components/account/profile-settings-form";
-import { ThemePreferenceCard } from "@/components/account/theme-preference-card";
 import { ChangePasswordForm } from "@/components/auth/change-password-form";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
 
@@ -30,10 +29,7 @@ export default async function ProfilePage() {
           initialEmail={session.user.email ?? ""}
           role={session.user.role}
         />
-        <div className="space-y-6">
-          <ThemePreferenceCard />
-          <ChangePasswordForm cardClassName="max-w-none" />
-        </div>
+        <ChangePasswordForm cardClassName="max-w-none" />
       </div>
     </div>
   );
