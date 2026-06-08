@@ -54,7 +54,7 @@ export function AppShell({ children, user }: AppShellProps) {
       <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(18,17,16,0.95),rgba(18,17,16,0.88))]">
         <div className="page-container flex items-center justify-between gap-3 py-3 sm:py-4">
           <Link href="/" className="shrink-0 pr-2 xl:pr-6" aria-label="tideofficial home">
-            <span className="font-heading block text-[2.2rem] leading-[0.82] font-semibold tracking-[-0.035em] text-[#2a170f] sm:text-[2.65rem]">
+            <span className="block text-[1.7rem] leading-none font-semibold tracking-[-0.04em] text-[#2f1d15] sm:text-[2rem]">
               tideofficial
             </span>
           </Link>
