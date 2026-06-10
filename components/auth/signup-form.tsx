@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export function SignupForm() {
   const router = useRouter();
@@ -190,7 +191,7 @@ export function SignupForm() {
           </div>
           <div className="space-y-2">
             <label htmlFor="signup-password" className="text-sm font-medium dark:text-[#faf3eb]">Password</label>
-            <Input id="signup-password" name="password" type="password" placeholder="Create a password (min 8 characters)" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
+            <PasswordInput id="signup-password" name="password" placeholder="Create a password (min 8 characters)" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
           </div>
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
           <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>

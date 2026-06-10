@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 type ChangePasswordResponse = {
   ok: boolean;
@@ -80,15 +80,14 @@ export function ChangePasswordForm({ cardClassName }: ChangePasswordFormProps) {
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={onSubmit}>
-          <Input name="currentPassword" type="password" placeholder="Current password" className="h-11 rounded-xl border-black/15 dark:border-white/15" required />
-          <Input
+          <PasswordInput name="currentPassword" placeholder="Current password" className="h-11 rounded-xl border-black/15 dark:border-white/15" required />
+          <PasswordInput
             name="newPassword"
-            type="password"
             placeholder="New password (min 8 chars, letters + numbers)"
             className="h-11 rounded-xl border-black/15 dark:border-white/15"
             required
           />
-          <Input name="confirmPassword" type="password" placeholder="Confirm new password" className="h-11 rounded-xl border-black/15 dark:border-white/15" required />
+          <PasswordInput name="confirmPassword" placeholder="Confirm new password" className="h-11 rounded-xl border-black/15 dark:border-white/15" required />
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
           {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
           <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>

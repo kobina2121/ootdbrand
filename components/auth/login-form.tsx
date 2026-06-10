@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
   const router = useRouter();
@@ -181,9 +182,8 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
             className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]"
             required
           />
-          <Input
+          <PasswordInput
             name="password"
-            type="password"
             placeholder="Password"
             className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]"
             required
