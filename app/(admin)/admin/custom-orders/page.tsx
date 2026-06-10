@@ -7,308 +7,308 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+ Table,
+ TableBody,
+ TableCell,
+ TableHead,
+ TableHeader,
+ TableRow,
 } from "@/components/ui/table";
 import { formatPriceNgn } from "@/lib/products";
 import { listCustomOrders } from "@/lib/services/custom-order-service";
 
 type AdminCustomOrdersPageProps = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+ searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function AdminCustomOrdersPage({ searchParams }: AdminCustomOrdersPageProps) {
-  const params = await searchParams;
-  const statusParam = typeof params.status === "string" ? params.status : "all";
-  const status = statusParam === "Pending" || statusParam === "Success" || statusParam === "Failed" ? statusParam : "all";
-  const pageParam = typeof params.page === "string" ? Number.parseInt(params.page, 10) : 1;
-  const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
-  const pageSize = 12;
+ const params = await searchParams;
+ const statusParam = typeof params.status === "string" ? params.status : "all";
+ const status = statusParam === "Pending" || statusParam === "Success" || statusParam === "Failed" ? statusParam : "all";
+ const pageParam = typeof params.page === "string" ? Number.parseInt(params.page, 10) : 1;
+ const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
+ const pageSize = 12;
 
-  const allCustomOrders = await listCustomOrders({ status: status === "all" ? undefined : status });
-  const totalPages = Math.max(1, Math.ceil(allCustomOrders.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const customOrders = allCustomOrders.slice((safePage - 1) * pageSize, safePage * pageSize);
+ const allCustomOrders = await listCustomOrders({ status: status === "all" ? undefined : status });
+ const totalPages = Math.max(1, Math.ceil(allCustomOrders.length / pageSize));
+ const safePage = Math.min(page, totalPages);
+ const customOrders = allCustomOrders.slice((safePage - 1) * pageSize, safePage * pageSize);
 
-  const successCount = allCustomOrders.filter((order) => order.status === "Success").length;
-  const pendingCount = allCustomOrders.filter((order) => order.status === "Pending").length;
-  const failedCount = allCustomOrders.filter((order) => order.status === "Failed").length;
+ const successCount = allCustomOrders.filter((order) => order.status === "Success").length;
+ const pendingCount = allCustomOrders.filter((order) => order.status === "Pending").length;
+ const failedCount = allCustomOrders.filter((order) => order.status === "Failed").length;
 
-  const buildHref = (nextPage: number, nextStatus = status) => {
-    const query = new URLSearchParams();
-    query.set("page", String(nextPage));
-    if (nextStatus !== "all") {
-      query.set("status", nextStatus);
-    }
+ const buildHref = (nextPage: number, nextStatus = status) => {
+ const query = new URLSearchParams();
+ query.set("page", String(nextPage));
+ if (nextStatus !== "all") {
+ query.set("status", nextStatus);
+ }
 
-    return `/admin/custom-orders?${query.toString()}`;
-  };
+ return `/admin/custom-orders?${query.toString()}`;
+ };
 
-  return (
-    <div className="space-y-5">
-      <Card className="border-black/10 bg-white/85 shadow-sm dark:border-white/10 dark:bg-zinc-950/75 dark:shadow-black/30">
-        <CardHeader className="space-y-4">
-          <div>
-            <p className="text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">Tailoring Queue</p>
-            <CardTitle className="font-sans text-2xl font-semibold">Custom Orders</CardTitle>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-4">
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Total requests</p>
-              <p className="text-lg font-semibold">{allCustomOrders.length}</p>
-            </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Success</p>
-              <p className="text-lg font-semibold">{successCount}</p>
-            </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Pending</p>
-              <p className="text-lg font-semibold">{pendingCount}</p>
-            </div>
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Failed</p>
-              <p className="text-lg font-semibold">{failedCount}</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href={buildHref(1, "all")}>
-              <Badge variant={status === "all" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
-                All
-              </Badge>
-            </Link>
-            <Link href={buildHref(1, "Pending")}>
-              <Badge variant={status === "Pending" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
-                Pending
-              </Badge>
-            </Link>
-            <Link href={buildHref(1, "Success")}>
-              <Badge variant={status === "Success" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
-                Success
-              </Badge>
-            </Link>
-            <Link href={buildHref(1, "Failed")}>
-              <Badge variant={status === "Failed" ? "default" : "outline"} className="rounded-full px-3 py-1 data-[variant=default]:dark:bg-white data-[variant=default]:dark:text-zinc-950 data-[variant=outline]:dark:border-white/15 data-[variant=outline]:dark:bg-white/[0.03] data-[variant=outline]:dark:text-white/80">
-                Failed
-              </Badge>
-            </Link>
-          </div>
-        </CardHeader>
-      </Card>
+ return (
+ <div className="space-y-5">
+ <Card className="border-black/10 bg-white/85 shadow-sm ">
+ <CardHeader className="space-y-4">
+ <div>
+ <p className="text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">Tailoring Queue</p>
+ <CardTitle className="font-sans text-2xl font-semibold">Custom Orders</CardTitle>
+ </div>
+ <div className="grid gap-3 sm:grid-cols-4">
+ <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Total requests</p>
+ <p className="text-lg font-semibold">{allCustomOrders.length}</p>
+ </div>
+ <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Success</p>
+ <p className="text-lg font-semibold">{successCount}</p>
+ </div>
+ <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Pending</p>
+ <p className="text-lg font-semibold">{pendingCount}</p>
+ </div>
+ <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Failed</p>
+ <p className="text-lg font-semibold">{failedCount}</p>
+ </div>
+ </div>
+ <div className="flex flex-wrap gap-2">
+ <Link href={buildHref(1, "all")}>
+ <Badge variant={status === "all" ? "default" : "outline"} className="rounded-full px-3 py-1 ">
+ All
+ </Badge>
+ </Link>
+ <Link href={buildHref(1, "Pending")}>
+ <Badge variant={status === "Pending" ? "default" : "outline"} className="rounded-full px-3 py-1 ">
+ Pending
+ </Badge>
+ </Link>
+ <Link href={buildHref(1, "Success")}>
+ <Badge variant={status === "Success" ? "default" : "outline"} className="rounded-full px-3 py-1 ">
+ Success
+ </Badge>
+ </Link>
+ <Link href={buildHref(1, "Failed")}>
+ <Badge variant={status === "Failed" ? "default" : "outline"} className="rounded-full px-3 py-1 ">
+ Failed
+ </Badge>
+ </Link>
+ </div>
+ </CardHeader>
+ </Card>
 
-      <Card className="border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-black/30">
-        <CardContent className="overflow-x-auto p-0">
-          <Table className="min-w-[1180px]">
-            <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted/50 dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/[0.05]">
-                <TableHead>Reference</TableHead>
-                <TableHead>Customer & Delivery</TableHead>
-                <TableHead>Product & Customization</TableHead>
-                <TableHead>Payment & Tracking</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Quick Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {customOrders.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center gap-2">
-                      <Ruler className="size-6 text-muted-foreground" />
-                      <p>No custom orders yet.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                customOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="align-top">
-                      <div className="space-y-1">
-                        <p className="font-medium">{order.paymentReference}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-top">
-                      <div className="space-y-1">
-                        <p className="font-medium">{order.fullName}</p>
-                        <p className="text-xs text-muted-foreground">{order.email}</p>
-                        <p className="text-xs text-muted-foreground">{order.phone}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {order.deliveryAddress.addressLine}, {order.deliveryAddress.city}, {order.deliveryAddress.stateRegion},{" "}
-                          {order.deliveryAddress.country}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-top">
-                      {(() => {
-                        const uploadedReferences = order.referenceImages?.length
-                          ? order.referenceImages
-                          : order.referenceImage
-                            ? [order.referenceImage]
-                            : [];
+ <Card className="border-black/10 bg-white/90 shadow-sm ">
+ <CardContent className="overflow-x-auto p-0">
+ <Table className="min-w-[1180px]">
+ <TableHeader>
+ <TableRow className="bg-muted/50 hover:bg-muted/50 ">
+ <TableHead>Reference</TableHead>
+ <TableHead>Customer & Delivery</TableHead>
+ <TableHead>Product & Customization</TableHead>
+ <TableHead>Payment & Tracking</TableHead>
+ <TableHead>Status</TableHead>
+ <TableHead className="text-right">Quick Actions</TableHead>
+ </TableRow>
+ </TableHeader>
+ <TableBody>
+ {customOrders.length === 0 ? (
+ <TableRow>
+ <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
+ <div className="flex flex-col items-center gap-2">
+ <Ruler className="size-6 text-muted-foreground" />
+ <p>No custom orders yet.</p>
+ </div>
+ </TableCell>
+ </TableRow>
+ ) : (
+ customOrders.map((order) => (
+ <TableRow key={order.id}>
+ <TableCell className="align-top">
+ <div className="space-y-1">
+ <p className="font-medium">{order.paymentReference}</p>
+ <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
+ </div>
+ </TableCell>
+ <TableCell className="align-top">
+ <div className="space-y-1">
+ <p className="font-medium">{order.fullName}</p>
+ <p className="text-xs text-muted-foreground">{order.email}</p>
+ <p className="text-xs text-muted-foreground">{order.phone}</p>
+ <p className="text-xs text-muted-foreground">
+ {order.deliveryAddress.addressLine}, {order.deliveryAddress.city}, {order.deliveryAddress.stateRegion},{" "}
+ {order.deliveryAddress.country}
+ </p>
+ </div>
+ </TableCell>
+ <TableCell className="align-top">
+ {(() => {
+ const uploadedReferences = order.referenceImages?.length
+ ? order.referenceImages
+ : order.referenceImage
+ ? [order.referenceImage]
+ : [];
 
-                        return (
-                        <div className="space-y-2">
-                        <div className="space-y-3 rounded-md border border-black/10 p-2 dark:border-white/10 dark:bg-white/[0.03]">
-                          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-                            <div className="space-y-1">
-                              <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                                Product image
-                              </p>
-                              <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40 dark:border-white/10 dark:bg-white/[0.04]">
-                                {order.productImage ? (
-                                  <Image
-                                    src={order.productImage}
-                                    alt={order.productName}
-                                    width={240}
-                                    height={180}
-                                    unoptimized
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
-                                    No product image
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            {uploadedReferences.length > 0 ? (
-                              uploadedReferences.map((image, index) => (
-                                <div key={`${order.id}-reference-${index}`} className="space-y-1">
-                                  <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                                    Uploaded reference {index + 1}
-                                  </p>
-                                  <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40 dark:border-white/10 dark:bg-white/[0.04]">
-                                    <Image
-                                      src={image}
-                                      alt={`${order.productName} reference ${index + 1}`}
-                                      width={240}
-                                      height={180}
-                                      unoptimized
-                                      className="h-full w-full object-cover"
-                                    />
-                                  </div>
-                                </div>
-                              ))
-                            ) : (
-                              <div className="space-y-1">
-                                <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                                  Uploaded reference
-                                </p>
-                                <div className="flex h-28 items-center justify-center rounded-md border border-black/10 bg-muted/40 text-[0.65rem] text-muted-foreground dark:border-white/10 dark:bg-white/[0.04]">
-                                  No uploaded reference
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">{order.productName}</p>
-                            <p className="text-xs text-muted-foreground">Slug: {order.productSlug}</p>
-                            <p className="text-xs text-muted-foreground">Variant SKU: {order.variantSku}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {order.category} · {order.size} · {order.color}
-                            </p>
-                            {order.type ? <p className="text-xs text-muted-foreground">Type: {order.type}</p> : null}
-                          </div>
-                        </div>
-                        <div className="rounded-md border border-black/10 p-2 dark:border-white/10 dark:bg-white/[0.03]">
-                          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Customization details</p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Preferred size:</span> {order.size}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Preferred color:</span> {order.color}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Bust:</span> {order.bustSize || "N/A"}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Waist:</span> {order.waistSize || "N/A"}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Hip:</span> {order.hipSize || "N/A"}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Additional:</span> {order.additionalMeasurements || "N/A"}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Notes:</span> {order.notes || "No notes"}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Images:</span>{" "}
-                            {order.productImage ? "Product image saved" : "No product image"}
-                            {uploadedReferences.length > 0 ? ` + ${uploadedReferences.length} uploaded reference image${uploadedReferences.length > 1 ? "s" : ""}` : " + no uploaded reference"}
-                          </p>
-                        </div>
-                      </div>
-                        );
-                      })()}
-                    </TableCell>
-                    <TableCell className="align-top">
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">Provider: {order.paymentProvider ?? "paystack"}</p>
-                        <p className="text-xs text-muted-foreground">Product price: {formatPriceNgn(order.baseUnitPrice)}</p>
-                        <p className="text-xs text-muted-foreground">Customization fee: {formatPriceNgn(order.customizationCharge)}</p>
-                        <p className="text-xs text-muted-foreground">Transaction fee: {formatPriceNgn(order.transactionFee ?? 0)}</p>
-                        <p className="text-sm font-semibold">Total: {formatPriceNgn(order.amountTotal)}</p>
-                        <p className="text-xs text-muted-foreground">Gateway status: {order.paymentGatewayStatus || "N/A"}</p>
-                        <p className="text-xs text-muted-foreground">Gateway response: {order.paymentGatewayResponse || "N/A"}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Paid at: {order.paidAt ? new Date(order.paidAt).toLocaleString() : "Not paid yet"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">Delivery: {order.deliveryStatus}</p>
-                        <p className="text-xs text-muted-foreground">Tracking: {order.trackingNumber || "Pending assignment"}</p>
-                        {order.trackingUrl ? (
-                          <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-xs text-[#1f1b18] underline dark:text-white/80">
-                            Open tracking link
-                          </a>
-                        ) : null}
-                        <p className="text-xs text-muted-foreground">Admin update: {order.adminUpdate || "No update yet."}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-top">
-                      <div className="space-y-1">
-                        <Badge
-                          variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}
-                        >
-                          {order.status}
-                        </Badge>
-                        <p className="text-xs text-muted-foreground">{order.deliveryStatus}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <OrderTableActions reference={order.paymentReference} customerEmail={order.email} orderType="custom" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+ return (
+ <div className="space-y-2">
+ <div className="space-y-3 rounded-md border border-black/10 p-2 ">
+ <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+ <div className="space-y-1">
+ <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+ Product image
+ </p>
+ <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40 ">
+ {order.productImage ? (
+ <Image
+ src={order.productImage}
+ alt={order.productName}
+ width={240}
+ height={180}
+ unoptimized
+ className="h-full w-full object-cover"
+ />
+ ) : (
+ <div className="flex h-full w-full items-center justify-center text-[0.65rem] text-muted-foreground">
+ No product image
+ </div>
+ )}
+ </div>
+ </div>
+ {uploadedReferences.length > 0 ? (
+ uploadedReferences.map((image, index) => (
+ <div key={`${order.id}-reference-${index}`} className="space-y-1">
+ <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+ Uploaded reference {index + 1}
+ </p>
+ <div className="h-28 overflow-hidden rounded-md border border-black/10 bg-muted/40 ">
+ <Image
+ src={image}
+ alt={`${order.productName} reference ${index + 1}`}
+ width={240}
+ height={180}
+ unoptimized
+ className="h-full w-full object-cover"
+ />
+ </div>
+ </div>
+ ))
+ ) : (
+ <div className="space-y-1">
+ <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+ Uploaded reference
+ </p>
+ <div className="flex h-28 items-center justify-center rounded-md border border-black/10 bg-muted/40 text-[0.65rem] text-muted-foreground ">
+ No uploaded reference
+ </div>
+ </div>
+ )}
+ </div>
+ <div className="space-y-1">
+ <p className="text-sm font-medium">{order.productName}</p>
+ <p className="text-xs text-muted-foreground">Slug: {order.productSlug}</p>
+ <p className="text-xs text-muted-foreground">Variant SKU: {order.variantSku}</p>
+ <p className="text-xs text-muted-foreground">
+ {order.category} · {order.size} · {order.color}
+ </p>
+ {order.type ? <p className="text-xs text-muted-foreground">Type: {order.type}</p> : null}
+ </div>
+ </div>
+ <div className="rounded-md border border-black/10 p-2 ">
+ <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Customization details</p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ <span className="font-medium text-foreground">Preferred size:</span> {order.size}
+ </p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ <span className="font-medium text-foreground">Preferred color:</span> {order.color}
+ </p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ <span className="font-medium text-foreground">Bust:</span> {order.bustSize || "N/A"}
+ </p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ <span className="font-medium text-foreground">Waist:</span> {order.waistSize || "N/A"}
+ </p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ <span className="font-medium text-foreground">Hip:</span> {order.hipSize || "N/A"}
+ </p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ <span className="font-medium text-foreground">Additional:</span> {order.additionalMeasurements || "N/A"}
+ </p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ <span className="font-medium text-foreground">Notes:</span> {order.notes || "No notes"}
+ </p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ <span className="font-medium text-foreground">Images:</span>{" "}
+ {order.productImage ? "Product image saved" : "No product image"}
+ {uploadedReferences.length > 0 ? ` + ${uploadedReferences.length} uploaded reference image${uploadedReferences.length > 1 ? "s" : ""}` : " + no uploaded reference"}
+ </p>
+ </div>
+ </div>
+ );
+ })()}
+ </TableCell>
+ <TableCell className="align-top">
+ <div className="space-y-1">
+ <p className="text-xs text-muted-foreground">Provider: {order.paymentProvider ?? "paystack"}</p>
+ <p className="text-xs text-muted-foreground">Product price: {formatPriceNgn(order.baseUnitPrice)}</p>
+ <p className="text-xs text-muted-foreground">Customization fee: {formatPriceNgn(order.customizationCharge)}</p>
+ <p className="text-xs text-muted-foreground">Transaction fee: {formatPriceNgn(order.transactionFee ?? 0)}</p>
+ <p className="text-sm font-semibold">Total: {formatPriceNgn(order.amountTotal)}</p>
+ <p className="text-xs text-muted-foreground">Gateway status: {order.paymentGatewayStatus || "N/A"}</p>
+ <p className="text-xs text-muted-foreground">Gateway response: {order.paymentGatewayResponse || "N/A"}</p>
+ <p className="text-xs text-muted-foreground">
+ Paid at: {order.paidAt ? new Date(order.paidAt).toLocaleString() : "Not paid yet"}
+ </p>
+ <p className="text-xs text-muted-foreground">Delivery: {order.deliveryStatus}</p>
+ <p className="text-xs text-muted-foreground">Tracking: {order.trackingNumber || "Pending assignment"}</p>
+ {order.trackingUrl ? (
+ <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-xs text-[#1f1b18] underline ">
+ Open tracking link
+ </a>
+ ) : null}
+ <p className="text-xs text-muted-foreground">Admin update: {order.adminUpdate || "No update yet."}</p>
+ </div>
+ </TableCell>
+ <TableCell className="align-top">
+ <div className="space-y-1">
+ <Badge
+ variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}
+ >
+ {order.status}
+ </Badge>
+ <p className="text-xs text-muted-foreground">{order.deliveryStatus}</p>
+ </div>
+ </TableCell>
+ <TableCell className="text-right">
+ <OrderTableActions reference={order.paymentReference} customerEmail={order.email} orderType="custom" />
+ </TableCell>
+ </TableRow>
+ ))
+ )}
+ </TableBody>
+ </Table>
+ </CardContent>
+ </Card>
 
-      <div className="flex items-center justify-end gap-2">
-        <Link
-          href={buildHref(Math.max(1, safePage - 1))}
-          aria-disabled={safePage <= 1}
-          className={safePage <= 1 ? "pointer-events-none opacity-50" : ""}
-        >
-          <Button variant="outline" size="sm" className="rounded-full dark:border-white/15 dark:bg-white/[0.03] dark:text-white/80 dark:hover:bg-white/[0.06]">Prev</Button>
-        </Link>
-        <Badge variant="outline" className="rounded-full border-black/20 dark:border-white/15 dark:bg-white/[0.03] dark:text-white/60">
-          Page {safePage} of {totalPages}
-        </Badge>
-        <Link
-          href={buildHref(Math.min(totalPages, safePage + 1))}
-          aria-disabled={safePage >= totalPages}
-          className={safePage >= totalPages ? "pointer-events-none opacity-50" : ""}
-        >
-          <Button variant="outline" size="sm" className="rounded-full dark:border-white/15 dark:bg-white/[0.03] dark:text-white/80 dark:hover:bg-white/[0.06]">Next</Button>
-        </Link>
-      </div>
-    </div>
-  );
+ <div className="flex items-center justify-end gap-2">
+ <Link
+ href={buildHref(Math.max(1, safePage - 1))}
+ aria-disabled={safePage <= 1}
+ className={safePage <= 1 ? "pointer-events-none opacity-50" : ""}
+ >
+ <Button variant="outline" size="sm" className="rounded-full ">Prev</Button>
+ </Link>
+ <Badge variant="outline" className="rounded-full border-black/20 ">
+ Page {safePage} of {totalPages}
+ </Badge>
+ <Link
+ href={buildHref(Math.min(totalPages, safePage + 1))}
+ aria-disabled={safePage >= totalPages}
+ className={safePage >= totalPages ? "pointer-events-none opacity-50" : ""}
+ >
+ <Button variant="outline" size="sm" className="rounded-full ">Next</Button>
+ </Link>
+ </div>
+ </div>
+ );
 }

@@ -8,43 +8,43 @@ import { enforceAdminPageAccess } from "@/lib/auth/guards";
 import { getUnreadAdminNotificationCount } from "@/lib/services/admin-notification-service";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await enforceAdminPageAccess("/admin/products");
-  const unreadNotifications = await getUnreadAdminNotificationCount();
+ const session = await enforceAdminPageAccess("/admin/products");
+ const unreadNotifications = await getUnreadAdminNotificationCount();
 
-  return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff,_#f5f6f8_40%,_#eceef2_100%)] transition-colors dark:bg-[radial-gradient(circle_at_top,_rgba(39,39,42,0.92),_#111113_45%,_#09090b_100%)]">
-      <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-5 lg:flex-row">
-          <AdminSidebar />
-          <section className="flex-1 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/80 px-4 py-3 shadow-sm backdrop-blur transition-colors dark:border-white/10 dark:bg-zinc-950/70 dark:shadow-black/30">
-              <div>
-                <p className="text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">Dashboard</p>
-                <p className="text-base font-medium">Signed in as {session.user.email}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Link href="/admin/notifications" className="relative">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full border border-black/10 transition-colors dark:border-white/10 dark:hover:bg-white/5"
-                  >
-                    <Bell className="size-4" />
-                    <span className="sr-only">Alerts</span>
-                  </Button>
-                  {unreadNotifications > 0 ? (
-                    <span className="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-[10px] font-semibold text-white dark:bg-white dark:text-black">
-                      {unreadNotifications > 99 ? "99+" : unreadNotifications}
-                    </span>
-                  ) : null}
-                </Link>
-                <AdminLogoutButton />
-              </div>
-            </div>
-            {children}
-          </section>
-        </div>
-      </div>
-    </div>
-  );
+ return (
+ <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff,_#f5f6f8_40%,_#eceef2_100%)] transition-colors ">
+ <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8">
+ <div className="flex flex-col gap-5 lg:flex-row">
+ <AdminSidebar />
+ <section className="flex-1 space-y-4">
+ <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/80 px-4 py-3 shadow-sm backdrop-blur transition-colors ">
+ <div>
+ <p className="text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">Dashboard</p>
+ <p className="text-base font-medium">Signed in as {session.user.email}</p>
+ </div>
+ <div className="flex items-center gap-2">
+ <Link href="/admin/notifications" className="relative">
+ <Button
+ variant="ghost"
+ size="icon"
+ className="rounded-full border border-black/10 transition-colors "
+ >
+ <Bell className="size-4" />
+ <span className="sr-only">Alerts</span>
+ </Button>
+ {unreadNotifications > 0 ? (
+ <span className="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-[10px] font-semibold text-white ">
+ {unreadNotifications > 99 ? "99+" : unreadNotifications}
+ </span>
+ ) : null}
+ </Link>
+ <AdminLogoutButton />
+ </div>
+ </div>
+ {children}
+ </section>
+ </div>
+ </div>
+ </div>
+ );
 }

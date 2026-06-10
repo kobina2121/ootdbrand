@@ -13,87 +13,87 @@ import { getProductBySlug, listProducts } from "@/lib/services/product-service";
 import { cn } from "@/lib/utils";
 
 export default async function ProductDetailPage({
-  params,
+ params,
 }: {
-  params: Promise<{ slug: string }>;
+ params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
-  const [product, allProducts, session, productReviews] = await Promise.all([
-    getProductBySlug(slug),
-    listProducts({ activeOnly: true, sort: "latest" }),
-    getCurrentSession(),
-    listReviewsByProductSlug(slug, 30),
-  ]);
+ const { slug } = await params;
+ const [product, allProducts, session, productReviews] = await Promise.all([
+ getProductBySlug(slug),
+ listProducts({ activeOnly: true, sort: "latest" }),
+ getCurrentSession(),
+ listReviewsByProductSlug(slug, 30),
+ ]);
 
-  if (!product) {
-    notFound();
-  }
+ if (!product) {
+ notFound();
+ }
 
-  const canReview = session?.user?.id
-    ? await hasSuccessfulPurchaseForProduct(session.user.id, product.slug)
-    : false;
-  const reviewEligibility = session?.user?.id
-    ? canReview
-      ? "can_review"
-      : "purchase_required"
-    : "login_required";
+ const canReview = session?.user?.id
+ ? await hasSuccessfulPurchaseForProduct(session.user.id, product.slug)
+ : false;
+ const reviewEligibility = session?.user?.id
+ ? canReview
+ ? "can_review"
+ : "purchase_required"
+ : "login_required";
 
-  const recommendations = allProducts
-    .filter((entry) => entry.slug !== product.slug)
-    .sort((a, b) => {
-      const aScore = a.category === product.category ? 1 : 0;
-      const bScore = b.category === product.category ? 1 : 0;
-      return bScore - aScore;
-    })
-    .slice(0, 4)
-    .map((entry) => ({
-      slug: entry.slug,
-      name: entry.name,
-      category: entry.category,
-      image: entry.image,
-      price: entry.basePrice,
-      sizes: [...new Set(entry.variants.map((variant) => variant.size))],
-      rating: 5,
-    }));
+ const recommendations = allProducts
+ .filter((entry) => entry.slug !== product.slug)
+ .sort((a, b) => {
+ const aScore = a.category === product.category ? 1 : 0;
+ const bScore = b.category === product.category ? 1 : 0;
+ return bScore - aScore;
+ })
+ .slice(0, 4)
+ .map((entry) => ({
+ slug: entry.slug,
+ name: entry.name,
+ category: entry.category,
+ image: entry.image,
+ price: entry.basePrice,
+ sizes: [...new Set(entry.variants.map((variant) => variant.size))],
+ rating: 5,
+ }));
 
-  return (
-    <div className="space-y-6">
-      <Link href="/products" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "rounded-full")}>
-        <ArrowLeft className="size-4" />
-        Back to shop
-      </Link>
+ return (
+ <div className="space-y-6">
+ <Link href="/products" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "rounded-full")}>
+ <ArrowLeft className="size-4" />
+ Back to shop
+ </Link>
 
-      <ProductDetailClient product={product} />
+ <ProductDetailClient product={product} />
 
-      <ProductReviews
-        productSlug={product.slug}
-        reviewEligibility={reviewEligibility}
-        reviews={productReviews.map((review) => ({
-          id: review.id,
-          productSlug: review.productSlug,
-          userName: review.userName,
-          rating: review.rating,
-          comment: review.comment,
-          createdAt: review.createdAt.toISOString(),
-        }))}
-      />
+ <ProductReviews
+ productSlug={product.slug}
+ reviewEligibility={reviewEligibility}
+ reviews={productReviews.map((review) => ({
+ id: review.id,
+ productSlug: review.productSlug,
+ userName: review.userName,
+ rating: review.rating,
+ comment: review.comment,
+ createdAt: review.createdAt.toISOString(),
+ }))}
+ />
 
-      <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-[#181513]/90 sm:p-6">
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-[#1f1b18] dark:text-white">You May Also Like</h2>
-          <Link
-            href="/products"
-            className="text-sm text-muted-foreground transition hover:text-foreground"
-          >
-            Browse all
-          </Link>
-        </div>
-        {recommendations.length > 0 ? (
-          <ProductGrid products={recommendations} />
-        ) : (
-          <p className="text-sm text-muted-foreground">More styles are coming soon.</p>
-        )}
-      </section>
-    </div>
-  );
+ <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
+ <div className="mb-5 flex items-center justify-between">
+ <h2 className="text-2xl font-semibold text-[#1f1b18] ">You May Also Like</h2>
+ <Link
+ href="/products"
+ className="text-sm text-muted-foreground transition hover:text-foreground"
+ >
+ Browse all
+ </Link>
+ </div>
+ {recommendations.length > 0 ? (
+ <ProductGrid products={recommendations} />
+ ) : (
+ <p className="text-sm text-muted-foreground">More styles are coming soon.</p>
+ )}
+ </section>
+ </div>
+ );
 }

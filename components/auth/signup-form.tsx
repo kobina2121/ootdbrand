@@ -11,200 +11,200 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 
 export function SignupForm() {
-  const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
-  const [googleStatusChecked, setGoogleStatusChecked] = useState(false);
-  const [isGoogleAvailable, setIsGoogleAvailable] = useState(false);
-  const showGoogleOption = isGoogleAvailable;
+ const router = useRouter();
+ const [errorMessage, setErrorMessage] = useState<string | null>(null);
+ const [isSubmitting, setIsSubmitting] = useState(false);
+ const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+ const [googleStatusChecked, setGoogleStatusChecked] = useState(false);
+ const [isGoogleAvailable, setIsGoogleAvailable] = useState(false);
+ const showGoogleOption = isGoogleAvailable;
 
-  useEffect(() => {
-    let isMounted = true;
+ useEffect(() => {
+ let isMounted = true;
 
-    const checkGoogleAvailability = async () => {
-      try {
-        const statusResponse = await fetch("/api/auth/google-status", { cache: "no-store" });
-        if (!statusResponse.ok) {
-          throw new Error("google-status-unavailable");
-        }
+ const checkGoogleAvailability = async () => {
+ try {
+ const statusResponse = await fetch("/api/auth/google-status", { cache: "no-store" });
+ if (!statusResponse.ok) {
+ throw new Error("google-status-unavailable");
+ }
 
-        const statusJson = (await statusResponse.json()) as {
-          ok: boolean;
-          data?: { enabled?: boolean };
-        };
+ const statusJson = (await statusResponse.json()) as {
+ ok: boolean;
+ data?: { enabled?: boolean };
+ };
 
-        if (!isMounted) {
-          return;
-        }
+ if (!isMounted) {
+ return;
+ }
 
-        const envEnabled = Boolean(statusJson.data?.enabled);
+ const envEnabled = Boolean(statusJson.data?.enabled);
 
-        if (!envEnabled) {
-          setIsGoogleAvailable(false);
-          setGoogleStatusChecked(true);
-          return;
-        }
+ if (!envEnabled) {
+ setIsGoogleAvailable(false);
+ setGoogleStatusChecked(true);
+ return;
+ }
 
-        const providers = await getProviders();
-        if (!isMounted) {
-          return;
-        }
+ const providers = await getProviders();
+ if (!isMounted) {
+ return;
+ }
 
-        setIsGoogleAvailable(Boolean(providers?.google));
-      } catch {
-        if (!isMounted) {
-          return;
-        }
+ setIsGoogleAvailable(Boolean(providers?.google));
+ } catch {
+ if (!isMounted) {
+ return;
+ }
 
-        setIsGoogleAvailable(false);
-      } finally {
-        if (isMounted) {
-          setGoogleStatusChecked(true);
-        }
-      }
-    };
+ setIsGoogleAvailable(false);
+ } finally {
+ if (isMounted) {
+ setGoogleStatusChecked(true);
+ }
+ }
+ };
 
-    void checkGoogleAvailability();
+ void checkGoogleAvailability();
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+ return () => {
+ isMounted = false;
+ };
+ }, []);
 
-  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setErrorMessage(null);
+ const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+ event.preventDefault();
+ setErrorMessage(null);
 
-    const formData = new FormData(event.currentTarget);
-    const payload = {
-      name: String(formData.get("name") ?? "").trim(),
-      email: String(formData.get("email") ?? "").trim(),
-      password: String(formData.get("password") ?? "").trim(),
-    };
+ const formData = new FormData(event.currentTarget);
+ const payload = {
+ name: String(formData.get("name") ?? "").trim(),
+ email: String(formData.get("email") ?? "").trim(),
+ password: String(formData.get("password") ?? "").trim(),
+ };
 
-    setIsSubmitting(true);
+ setIsSubmitting(true);
 
-    try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+ try {
+ const response = await fetch("/api/auth/signup", {
+ method: "POST",
+ headers: {
+ "Content-Type": "application/json",
+ },
+ body: JSON.stringify(payload),
+ });
 
-      const json = (await response.json()) as {
-        ok: boolean;
-        message: string;
-      };
+ const json = (await response.json()) as {
+ ok: boolean;
+ message: string;
+ };
 
-      if (!response.ok || !json.ok) {
-        setErrorMessage(json.message || "Could not create account.");
-        return;
-      }
+ if (!response.ok || !json.ok) {
+ setErrorMessage(json.message || "Could not create account.");
+ return;
+ }
 
-      const loginResult = await signIn("credentials", {
-        email: payload.email,
-        password: payload.password,
-        redirect: false,
-      });
+ const loginResult = await signIn("credentials", {
+ email: payload.email,
+ password: payload.password,
+ redirect: false,
+ });
 
-      if (!loginResult?.ok) {
-        router.push("/login");
-        return;
-      }
+ if (!loginResult?.ok) {
+ router.push("/login");
+ return;
+ }
 
-      router.push("/orders");
-      router.refresh();
-    } catch {
-      setErrorMessage("Signup failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+ router.push("/orders");
+ router.refresh();
+ } catch {
+ setErrorMessage("Signup failed. Please try again.");
+ } finally {
+ setIsSubmitting(false);
+ }
+ };
 
-  const onGoogleSignup = async () => {
-    setErrorMessage(null);
-    setIsGoogleSubmitting(true);
+ const onGoogleSignup = async () => {
+ setErrorMessage(null);
+ setIsGoogleSubmitting(true);
 
-    await signIn("google", {
-      callbackUrl: "/orders",
-    });
-  };
+ await signIn("google", {
+ callbackUrl: "/orders",
+ });
+ };
 
-  return (
-    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm dark:border-white/10 dark:bg-[#181513]/90">
-      <CardHeader className="space-y-2 border-b border-black/10 dark:border-white/10">
-        <p className="text-xs tracking-[0.24em] text-muted-foreground">CREATE ACCOUNT</p>
-        <CardTitle className="font-heading text-5xl leading-none dark:text-[#faf3eb]">Create Customer Account</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {showGoogleOption ? (
-          <Button
-            type="button"
-            variant="outline"
-            className="mb-4 h-11 w-full rounded-full border-black/20 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:hover:bg-white/10"
-            onClick={onGoogleSignup}
-            disabled={isGoogleSubmitting || isSubmitting}
-          >
-            <svg aria-hidden="true" viewBox="0 0 48 48" className="mr-2 size-4">
-              <path
-                fill="#FFC107"
-                d="M43.61 20.08H42V20H24v8h11.3C33.65 32.66 29.19 36 24 36c-6.63 0-12-5.37-12-12s5.37-12 12-12c3.06 0 5.85 1.15 7.96 3.04l5.66-5.66C34.07 6.05 29.29 4 24 4 12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20c0-1.34-.14-2.65-.39-3.92z"
-              />
-              <path
-                fill="#FF3D00"
-                d="M6.31 14.69l6.57 4.82C14.66 15.11 18.96 12 24 12c3.06 0 5.85 1.15 7.96 3.04l5.66-5.66C34.07 6.05 29.29 4 24 4 16.32 4 9.66 8.34 6.31 14.69z"
-              />
-              <path
-                fill="#4CAF50"
-                d="M24 44c5.19 0 9.93-1.99 13.51-5.23l-6.2-5.24C29.24 35.06 26.73 36 24 36c-5.17 0-9.62-3.32-11.26-7.93l-6.52 5.02C9.53 39.57 16.26 44 24 44z"
-              />
-              <path
-                fill="#1976D2"
-                d="M43.61 20.08H42V20H24v8h11.3c-.79 2.37-2.31 4.39-4.29 5.53l6.2 5.24C36.77 39.19 44 34 44 24c0-1.34-.14-2.65-.39-3.92z"
-              />
-            </svg>
-            {isGoogleSubmitting ? "Redirecting..." : "Continue with Google"}
-          </Button>
-        ) : googleStatusChecked ? (
-          <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-            Google sign-up is currently unavailable. Please continue with email and password.
-          </p>
-        ) : null}
-        {showGoogleOption ? (
-          <div className="mb-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
-            <span className="text-xs tracking-[0.2em] text-muted-foreground">OR</span>
-            <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
-          </div>
-        ) : null}
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <div className="space-y-2">
-            <label htmlFor="signup-name" className="text-sm font-medium dark:text-[#faf3eb]">Full name</label>
-            <Input id="signup-name" name="name" type="text" placeholder="Your full name" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="signup-email" className="text-sm font-medium dark:text-[#faf3eb]">Email</label>
-            <Input id="signup-email" name="email" type="email" placeholder="Enter your email address" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="signup-password" className="text-sm font-medium dark:text-[#faf3eb]">Password</label>
-            <PasswordInput id="signup-password" name="password" placeholder="Create a password (min 8 characters)" className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]" required />
-          </div>
-          {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
-          <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating account..." : "Sign up"}
-          </Button>
-        </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
-            <Link href="/login" className="font-medium text-foreground underline underline-offset-4 dark:text-[#faf3eb]">
-              Login
-            </Link>
-        </p>
-      </CardContent>
-    </Card>
-  );
+ return (
+ <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ">
+ <CardHeader className="space-y-2 border-b border-black/10 ">
+ <p className="text-xs tracking-[0.24em] text-muted-foreground">CREATE ACCOUNT</p>
+ <CardTitle className="font-heading text-5xl leading-none ">Create Customer Account</CardTitle>
+ </CardHeader>
+ <CardContent>
+ {showGoogleOption ? (
+ <Button
+ type="button"
+ variant="outline"
+ className="mb-4 h-11 w-full rounded-full border-black/20 "
+ onClick={onGoogleSignup}
+ disabled={isGoogleSubmitting || isSubmitting}
+ >
+ <svg aria-hidden="true" viewBox="0 0 48 48" className="mr-2 size-4">
+ <path
+ fill="#FFC107"
+ d="M43.61 20.08H42V20H24v8h11.3C33.65 32.66 29.19 36 24 36c-6.63 0-12-5.37-12-12s5.37-12 12-12c3.06 0 5.85 1.15 7.96 3.04l5.66-5.66C34.07 6.05 29.29 4 24 4 12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20c0-1.34-.14-2.65-.39-3.92z"
+ />
+ <path
+ fill="#FF3D00"
+ d="M6.31 14.69l6.57 4.82C14.66 15.11 18.96 12 24 12c3.06 0 5.85 1.15 7.96 3.04l5.66-5.66C34.07 6.05 29.29 4 24 4 16.32 4 9.66 8.34 6.31 14.69z"
+ />
+ <path
+ fill="#4CAF50"
+ d="M24 44c5.19 0 9.93-1.99 13.51-5.23l-6.2-5.24C29.24 35.06 26.73 36 24 36c-5.17 0-9.62-3.32-11.26-7.93l-6.52 5.02C9.53 39.57 16.26 44 24 44z"
+ />
+ <path
+ fill="#1976D2"
+ d="M43.61 20.08H42V20H24v8h11.3c-.79 2.37-2.31 4.39-4.29 5.53l6.2 5.24C36.77 39.19 44 34 44 24c0-1.34-.14-2.65-.39-3.92z"
+ />
+ </svg>
+ {isGoogleSubmitting ? "Redirecting..." : "Continue with Google"}
+ </Button>
+ ) : googleStatusChecked ? (
+ <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 ">
+ Google sign-up is currently unavailable. Please continue with email and password.
+ </p>
+ ) : null}
+ {showGoogleOption ? (
+ <div className="mb-4 flex items-center gap-3">
+ <div className="h-px flex-1 bg-black/10 " />
+ <span className="text-xs tracking-[0.2em] text-muted-foreground">OR</span>
+ <div className="h-px flex-1 bg-black/10 " />
+ </div>
+ ) : null}
+ <form className="space-y-4" onSubmit={onSubmit}>
+ <div className="space-y-2">
+ <label htmlFor="signup-name" className="text-sm font-medium ">Full name</label>
+ <Input id="signup-name" name="name" type="text" placeholder="Your full name" className="h-11 rounded-xl border-black/15 " required />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="signup-email" className="text-sm font-medium ">Email</label>
+ <Input id="signup-email" name="email" type="email" placeholder="Enter your email address" className="h-11 rounded-xl border-black/15 " required />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="signup-password" className="text-sm font-medium ">Password</label>
+ <PasswordInput id="signup-password" name="password" placeholder="Create a password (min 8 characters)" className="h-11 rounded-xl border-black/15 " required />
+ </div>
+ {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
+ <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
+ {isSubmitting ? "Creating account..." : "Sign up"}
+ </Button>
+ </form>
+ <p className="mt-4 text-center text-sm text-muted-foreground">
+ Already have an account?{" "}
+ <Link href="/login" className="font-medium text-foreground underline underline-offset-4 ">
+ Login
+ </Link>
+ </p>
+ </CardContent>
+ </Card>
+ );
 }
