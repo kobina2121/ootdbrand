@@ -177,7 +177,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
           <Input
             name="email"
             type="email"
-            placeholder={nextPath.startsWith("/admin") ? "admin@theootd.brand" : "you@example.com"}
+            placeholder={nextPath.startsWith("/admin") ? "admin email" : "you@example.com"}
             className="h-11 rounded-xl border-black/15 dark:border-white/15 dark:bg-[#221d19] dark:text-[#faf3eb] dark:placeholder:text-[#9f9388]"
             required
           />

@@ -6,24 +6,15 @@ import { Types } from "mongoose";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { UserModel, type UserRole } from "@/lib/db/models/user";
 
-const defaultDevAdmin = {
-  email: "admin@theootd.brand",
-  password: "Admin@12345",
-  name: "Store Admin",
-} as const;
-
 function getAdminBootstrapConfig() {
   const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || "";
   const adminPassword = process.env.ADMIN_PASSWORD || "";
   const adminName = process.env.ADMIN_NAME?.trim() || "Store Admin";
-  const allowDevFallback = process.env.ALLOW_DEV_DEFAULT_ADMIN === "true";
-  const useDefaultDevAdmin =
-    allowDevFallback && process.env.NODE_ENV === "development" && (!adminEmail || !adminPassword);
 
   return {
-    adminEmail: adminEmail || (useDefaultDevAdmin ? defaultDevAdmin.email : ""),
-    adminPassword: adminPassword || (useDefaultDevAdmin ? defaultDevAdmin.password : ""),
-    adminName: adminName || (useDefaultDevAdmin ? defaultDevAdmin.name : "Store Admin"),
+    adminEmail,
+    adminPassword,
+    adminName,
   };
 }
 
