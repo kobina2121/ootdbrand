@@ -10,6 +10,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 
+function getLoginErrorMessage(error?: string | null) {
+ if (!error || error === "CredentialsSignin") {
+ return "Invalid credentials. Please try again.";
+ }
+
+ if (error === "AuthServiceUnavailable") {
+ return "Login is temporarily unavailable. Check the database connection and try again.";
+ }
+
+ if (error === "Configuration") {
+ return "Login is temporarily unavailable. Check the authentication configuration and try again.";
+ }
+
+ return "Login failed. Please try again.";
+}
+
 export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
  const router = useRouter();
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -102,7 +118,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
  setIsSubmitting(false);
 
  if (!result?.ok) {
- setErrorMessage("Invalid credentials. Please try again.");
+ setErrorMessage(getLoginErrorMessage(result?.error));
  return;
  }
 

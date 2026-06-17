@@ -77,21 +77,15 @@ export async function ensureAdminUserBootstrap() {
 
   await connectToDatabase();
 
-  const existingAdmin = await UserModel.findOne({ role: "admin" });
-
-  if (existingAdmin) {
-    return toAppUser(existingAdmin);
-  }
-
-  const existingUser = await UserModel.findOne({ email: adminEmail });
   const passwordHash = await bcrypt.hash(adminPassword, 12);
+  const configuredAdmin = await UserModel.findOne({ email: adminEmail });
 
-  if (existingUser) {
-    existingUser.name = existingUser.name || adminName;
-    existingUser.role = "admin";
-    existingUser.passwordHash = passwordHash;
-    await existingUser.save();
-    return toAppUser(existingUser);
+  if (configuredAdmin) {
+    configuredAdmin.name = configuredAdmin.name || adminName;
+    configuredAdmin.role = "admin";
+    configuredAdmin.passwordHash = passwordHash;
+    await configuredAdmin.save();
+    return toAppUser(configuredAdmin);
   }
 
   const created = await UserModel.create({

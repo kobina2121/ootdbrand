@@ -30,6 +30,9 @@ export const authOptions: NextAuthOptions = {
           GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            httpOptions: {
+              timeout: 15000,
+            },
           }),
         ]
       : []),
@@ -47,7 +50,13 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await verifyUserCredentials(email, password);
+        let user;
+        try {
+          user = await verifyUserCredentials(email, password);
+        } catch (error) {
+          console.error("Credentials authentication failed", error);
+          throw new Error("AuthServiceUnavailable");
+        }
 
         if (!user) {
           return null;

@@ -7,6 +7,7 @@ type CachedMongoose = {
 
 declare global {
   var __mongooseCache: CachedMongoose | undefined;
+  var __mongooseConnectionLogged: boolean | undefined;
 }
 
 const cached = global.__mongooseCache ?? { conn: null, promise: null };
@@ -38,8 +39,84 @@ async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function buildMongoUri(rawUri: string) {
+function extractMongoHosts(uri: string) {
+  if (uri.startsWith("mongodb://")) {
+    const remainder = uri.slice("mongodb://".length);
+    const [authorityAndPath] = remainder.split("?", 1);
+    const slashIndex = authorityAndPath.indexOf("/");
+    const authority = slashIndex >= 0 ? authorityAndPath.slice(0, slashIndex) : authorityAndPath;
+    const hostSection = authority.includes("@") ? authority.split("@").pop() ?? "" : authority;
+    return hostSection
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+  }
+
+  try {
+    const parsed = new URL(uri);
+    return parsed.host ? [parsed.host] : [];
+  } catch {
+    return [];
+  }
+}
+
+function logMongoConnection(kind: "direct" | "srv", uri: string) {
+  const shouldLogConnection =
+    process.env.NODE_ENV === "development" && process.env.DEBUG_MONGODB_CONNECTION?.trim() === "true";
+
+  if (!shouldLogConnection || global.__mongooseConnectionLogged) {
+    return;
+  }
+
+  const dbName = process.env.MONGODB_DB_NAME?.trim() || "tide-brand";
+  const hosts = extractMongoHosts(uri);
+
+  console.info(
+    `[db] Connected to MongoDB (${kind}) using database "${dbName}" on ${hosts.length > 0 ? hosts.join(", ") : "unknown host"}`,
+  );
+
+  global.__mongooseConnectionLogged = true;
+}
+
+function buildDirectMongoUri(rawUri: string, dbName: string) {
+  const scheme = "mongodb://";
+
+  if (!rawUri.startsWith(scheme)) {
+    throw new Error("Invalid MONGODB_URI format");
+  }
+
+  const remainder = rawUri.slice(scheme.length);
+  const [authorityAndPath, rawQuery = ""] = remainder.split("?", 2);
+  const slashIndex = authorityAndPath.indexOf("/");
+  const authority = slashIndex >= 0 ? authorityAndPath.slice(0, slashIndex) : authorityAndPath;
+  const pathname = slashIndex >= 0 ? authorityAndPath.slice(slashIndex) : "/";
+
+  if (!authority) {
+    throw new Error("Invalid MONGODB_URI format");
+  }
+
+  const searchParams = new URLSearchParams(rawQuery);
+  if (!searchParams.has("retryWrites")) {
+    searchParams.set("retryWrites", "true");
+  }
+
+  if (!searchParams.has("w")) {
+    searchParams.set("w", "majority");
+  }
+
+  const normalizedPathname = pathname === "/" ? `/${dbName}` : pathname;
+  const query = searchParams.toString();
+
+  return `${scheme}${authority}${normalizedPathname}${query ? `?${query}` : ""}`;
+}
+
+export function buildMongoUri(rawUri: string) {
   const uri = rawUri.trim();
+  const dbName = process.env.MONGODB_DB_NAME?.trim() || "tide-brand";
+
+  if (uri.startsWith("mongodb://")) {
+    return buildDirectMongoUri(uri, dbName);
+  }
 
   let parsed: URL;
   try {
@@ -48,7 +125,6 @@ function buildMongoUri(rawUri: string) {
     throw new Error("Invalid MONGODB_URI format");
   }
 
-  const dbName = process.env.MONGODB_DB_NAME?.trim() || "theootd-brand";
   if (!parsed.pathname || parsed.pathname === "/") {
     parsed.pathname = `/${dbName}`;
   }
@@ -110,12 +186,15 @@ export async function connectToDatabase() {
       for (const candidate of candidates) {
         for (let attempt = 1; attempt <= 3; attempt += 1) {
           try {
-            return await mongoose.connect(candidate.uri, {
+            const connection = await mongoose.connect(candidate.uri, {
               dbName: process.env.MONGODB_DB_NAME,
               serverSelectionTimeoutMS: 10000,
               socketTimeoutMS: 20000,
               family: 4,
             });
+
+            logMongoConnection(candidate.kind, candidate.uri);
+            return connection;
           } catch (error) {
             lastError = error;
 
