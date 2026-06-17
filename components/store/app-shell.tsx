@@ -232,8 +232,8 @@ export function AppShell({ children, user }: AppShellProps) {
  alt="TIDE"
  width={336}
  height={96}
- className="h-16 w-auto object-contain sm:h-20 lg:h-24"
- priority={false}
+ className="h-auto w-40 object-contain sm:w-52 lg:w-60"
+ loading="eager"
  />
  </Link>
  <p className="mt-4 text-xs tracking-[0.28em] text-[#7d7771] ">
