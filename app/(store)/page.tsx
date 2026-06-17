@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
 import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
 import { buttonVariants } from "@/components/ui/button";
-import { formatPriceNgn, products } from "@/lib/products";
+import { formatPriceNgn } from "@/lib/products";
 import { listProducts } from "@/lib/services/product-service";
 import { cn } from "@/lib/utils";
 
@@ -86,10 +86,10 @@ const editorialShowcase = {
 
 export default async function HomePage() {
  const catalogProducts = await listProducts({ activeOnly: true, sort: "latest" });
- const featuredCatalogProducts = (catalogProducts.length > 0 ? catalogProducts : products).slice(0, 6);
+ const featuredCatalogProducts = catalogProducts.slice(0, 6);
 
  const productDetailsBySlug = Object.fromEntries(
- [...products, ...catalogProducts].map((product) => [
+ catalogProducts.map((product) => [
  product.slug,
  {
  description: product.description,
@@ -109,7 +109,7 @@ export default async function HomePage() {
  <Image
  key={image}
  src={image}
- alt={`theootd.brand hero ${index + 1}`}
+     alt={`Tide hero ${index + 1}`}
  fill
  sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), 1440px"
  className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"

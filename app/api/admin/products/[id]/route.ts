@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { requireAdminUser } from "@/lib/auth/guards";
@@ -9,6 +10,18 @@ import { adminProductUpdateSchema } from "@/lib/validators/admin";
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
+
+function revalidateProductPaths(...slugs: Array<string | undefined>) {
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/custom-order");
+  revalidatePath("/admin/products");
+
+  const uniqueSlugs = Array.from(new Set(slugs.filter((slug): slug is string => Boolean(slug))));
+  uniqueSlugs.forEach((slug) => {
+    revalidatePath(`/products/${slug}`);
+  });
+}
 
 function resolveProductWriteError(error: unknown) {
   if (error instanceof Error && error.name === "ValidationError") {
@@ -96,6 +109,12 @@ export async function PATCH(request: Request, context: RouteContext) {
   const { id } = await context.params;
 
   try {
+    const existing = await getProductById(id);
+
+    if (!existing) {
+      return NextResponse.json(failure("Product not found"), { status: 404 });
+    }
+
     const json = await request.json();
     const parsed = adminProductUpdateSchema.safeParse(json);
 
@@ -108,6 +127,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (!updated) {
       return NextResponse.json(failure("Product not found"), { status: 404 });
     }
+
+    revalidateProductPaths(existing.slug, updated.slug);
 
     return NextResponse.json(success("Product updated", updated));
   } catch (error) {
@@ -143,11 +164,19 @@ export async function DELETE(request: Request, context: RouteContext) {
   const { id } = await context.params;
 
   try {
+    const existing = await getProductById(id);
+
+    if (!existing) {
+      return NextResponse.json(failure("Product not found"), { status: 404 });
+    }
+
     const deleted = await deleteProductById(id);
 
     if (!deleted) {
       return NextResponse.json(failure("Product not found"), { status: 404 });
     }
+
+    revalidateProductPaths(existing.slug);
 
     return NextResponse.json(success("Product deleted", {}));
   } catch {

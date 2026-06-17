@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { requireAdminUser } from "@/lib/auth/guards";
@@ -5,6 +6,17 @@ import { failure, success } from "@/lib/api-response";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { createProduct, listProducts } from "@/lib/services/product-service";
 import { adminProductSchema } from "@/lib/validators/admin";
+
+function revalidateProductPaths(slug?: string) {
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/custom-order");
+  revalidatePath("/admin/products");
+
+  if (slug) {
+    revalidatePath(`/products/${slug}`);
+  }
+}
 
 function resolveProductWriteError(error: unknown) {
   if (error instanceof Error && error.name === "ValidationError") {
@@ -91,6 +103,7 @@ export async function POST(request: Request) {
     }
 
     const created = await createProduct(parsed.data);
+    revalidateProductPaths(created.slug);
 
     return NextResponse.json(success("Product created", created), { status: 201 });
   } catch (error) {

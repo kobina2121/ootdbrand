@@ -1,9 +1,9 @@
 import { Types } from "mongoose";
+import { unstable_noStore as noStore } from "next/cache";
 
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { ProductModel } from "@/lib/db/models/product";
-import { seedProductsIfEmpty } from "@/lib/db/seed";
-import { products as fallbackProducts, type CartItem, type Product } from "@/lib/products";
+import { type CartItem, type Product } from "@/lib/products";
 
 export type ProductFilters = {
   activeOnly?: boolean;
@@ -76,62 +76,48 @@ function sortProducts(items: Product[], sort: ProductFilters["sort"]) {
 }
 
 export async function listProducts(filters: ProductFilters = {}) {
-  try {
-    await connectToDatabase();
-    await seedProductsIfEmpty();
+  noStore();
+  await connectToDatabase();
 
-    const query: Record<string, unknown> = {};
+  const query: Record<string, unknown> = {};
 
-    if (filters.activeOnly) {
-      query.isActive = true;
-    }
-
-    if (filters.category && filters.category.toLowerCase() !== "all") {
-      query.category = new RegExp(`^${filters.category}$`, "i");
-    }
-
-    const docs = await ProductModel.find(query).lean();
-    const mapped = docs.map((doc) => ({
-      slug: doc.slug,
-      name: doc.name,
-      category: doc.category,
-      description: doc.description,
-      basePrice: doc.basePrice,
-      image: doc.images[0] ?? "",
-      images: doc.images ?? [],
-      variants: doc.variants.map((variant) => ({
-        size: variant.size,
-        color: variant.color?.name ?? "Unknown",
-        colorCode: variant.color?.code ?? "#9CA3AF",
-        image: variant.image ?? undefined,
-        sku: variant.sku,
-        stock: variant.stock,
-        priceOverride: variant.priceOverride ?? undefined,
-      })),
-    })) satisfies Product[];
-
-    return sortProducts(mapped, filters.sort);
-  } catch {
-    // Keep storefront usable if DB is temporarily unavailable.
-    const items =
-      filters.category && filters.category.toLowerCase() !== "all"
-        ? fallbackProducts.filter((product) => product.category.toLowerCase() === filters.category?.toLowerCase())
-        : fallbackProducts;
-
-    return sortProducts(items, filters.sort);
+  if (filters.activeOnly) {
+    query.isActive = true;
   }
+
+  if (filters.category && filters.category.toLowerCase() !== "all") {
+    query.category = new RegExp(`^${filters.category}$`, "i");
+  }
+
+  const docs = await ProductModel.find(query).lean();
+  const mapped = docs.map((doc) => ({
+    slug: doc.slug,
+    name: doc.name,
+    category: doc.category,
+    description: doc.description,
+    basePrice: doc.basePrice,
+    image: doc.images[0] ?? "",
+    images: doc.images ?? [],
+    variants: doc.variants.map((variant) => ({
+      size: variant.size,
+      color: variant.color?.name ?? "Unknown",
+      colorCode: variant.color?.code ?? "#9CA3AF",
+      image: variant.image ?? undefined,
+      sku: variant.sku,
+      stock: variant.stock,
+      priceOverride: variant.priceOverride ?? undefined,
+    })),
+  })) satisfies Product[];
+
+  return sortProducts(mapped, filters.sort);
 }
 
 export async function getProductBySlug(slug: string) {
-  try {
-    await connectToDatabase();
-    await seedProductsIfEmpty();
+  noStore();
+  await connectToDatabase();
 
-    const doc = await ProductModel.findOne({ slug: slug.toLowerCase() });
-    return toUiProduct(doc);
-  } catch {
-    return fallbackProducts.find((product) => product.slug === slug) ?? null;
-  }
+  const doc = await ProductModel.findOne({ slug: slug.toLowerCase() });
+  return toUiProduct(doc);
 }
 
 export async function getProductById(id: string) {
@@ -139,6 +125,7 @@ export async function getProductById(id: string) {
     return null;
   }
 
+  noStore();
   await connectToDatabase();
   const doc = await ProductModel.findById(id).lean();
 
@@ -239,8 +226,8 @@ export async function deleteProductById(id: string) {
 }
 
 export async function resolveOrderItemsFromCart(items: CartItem[]): Promise<ResolvedOrderItem[]> {
+  noStore();
   await connectToDatabase();
-  await seedProductsIfEmpty();
 
   const skus = items.map((item) => item.sku);
   const docs = await ProductModel.find({ "variants.sku": { $in: skus } }).lean();
@@ -301,24 +288,20 @@ export async function resolveOrderItemsFromCart(items: CartItem[]): Promise<Reso
 }
 
 export async function listProductsForAdmin() {
-  try {
-    await connectToDatabase();
-    await seedProductsIfEmpty();
+  noStore();
+  await connectToDatabase();
 
-    const docs = await ProductModel.find().sort({ createdAt: -1 }).lean();
+  const docs = await ProductModel.find().sort({ createdAt: -1 }).lean();
 
-    return docs.map((doc) => ({
-      id: String(doc._id),
-      name: doc.name,
-      category: doc.category,
-      slug: doc.slug,
-      isActive: doc.isActive,
-      variantsCount: doc.variants.length,
-      updatedAt: doc.updatedAt,
-    }));
-  } catch {
-    return [];
-  }
+  return docs.map((doc) => ({
+    id: String(doc._id),
+    name: doc.name,
+    category: doc.category,
+    slug: doc.slug,
+    isActive: doc.isActive,
+    variantsCount: doc.variants.length,
+    updatedAt: doc.updatedAt,
+  }));
 }
 
 export async function listProductsForAdminPaged(filters: AdminProductListFilters = {}) {
@@ -327,63 +310,51 @@ export async function listProductsForAdminPaged(filters: AdminProductListFilters
   const q = (filters.q ?? "").trim();
   const status = filters.status ?? "all";
 
-  try {
-    await connectToDatabase();
-    await seedProductsIfEmpty();
+  noStore();
+  await connectToDatabase();
 
-    const query: Record<string, unknown> = {};
+  const query: Record<string, unknown> = {};
 
-    if (q) {
-      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const searchRegex = new RegExp(escaped, "i");
+  if (q) {
+    const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const searchRegex = new RegExp(escaped, "i");
 
-      query.$or = [{ name: searchRegex }, { category: searchRegex }, { slug: searchRegex }];
-    }
-
-    if (status === "active") {
-      query.isActive = true;
-    } else if (status === "inactive") {
-      query.isActive = false;
-    }
-
-    const [docs, totalCount] = await Promise.all([
-      ProductModel.find(query)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .lean(),
-      ProductModel.countDocuments(query),
-    ]);
-
-    const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-    const safePage = Math.min(page, totalPages);
-
-    return {
-      products: docs.map((doc) => ({
-        id: String(doc._id),
-        name: doc.name,
-        category: doc.category,
-        slug: doc.slug,
-        isActive: doc.isActive,
-        variantsCount: doc.variants.length,
-        updatedAt: doc.updatedAt,
-      })),
-      pagination: {
-        page: safePage,
-        pageSize,
-        totalCount,
-        totalPages,
-      },
-    };
-  } catch {
-    return {
-      products: [],
-      pagination: {
-        page: 1,
-        pageSize,
-        totalCount: 0,
-        totalPages: 1,
-      },
-    };
+    query.$or = [{ name: searchRegex }, { category: searchRegex }, { slug: searchRegex }];
   }
+
+  if (status === "active") {
+    query.isActive = true;
+  } else if (status === "inactive") {
+    query.isActive = false;
+  }
+
+  const [docs, totalCount] = await Promise.all([
+    ProductModel.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .lean(),
+    ProductModel.countDocuments(query),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const safePage = Math.min(page, totalPages);
+
+  return {
+    products: docs.map((doc) => ({
+      id: String(doc._id),
+      name: doc.name,
+      category: doc.category,
+      slug: doc.slug,
+      isActive: doc.isActive,
+      variantsCount: doc.variants.length,
+      updatedAt: doc.updatedAt,
+    })),
+    pagination: {
+      page: safePage,
+      pageSize,
+      totalCount,
+      totalPages,
+    },
+  };
 }

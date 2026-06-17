@@ -2,9 +2,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireAdminUser } from "@/lib/auth/guards";
 import { deleteProductById, getProductById, updateProductById } from "@/lib/services/product-service";
+import { revalidatePath } from "next/cache";
 
 vi.mock("@/lib/auth/guards", () => ({
   requireAdminUser: vi.fn(),
+}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
 }));
 
 vi.mock("@/lib/services/product-service", () => ({
@@ -19,6 +24,7 @@ const mockRequireAdminUser = vi.mocked(requireAdminUser);
 const mockGetProductById = vi.mocked(getProductById);
 const mockUpdateProductById = vi.mocked(updateProductById);
 const mockDeleteProductById = vi.mocked(deleteProductById);
+const mockRevalidatePath = vi.mocked(revalidatePath);
 
 const context = { params: Promise.resolve({ id: "507f1f77bcf86cd799439011" }) };
 
@@ -54,6 +60,7 @@ describe("Admin product by id route", () => {
 
   it("updates product and returns 200", async () => {
     mockRequireAdminUser.mockResolvedValue({ user: { id: "admin-id", role: "admin" } } as never);
+    mockGetProductById.mockResolvedValue({ id: "p1", slug: "dress-old" } as never);
     mockUpdateProductById.mockResolvedValue({ id: "p1", slug: "dress" } as never);
 
     const request = new Request("http://localhost:3000/api/admin/products/id", {
@@ -71,10 +78,17 @@ describe("Admin product by id route", () => {
       message: "Product updated",
       data: { id: "p1", slug: "dress" },
     });
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/products");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/custom-order");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/products");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/products/dress-old");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/products/dress");
   });
 
   it("deletes product and returns 200", async () => {
     mockRequireAdminUser.mockResolvedValue({ user: { id: "admin-id", role: "admin" } } as never);
+    mockGetProductById.mockResolvedValue({ id: "p1", slug: "dress" } as never);
     mockDeleteProductById.mockResolvedValue(true);
 
     const response = await DELETE(new Request("http://localhost:3000/api/admin/products/id"), context);
@@ -85,5 +99,10 @@ describe("Admin product by id route", () => {
       ok: true,
       message: "Product deleted",
     });
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/products");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/custom-order");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/products");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/products/dress");
   });
 });

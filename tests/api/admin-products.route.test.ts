@@ -2,9 +2,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireAdminUser } from "@/lib/auth/guards";
 import { createProduct, listProducts } from "@/lib/services/product-service";
+import { revalidatePath } from "next/cache";
 
 vi.mock("@/lib/auth/guards", () => ({
   requireAdminUser: vi.fn(),
+}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
 }));
 
 vi.mock("@/lib/services/product-service", () => ({
@@ -17,6 +22,7 @@ import { GET, POST } from "@/app/api/admin/products/route";
 const mockRequireAdminUser = vi.mocked(requireAdminUser);
 const mockCreateProduct = vi.mocked(createProduct);
 const mockListProducts = vi.mocked(listProducts);
+const mockRevalidatePath = vi.mocked(revalidatePath);
 
 const validPayload = {
   name: "Test Dress",
@@ -87,6 +93,11 @@ describe("Admin products route", () => {
       data: { id: "product-1", slug: "test-dress" },
     });
     expect(mockCreateProduct).toHaveBeenCalledWith(validPayload);
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/products");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/custom-order");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/products");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/products/test-dress");
   });
 
   it("returns 409 on duplicate slug", async () => {
