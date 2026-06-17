@@ -16,7 +16,7 @@ type RateLimitCheck =
       retryAfterSeconds: number;
     };
 
-const RATE_LIMIT_STORE_KEY = "__theootd_rate_limit_store__";
+const RATE_LIMIT_STORE_KEY = "__tide_rate_limit_store__";
 
 function getStore() {
   const globalScope = globalThis as typeof globalThis & {

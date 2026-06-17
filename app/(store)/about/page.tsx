@@ -8,7 +8,7 @@ const milestones = [
  year: "2023",
  title: "The First Sketch",
  description:
- "theootd.brand started with a simple idea: create elegant pieces that make women feel confident the moment they wear them.",
+ "Tide started with a simple idea: create elegant pieces that make women feel confident the moment they wear them.",
  },
  {
  year: "2024",
@@ -55,7 +55,7 @@ export default function AboutPage() {
  <div className="max-w-3xl space-y-5">
  <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Our Story</h1>
  <p className="text-base leading-relaxed text-[#645f59] sm:text-lg">
- theootd.brand is built on style, intention, and identity. We create statement pieces for women who want to
+ Tide is built on style, intention, and identity. We create statement pieces for women who want to
  feel effortlessly elegant and unapologetically confident.
  </p>
  </div>
@@ -82,7 +82,7 @@ export default function AboutPage() {
  <h2 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">{ownerProfile.name}</h2>
  <p className="text-sm uppercase tracking-[0.2em] text-[#6b655f] ">{ownerProfile.title}</p>
  <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
- theootd.brand started from a clear idea: women deserve pieces that make them feel beautiful, confident,
+ Tide started from a clear idea: women deserve pieces that make them feel beautiful, confident,
  and fully themselves. Every collection is built with intention, from silhouette choices to finishing detail.
  </p>
  <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
@@ -119,7 +119,7 @@ export default function AboutPage() {
  as they look.
  </p>
  <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
- Beyond clothing, theootd.brand is about expression, ownership of personal style, and wearing every piece
+ Beyond clothing, Tide is about expression, ownership of personal style, and wearing every piece
  with bold intention.
  </p>
  </CardContent>

@@ -67,7 +67,7 @@ export async function sendResetPasswordEmail(input: SendResetPasswordEmailInput)
     auth: config.auth,
   });
 
-  const brandName = input.brandName || "theootd.brand";
+  const brandName = input.brandName || "Tide";
   const safeBrandName = escapeHtml(brandName);
   const safeResetUrl = escapeHtml(input.resetUrl);
 
@@ -122,7 +122,7 @@ export async function sendAdminOrderEmail(input: SendAdminOrderEmailInput) {
   await transporter.sendMail({
     from: config.from,
     to: adminEmail,
-    subject: `[theootd.brand] New ${input.orderType} • ${input.reference}`,
+    subject: `[Tide] New ${input.orderType} • ${input.reference}`,
     text: [
       `New ${input.orderType} received.`,
       `Reference: ${input.reference}`,

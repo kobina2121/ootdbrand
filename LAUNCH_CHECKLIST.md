@@ -1,4 +1,4 @@
-# Launch Checklist (theootd.brand)
+# Launch Checklist (Tide)
 
 Use this checklist before merging `codex/next-task` into `main` and going live.
 

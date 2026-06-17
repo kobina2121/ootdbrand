@@ -54,7 +54,7 @@ export async function POST(request: Request) {
         await sendResetPasswordEmail({
           to: parsed.data.email,
           resetUrl,
-          brandName: "theootd.brand",
+          brandName: "Tide",
         });
       } catch {
         return NextResponse.json(failure("Could not send password reset email. Please try again."), { status: 502 });

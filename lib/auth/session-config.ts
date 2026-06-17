@@ -19,7 +19,7 @@ export function getAuthSecret() {
   }
 
   if (process.env.NODE_ENV === "development") {
-    return "theootd-dev-nextauth-secret-change-me";
+    return "tide-dev-nextauth-secret-change-me";
   }
 
   throw new Error("Missing NEXTAUTH_SECRET or AUTH_SECRET environment variable.");
@@ -41,5 +41,5 @@ export function shouldUseSecureAuthCookies() {
 
 export function getSessionTokenCookieName() {
   const securePrefix = shouldUseSecureAuthCookies() ? "__Secure-" : "";
-  return `${securePrefix}theootd.session-token.v1`;
+  return `${securePrefix}tide.session-token.v1`;
 }

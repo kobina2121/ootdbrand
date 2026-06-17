@@ -123,7 +123,7 @@ describe("POST /api/custom-order/init", () => {
       user: {
         id: "admin_1",
         name: "Store Admin",
-        email: "admin@theootd.brand",
+        email: "admin@tide.brand",
         role: "admin",
       },
       expires: new Date(Date.now() + 60_000).toISOString(),

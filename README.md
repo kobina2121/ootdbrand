@@ -1,4 +1,4 @@
-# theootd.brand E-commerce MVP
+# Tide E-commerce MVP
 
 Next.js 16 App Router storefront + admin with MongoDB, Auth.js role guards, and Paystack payment/webhook integration.
 
@@ -26,7 +26,7 @@ Copy `.env.example` to `.env` and fill values:
 - `PAYSTACK_SECRET_KEY`
 - `PAYSTACK_WEBHOOK_SECRET` (or fallback to secret key)
 - `NEXT_PUBLIC_APP_URL`
-- `EMAIL_FROM` (e.g. `"theootd.brand <no-reply@yourdomain.com>"`)
+- `EMAIL_FROM` (e.g. `"Tide <no-reply@yourdomain.com>"`)
 - `SMTP_HOST`
 - `SMTP_PORT` (usually `587` or `465`)
 - `SMTP_USER`

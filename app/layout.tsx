@@ -14,7 +14,7 @@ const cormorantGaramond = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "theootd.brand E-commerce",
+  title: "Tide E-commerce",
   description: "Production-ready clothing e-commerce MVP",
 };
 
