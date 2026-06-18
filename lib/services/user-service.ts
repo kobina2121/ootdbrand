@@ -37,8 +37,12 @@ type PasswordChangeResult =
   | { ok: false; reason: "invalid-user" | "password-not-set" | "invalid-current-password" | "same-password" };
 
 type ProfileUpdateResult =
-  | { ok: true; user: AppUser; emailChanged: boolean }
-  | { ok: false; reason: "invalid-user" | "duplicate-email" };
+  | { ok: true; user: AppUser; emailChanged: boolean; pendingEmail?: string; verificationToken?: string }
+  | { ok: false; reason: "invalid-user" | "duplicate-email" | "invalid-current-password" | "password-not-set" };
+
+type EmailVerificationResult =
+  | { ok: true; user: AppUser }
+  | { ok: false; reason: "invalid-token" | "duplicate-email" };
 
 function toAppUser(doc: {
   _id: unknown;
@@ -293,6 +297,7 @@ export async function updateProfileForUser(input: {
   userId: string;
   name: string;
   email: string;
+  currentPassword?: string;
 }): Promise<ProfileUpdateResult> {
   if (!Types.ObjectId.isValid(input.userId)) {
     return { ok: false, reason: "invalid-user" };
@@ -309,19 +314,50 @@ export async function updateProfileForUser(input: {
   const normalizedEmail = input.email.trim().toLowerCase();
   const trimmedName = input.name.trim();
 
+  user.name = trimmedName;
+
+  if (user.email === normalizedEmail) {
+    await user.save();
+
+    return {
+      ok: true,
+      user: {
+        id: String(user._id),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      emailChanged: false,
+      pendingEmail: user.pendingEmail ?? undefined,
+    };
+  }
+
+  if (!user.passwordHash) {
+    return { ok: false, reason: "password-not-set" };
+  }
+
+  if (!input.currentPassword) {
+    return { ok: false, reason: "invalid-current-password" };
+  }
+
+  const isCurrentMatch = await bcrypt.compare(input.currentPassword, user.passwordHash);
+  if (!isCurrentMatch) {
+    return { ok: false, reason: "invalid-current-password" };
+  }
+
   const duplicate = await UserModel.findOne({
-    email: normalizedEmail,
     _id: { $ne: user._id },
+    $or: [{ email: normalizedEmail }, { pendingEmail: normalizedEmail }],
   }).lean();
 
   if (duplicate) {
     return { ok: false, reason: "duplicate-email" };
   }
 
-  const emailChanged = user.email !== normalizedEmail;
-
-  user.name = trimmedName;
-  user.email = normalizedEmail;
+  const verificationToken = randomBytes(32).toString("hex");
+  user.pendingEmail = normalizedEmail;
+  user.pendingEmailChangeTokenHash = createResetTokenHash(verificationToken);
+  user.pendingEmailChangeExpiresAt = new Date(Date.now() + 1000 * 60 * 30);
   await user.save();
 
   return {
@@ -332,6 +368,47 @@ export async function updateProfileForUser(input: {
       email: user.email,
       role: user.role,
     },
-    emailChanged,
+    emailChanged: false,
+    pendingEmail: user.pendingEmail,
+    verificationToken,
+  };
+}
+
+export async function verifyEmailChangeByToken(token: string): Promise<EmailVerificationResult> {
+  await connectToDatabase();
+
+  const tokenHash = createResetTokenHash(token);
+  const user = await UserModel.findOne({
+    pendingEmailChangeTokenHash: tokenHash,
+    pendingEmailChangeExpiresAt: { $gt: new Date() },
+  });
+
+  if (!user || !user.pendingEmail) {
+    return { ok: false, reason: "invalid-token" };
+  }
+
+  const duplicate = await UserModel.findOne({
+    _id: { $ne: user._id },
+    $or: [{ email: user.pendingEmail }, { pendingEmail: user.pendingEmail }],
+  }).lean();
+
+  if (duplicate) {
+    return { ok: false, reason: "duplicate-email" };
+  }
+
+  user.email = user.pendingEmail;
+  user.pendingEmail = undefined;
+  user.pendingEmailChangeTokenHash = undefined;
+  user.pendingEmailChangeExpiresAt = undefined;
+  await user.save();
+
+  return {
+    ok: true,
+    user: {
+      id: String(user._id),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
   };
 }

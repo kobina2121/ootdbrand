@@ -7,6 +7,7 @@ import { UserLogoutButton } from "@/components/store/user-logout-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 type ProfileSettingsFormProps = {
  initialName: string;
@@ -23,20 +24,30 @@ type UpdateProfileResponse = {
  email: string;
  };
  emailChanged?: boolean;
+ pendingEmail?: string;
  };
 };
 
 export function ProfileSettingsForm({ initialName, initialEmail, role }: ProfileSettingsFormProps) {
+ const [savedName, setSavedName] = useState(initialName);
+ const [savedEmail, setSavedEmail] = useState(initialEmail);
  const [name, setName] = useState(initialName);
  const [email, setEmail] = useState(initialEmail);
+ const [currentPassword, setCurrentPassword] = useState("");
+ const [pendingEmail, setPendingEmail] = useState<string | null>(null);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const [successMessage, setSuccessMessage] = useState<string | null>(null);
  const [emailChangedNotice, setEmailChangedNotice] = useState(false);
+ const comparisonEmail = pendingEmail ?? savedEmail;
+ const normalizedInputEmail = email.trim().toLowerCase();
+ const normalizedPendingEmail = pendingEmail?.toLowerCase() ?? null;
+ const requiresCurrentPassword =
+ normalizedInputEmail !== savedEmail.toLowerCase() && normalizedInputEmail !== normalizedPendingEmail;
 
  const hasChanges = useMemo(
- () => name.trim() !== initialName || email.trim().toLowerCase() !== initialEmail.toLowerCase(),
- [email, initialEmail, initialName, name],
+ () => name.trim() !== savedName || email.trim().toLowerCase() !== comparisonEmail.toLowerCase(),
+ [comparisonEmail, email, name, savedName],
  );
 
  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -53,6 +64,11 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
  return;
  }
 
+ if (requiresCurrentPassword && !currentPassword.trim()) {
+ setErrorMessage("Current password is required to change your email address.");
+ return;
+ }
+
  setIsSubmitting(true);
 
  try {
@@ -64,6 +80,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
  body: JSON.stringify({
  name: trimmedName,
  email: trimmedEmail,
+ currentPassword: currentPassword.trim() || undefined,
  }),
  });
 
@@ -74,8 +91,16 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
  return;
  }
 
- setName(json.data?.user?.name ?? trimmedName);
- setEmail(json.data?.user?.email ?? trimmedEmail);
+ const nextName = json.data?.user?.name ?? trimmedName;
+ const nextEmail = json.data?.user?.email ?? savedEmail;
+ const nextPendingEmail = json.data?.pendingEmail ?? null;
+
+ setSavedName(nextName);
+ setSavedEmail(nextEmail);
+ setName(nextName);
+ setPendingEmail(nextPendingEmail);
+ setEmail(nextPendingEmail ?? nextEmail);
+ setCurrentPassword("");
  setSuccessMessage(json.message);
  setEmailChangedNotice(Boolean(json.data?.emailChanged));
  } catch {
@@ -105,7 +130,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
  </div>
  <div>
  <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">Email on file</p>
- <p className="mt-1 break-all font-medium">{initialEmail}</p>
+ <p className="mt-1 break-all font-medium">{savedEmail}</p>
  </div>
  <div>
  <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">Security</p>
@@ -137,11 +162,33 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
  />
  </div>
  </div>
+ {pendingEmail ? (
+ <p className="text-sm text-[#6b655f] ">
+ Verification pending for <span className="font-medium">{pendingEmail}</span>. Open the verification link sent there to finish the email change.
+ </p>
+ ) : null}
+ {requiresCurrentPassword ? (
+ <div className="space-y-2">
+ <label className="text-sm font-medium" htmlFor="profile-current-password">Current password</label>
+ <PasswordInput
+ id="profile-current-password"
+ value={currentPassword}
+ onChange={(event) => setCurrentPassword(event.target.value)}
+ className="h-11 rounded-xl border-black/15 "
+ placeholder="Enter current password to verify this email change"
+ />
+ </div>
+ ) : null}
  {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
  {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
  {emailChangedNotice ? (
  <p className="text-sm text-[#6b655f] ">
  Your email was updated. Sign out and sign back in to refresh it across the whole site.
+ </p>
+ ) : null}
+ {!emailChangedNotice && pendingEmail ? (
+ <p className="text-sm text-[#6b655f] ">
+ Your login email will not change until you verify the new address.
  </p>
  ) : null}
  <div className="flex flex-wrap items-center gap-3">

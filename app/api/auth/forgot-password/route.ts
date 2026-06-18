@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
+import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { isSmtpConfigured, sendResetPasswordEmail } from "@/lib/email/smtp";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { requestPasswordReset } from "@/lib/services/user-service";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email("Enter a valid email address"),
+  email: z.string().trim().email("Enter a valid email address").optional(),
 });
 
 export async function POST(request: Request) {
@@ -46,17 +47,34 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("Invalid request"), { status: 400 });
     }
 
-    const result = await requestPasswordReset(parsed.data.email);
+    const session = await requireAuthenticatedUser();
+    const requestedEmail = parsed.data.email?.trim().toLowerCase();
+    const authenticatedEmail = session?.user?.email?.trim().toLowerCase();
+
+    if (authenticatedEmail && requestedEmail && requestedEmail !== authenticatedEmail) {
+      return NextResponse.json(failure("Signed-in users can only reset the password for their own account."), {
+        status: 403,
+      });
+    }
+
+    const effectiveEmail = authenticatedEmail ?? requestedEmail;
+
+    if (!effectiveEmail) {
+      return NextResponse.json(failure("Email is required."), { status: 400 });
+    }
+
+    const result = await requestPasswordReset(effectiveEmail);
     if (result.requested) {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
       const resetUrl = `${appUrl}/reset-password?token=${result.token}`;
       try {
         await sendResetPasswordEmail({
-          to: parsed.data.email,
+          to: effectiveEmail,
           resetUrl,
           brandName: "Tide",
         });
-      } catch {
+      } catch (error) {
+        console.error("[auth.forgot-password] Failed to send reset email", error);
         return NextResponse.json(failure("Could not send password reset email. Please try again."), { status: 502 });
       }
     }

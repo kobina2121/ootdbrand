@@ -6,6 +6,13 @@ type SendResetPasswordEmailInput = {
   brandName?: string;
 };
 
+type SendEmailChangeVerificationEmailInput = {
+  to: string;
+  verifyUrl: string;
+  brandName?: string;
+  currentEmail: string;
+};
+
 type SendAdminOrderEmailInput = {
   orderType: "Store Order" | "Custom Order";
   reference: string;
@@ -90,6 +97,49 @@ export async function sendResetPasswordEmail(input: SendResetPasswordEmailInput)
           <a href="${safeResetUrl}" style="color: #1f1b18;">${safeResetUrl}</a>
         </p>
         <p style="font-size: 13px; color: #6b645e;">If you did not request this, you can safely ignore this email.</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendEmailChangeVerificationEmail(input: SendEmailChangeVerificationEmailInput) {
+  const config = getSmtpConfig();
+
+  if (!config) {
+    throw new Error("SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM.");
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: config.auth,
+  });
+
+  const brandName = input.brandName || "Tide";
+  const safeBrandName = escapeHtml(brandName);
+  const safeVerifyUrl = escapeHtml(input.verifyUrl);
+  const safeCurrentEmail = escapeHtml(input.currentEmail);
+
+  await transporter.sendMail({
+    from: config.from,
+    to: input.to,
+    subject: `${brandName} email verification`,
+    text: `You requested to change the email on your account from ${input.currentEmail}.\n\nOpen this link to verify your new email address:\n${input.verifyUrl}\n\nIf you did not request this change, you can ignore this email.`,
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #1f1b18; line-height: 1.6;">
+        <h2 style="margin: 0 0 12px;">Verify Your New ${safeBrandName} Email</h2>
+        <p>You requested to change your account email from <strong>${safeCurrentEmail}</strong>.</p>
+        <p>
+          <a href="${safeVerifyUrl}" style="display: inline-block; padding: 10px 18px; border-radius: 999px; background: #1f1b18; color: #ffffff; text-decoration: none;">
+            Verify New Email
+          </a>
+        </p>
+        <p style="font-size: 13px; color: #6b645e;">
+          If the button does not work, copy and paste this link into your browser:<br/>
+          <a href="${safeVerifyUrl}" style="color: #1f1b18;">${safeVerifyUrl}</a>
+        </p>
+        <p style="font-size: 13px; color: #6b645e;">If you did not request this change, you can safely ignore this email.</p>
       </div>
     `,
   });

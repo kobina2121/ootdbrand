@@ -12,7 +12,7 @@ type ForgotPasswordResponse = {
  message: string;
 };
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ lockedEmail }: { lockedEmail?: string | null }) {
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const [successMessage, setSuccessMessage] = useState<string | null>(null);
  const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,7 +23,7 @@ export function ForgotPasswordForm() {
  setSuccessMessage(null);
 
  const formData = new FormData(event.currentTarget);
- const email = String(formData.get("email") ?? "").trim();
+ const email = (lockedEmail ?? String(formData.get("email") ?? "")).trim();
 
  if (!email) {
  setErrorMessage("Email is required.");
@@ -64,7 +64,24 @@ export function ForgotPasswordForm() {
  </CardHeader>
  <CardContent>
  <form className="space-y-4" onSubmit={onSubmit}>
- <Input name="email" type="email" placeholder="Enter your email" className="h-11 rounded-xl border-black/15 " required />
+ <div className="space-y-2">
+ <label className="text-sm font-medium" htmlFor="forgot-password-email">Email address</label>
+ <Input
+ id="forgot-password-email"
+ name="email"
+ type="email"
+ defaultValue={lockedEmail ?? ""}
+ placeholder="Enter your email"
+ className="h-11 rounded-xl border-black/15 "
+ readOnly={Boolean(lockedEmail)}
+ required
+ />
+ </div>
+ {lockedEmail ? (
+ <p className="text-sm text-muted-foreground">
+ Reset emails can only be sent to the currently signed-in account while you are logged in.
+ </p>
+ ) : null}
  {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
  {successMessage ? <p className="text-sm text-emerald-700 ">{successMessage}</p> : null}
  <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
