@@ -96,6 +96,9 @@ export default async function AccountOrdersPage() {
 
  <div className="grid gap-3 rounded-xl border border-black/10 bg-[#f7f5f1]/80 p-3 text-sm sm:grid-cols-2">
  <p><span className="text-muted-foreground ">Subtotal:</span> {formatPriceNgn(order.amountSubtotal)}</p>
+ {order.discountAmount > 0 ? (
+ <p><span className="text-muted-foreground ">Discount{order.discountCode ? ` (${order.discountCode})` : ""}:</span> -{formatPriceNgn(order.discountAmount)}</p>
+ ) : null}
  <p><span className="text-muted-foreground ">Transaction fee:</span> {formatPriceNgn(order.transactionFee ?? 0)}</p>
  <p><span className="text-muted-foreground ">Total:</span> {formatPriceNgn(order.amountTotal)}</p>
  <p><span className="text-muted-foreground ">Tracking:</span> {order.trackingNumber || "Pending assignment"}</p>

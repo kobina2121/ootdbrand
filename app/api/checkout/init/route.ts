@@ -116,6 +116,10 @@ export async function POST(request: Request) {
     }
 
     if (error instanceof Error) {
+      if (error.message.toLowerCase().includes("coupon")) {
+        return NextResponse.json(failure(error.message), { status: 400 });
+      }
+
       if (error.message.startsWith("Variant not found") || error.message.startsWith("Insufficient stock")) {
         return NextResponse.json(failure(error.message), { status: 409 });
       }

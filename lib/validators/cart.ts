@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { discountCodeSchema } from "@/lib/validators/discount";
+
 export const cartItemSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
@@ -13,6 +15,7 @@ export const cartItemSchema = z.object({
 
 export const cartPayloadSchema = z.object({
   items: z.array(cartItemSchema),
+  discountCode: discountCodeSchema.optional(),
 });
 
 export type CartPayload = z.infer<typeof cartPayloadSchema>;

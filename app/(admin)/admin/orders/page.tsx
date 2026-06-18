@@ -170,6 +170,11 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
  <div className="space-y-1">
  <p className="text-xs text-muted-foreground">Provider: {order.paymentProvider}</p>
  <p className="text-xs text-muted-foreground">Subtotal: {formatPriceNgn(order.amountSubtotal)}</p>
+ {order.discountAmount > 0 ? (
+ <p className="text-xs text-emerald-700">
+ Discount{order.discountCode ? ` (${order.discountCode})` : ""}: -{formatPriceNgn(order.discountAmount)}
+ </p>
+ ) : null}
  <p className="text-xs text-muted-foreground">Shipping: {formatPriceNgn(order.shippingFee)}</p>
  <p className="text-xs text-muted-foreground">Transaction fee: {formatPriceNgn(order.transactionFee ?? 0)}</p>
  <p className="text-sm font-semibold">Total: {formatPriceNgn(order.amountTotal)}</p>

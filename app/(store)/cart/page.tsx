@@ -22,8 +22,26 @@ type SuggestedProduct = {
 };
 
 export default function CartPage() {
- const { items, subtotal, transactionFee, total, updateQuantity, removeItem, clearCart, syncCart, userRole } = useCart();
+ const {
+ items,
+ subtotal,
+ discount,
+ discountCode,
+ appliedDiscountCode,
+ discountMessage,
+ transactionFee,
+ total,
+ updateQuantity,
+ removeItem,
+ clearCart,
+ applyDiscountCode,
+ clearDiscountCode,
+ syncCart,
+ userRole,
+ } = useCart();
  const [pendingSku, setPendingSku] = useState<string | null>(null);
+ const [couponCodeInput, setCouponCodeInput] = useState(discountCode);
+ const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
  const [suggestedProducts, setSuggestedProducts] = useState<SuggestedProduct[]>([]);
  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
  const isHydrated = useSyncExternalStore(
@@ -161,6 +179,31 @@ export default function CartPage() {
  }
  };
 
+ const handleApplyCoupon = async () => {
+ setIsApplyingCoupon(true);
+ try {
+ await applyDiscountCode(couponCodeInput);
+ } catch (error) {
+ const message = error instanceof Error ? error.message : "Could not apply coupon.";
+ toast.error(message);
+ } finally {
+ setIsApplyingCoupon(false);
+ }
+ };
+
+ const handleClearCoupon = async () => {
+ setIsApplyingCoupon(true);
+ try {
+ await clearDiscountCode();
+ setCouponCodeInput("");
+ } catch (error) {
+ const message = error instanceof Error ? error.message : "Could not remove coupon.";
+ toast.error(message);
+ } finally {
+ setIsApplyingCoupon(false);
+ }
+ };
+
  return (
  <div className="space-y-6">
  <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede6_100%)] p-5 shadow-sm sm:p-7">
@@ -216,10 +259,50 @@ export default function CartPage() {
  <CardTitle className="">Summary</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
+ <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3">
+ <p className="text-sm font-medium text-[#1f1b18] ">Coupon code</p>
+ <div className="flex flex-col gap-2 sm:flex-row">
+ <Input
+ value={couponCodeInput}
+ placeholder="Enter coupon"
+ className="h-10 rounded-lg border-black/15 uppercase "
+ onChange={(event) => setCouponCodeInput(event.target.value.toUpperCase())}
+ />
+ <Button
+ type="button"
+ className="rounded-full"
+ onClick={() => void handleApplyCoupon()}
+ disabled={isApplyingCoupon || couponCodeInput.trim().length === 0}
+ >
+ {isApplyingCoupon ? "Applying..." : appliedDiscountCode ? "Update" : "Apply"}
+ </Button>
+ </div>
+ {appliedDiscountCode ? (
+ <div className="flex items-center justify-between gap-3">
+ <p className="text-xs text-emerald-700 ">Coupon {appliedDiscountCode} applied.</p>
+ <Button
+ type="button"
+ variant="ghost"
+ className="h-auto rounded-full px-0 py-0 text-xs text-muted-foreground hover:bg-transparent"
+ onClick={() => void handleClearCoupon()}
+ disabled={isApplyingCoupon}
+ >
+ Remove coupon
+ </Button>
+ </div>
+ ) : null}
+ {!appliedDiscountCode && discountMessage ? <p className="text-xs text-destructive ">{discountMessage}</p> : null}
+ </div>
  <div className="flex items-center justify-between text-sm text-[#4f4944] ">
  <span>Subtotal</span>
  <span>{formatPriceNgn(subtotal)}</span>
  </div>
+ {discount > 0 ? (
+ <div className="flex items-center justify-between text-sm text-emerald-700 ">
+ <span>Discount</span>
+ <span>-{formatPriceNgn(discount)}</span>
+ </div>
+ ) : null}
  <div className="flex items-center justify-between text-sm text-[#4f4944] ">
  <span>Transaction fee</span>
  <span>{formatPriceNgn(transactionFee)}</span>

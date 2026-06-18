@@ -141,21 +141,16 @@ export function calculateTransactionFee(subtotal: number) {
   return subtotal > 0 ? 4 : 0;
 }
 
-export type DiscountComputation = {
-  code: string;
-  amount: number;
+export type CartTotals = {
+  subtotal: number;
+  discount: number;
+  discountedSubtotal: number;
+  shipping: number;
+  transactionFee: number;
+  total: number;
 };
 
-export function resolveDiscount(_items: CartItem[], code?: string): DiscountComputation | null {
-  if (!code) {
-    return null;
-  }
-
-  // Placeholder for future coupon logic in Point 2 extension.
-  return null;
-}
-
-export function calculateCartTotals(items: CartItem[], discountAmount = 0) {
+export function calculateCartTotals(items: CartItem[], discountAmount = 0): CartTotals {
   const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   const safeDiscount = Math.max(0, Math.min(discountAmount, subtotal));
   const discountedSubtotal = subtotal - safeDiscount;

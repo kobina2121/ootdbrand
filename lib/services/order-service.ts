@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { OrderModel, type OrderStatus } from "@/lib/db/models/order";
+import { resolveDiscount } from "@/lib/discounts";
 import { ProductModel } from "@/lib/db/models/product";
 import { calculateShipping, calculateTransactionFee } from "@/lib/products";
 import { resolveOrderItemsFromCart } from "@/lib/services/product-service";
@@ -14,6 +15,7 @@ export type CheckoutOrderInput = {
   email: string;
   phone: string;
   address: string;
+  discountCode?: string;
   items: Array<{
     slug: string;
     name: string;
@@ -53,17 +55,36 @@ function toValidDate(value?: string | null) {
 export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUser | null) {
   await connectToDatabase();
   const resolvedItems = await resolveOrderItemsFromCart(input.items);
+  const pricingItems = resolvedItems.map((item) => ({
+    slug: item.productId,
+    name: item.productNameSnapshot,
+    image: "",
+    size: item.variant.size,
+    color: item.variant.color.name,
+    sku: item.variant.sku,
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+  }));
 
   const amountSubtotal = resolvedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-  const shippingFee = calculateShipping(amountSubtotal);
-  const transactionFee = calculateTransactionFee(amountSubtotal);
-  const amountTotal = amountSubtotal + shippingFee + transactionFee;
+  const discount = resolveDiscount(pricingItems, input.discountCode);
+
+  if (discount.requestedCode && !discount.appliedCode) {
+    throw new Error(discount.message ?? "Invalid coupon code.");
+  }
+
+  const discountedSubtotal = Math.max(0, amountSubtotal - discount.amount);
+  const shippingFee = calculateShipping(discountedSubtotal);
+  const transactionFee = calculateTransactionFee(discountedSubtotal);
+  const amountTotal = discountedSubtotal + shippingFee + transactionFee;
   const paymentReference = `PSK-${randomUUID().slice(0, 8).toUpperCase()}`;
 
   const order = await OrderModel.create({
     userId: user && Types.ObjectId.isValid(user.id) ? new Types.ObjectId(user.id) : undefined,
     items: resolvedItems,
     amountSubtotal,
+    discountCode: discount.appliedCode ?? undefined,
+    discountAmount: discount.amount,
     shippingFee,
     transactionFee,
     amountTotal,
@@ -85,6 +106,8 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
     paymentReference,
     amountTotal,
     amountSubtotal,
+    discountCode: discount.appliedCode,
+    discountAmount: discount.amount,
     shippingFee,
     transactionFee,
     currency: order.currency,
@@ -265,6 +288,8 @@ export async function listOrders(filters: { status?: OrderStatus; limit?: number
         },
       })),
       amountSubtotal: doc.amountSubtotal,
+      discountCode: doc.discountCode ?? "",
+      discountAmount: doc.discountAmount ?? 0,
       shippingFee: doc.shippingFee,
       transactionFee: doc.transactionFee ?? 0,
       amountTotal: doc.amountTotal,
@@ -321,6 +346,8 @@ export async function getOrdersByUserId(userId: string) {
     paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
     amountTotal: doc.amountTotal,
     amountSubtotal: doc.amountSubtotal,
+    discountCode: doc.discountCode ?? "",
+    discountAmount: doc.discountAmount ?? 0,
     shippingFee: doc.shippingFee,
     transactionFee: doc.transactionFee ?? 0,
     currency: doc.currency,

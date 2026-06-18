@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { discountCodeSchema } from "@/lib/validators/discount";
 import { cartItemSchema } from "@/lib/validators/cart";
 
 export const checkoutInitSchema = z.object({
@@ -9,6 +10,7 @@ export const checkoutInitSchema = z.object({
   address: z.string().min(10),
   paymentMethod: z.enum(["card", "mobile_money"]).default("card"),
   items: z.array(cartItemSchema).min(1),
+  discountCode: discountCodeSchema.optional(),
 });
 
 export type CheckoutInitPayload = z.infer<typeof checkoutInitSchema>;

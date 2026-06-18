@@ -29,6 +29,7 @@ const validCheckoutPayload = {
   fullName: "Test Buyer",
   phone: "+233536477207",
   address: "123 Oxford Street, Accra Ghana",
+  discountCode: "TIDE10",
   items: [
     {
       slug: "arc-hoodie",
@@ -56,7 +57,10 @@ describe("POST /api/checkout/init", () => {
       paymentReference: "PSK-ABC12345",
       amountTotal: 250,
       amountSubtotal: 240,
-      shippingFee: 10,
+      discountCode: "TIDE10",
+      discountAmount: 20,
+      shippingFee: 0,
+      transactionFee: 4,
       currency: "GHS",
       status: "Pending",
     });
@@ -146,6 +150,27 @@ describe("POST /api/checkout/init", () => {
     expect(mockInitializePaystackTransaction).not.toHaveBeenCalled();
   });
 
+  it("returns 400 when the coupon code is invalid", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue(null);
+    mockCreatePendingOrder.mockRejectedValue(new Error("Coupon code is invalid or inactive."));
+
+    const request = new Request("http://localhost:3000/api/checkout/init", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(validCheckoutPayload),
+    });
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "Coupon code is invalid or inactive.",
+    });
+    expect(mockInitializePaystackTransaction).not.toHaveBeenCalled();
+  });
+
   it("returns 504 when Paystack initialization times out", async () => {
     mockRequireAuthenticatedUser.mockResolvedValue(null);
     mockCreatePendingOrder.mockResolvedValue({
@@ -153,7 +178,10 @@ describe("POST /api/checkout/init", () => {
       paymentReference: "PSK-TIMEOUT1",
       amountTotal: 95,
       amountSubtotal: 85,
-      shippingFee: 10,
+      discountCode: "TIDE10",
+      discountAmount: 0,
+      shippingFee: 0,
+      transactionFee: 4,
       currency: "GHS",
       status: "Pending",
     });
@@ -183,7 +211,10 @@ describe("POST /api/checkout/init", () => {
       paymentReference: "PSK-FAILED00",
       amountTotal: 120,
       amountSubtotal: 110,
-      shippingFee: 10,
+      discountCode: "TIDE10",
+      discountAmount: 0,
+      shippingFee: 0,
+      transactionFee: 4,
       currency: "GHS",
       status: "Pending",
     });

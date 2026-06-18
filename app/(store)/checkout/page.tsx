@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, useSyncExternalStore } from "react";
+import { FormEvent, useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { CreditCard, MapPin, Smartphone } from "lucide-react";
 
@@ -12,7 +12,18 @@ import { formatPriceNgn } from "@/lib/products";
 import { checkoutInitSchema } from "@/lib/validators/checkout";
 
 export default function CheckoutPage() {
- const { items, subtotal, transactionFee, total, userRole } = useCart();
+ const {
+ items,
+ subtotal,
+ discount,
+ discountCode,
+ appliedDiscountCode,
+ discountMessage,
+ transactionFee,
+ total,
+ syncCart,
+ userRole,
+ } = useCart();
  const isClientReady = useSyncExternalStore(
  () => () => {},
  () => true,
@@ -22,6 +33,17 @@ export default function CheckoutPage() {
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const router = useRouter();
+
+ useEffect(() => {
+ if (!isClientReady || userRole === "admin") {
+ return;
+ }
+
+ void syncCart().catch((error: unknown) => {
+ const message = error instanceof Error ? error.message : "Could not sync cart.";
+ setErrorMessage(message);
+ });
+ }, [isClientReady, syncCart, userRole]);
 
  if (!isClientReady) {
  return (
@@ -81,6 +103,7 @@ export default function CheckoutPage() {
  phone: String(formData.get("phone") ?? ""),
  address: [addressLine, city, stateRegion, country].filter(Boolean).join(", "),
  paymentMethod,
+ discountCode,
  items,
  };
 
@@ -205,6 +228,12 @@ export default function CheckoutPage() {
  <span>Subtotal</span>
  <span>{formatPriceNgn(subtotal)}</span>
  </div>
+ {discount > 0 ? (
+ <div className="flex items-center justify-between text-sm text-emerald-700 ">
+ <span>Discount{appliedDiscountCode ? ` (${appliedDiscountCode})` : ""}</span>
+ <span>-{formatPriceNgn(discount)}</span>
+ </div>
+ ) : null}
  <div className="flex items-center justify-between text-sm ">
  <span>Transaction fee</span>
  <span>{formatPriceNgn(transactionFee)}</span>
@@ -213,8 +242,13 @@ export default function CheckoutPage() {
  <span>Total</span>
  <span>{formatPriceNgn(total)}</span>
  </div>
+ {discountCode && discountMessage ? <p className="text-xs text-destructive">{discountMessage}</p> : null}
  <p className="text-xs text-muted-foreground">Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).</p>
- <Button className="w-full rounded-full" type="submit" disabled={isSubmitting}>
+ <Button
+ className="w-full rounded-full"
+ type="submit"
+ disabled={isSubmitting || Boolean(discountCode && discountMessage)}
+ >
  {isSubmitting ? "Initializing..." : paymentMethod === "card" ? "Pay with Visa Card" : "Pay with Mobile Money"}
  </Button>
  </CardContent>
