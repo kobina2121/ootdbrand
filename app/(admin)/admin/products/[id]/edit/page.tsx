@@ -33,7 +33,7 @@ export default async function AdminProductEditPage({
           variants:
             product.variants.length > 0
               ? product.variants.map((variant) => ({
-                  sizes: [variant.size],
+                  size: variant.size,
                   colorName: variant.color?.name ?? "",
                   colorCode: variant.color?.code ?? "#111827",
                   image: variant.image ?? "",
@@ -42,7 +42,7 @@ export default async function AdminProductEditPage({
                 }))
               : [
                   {
-                    sizes: ["M"],
+                    size: "M",
                     colorName: "",
                     colorCode: "#111827",
                     image: "",

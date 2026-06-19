@@ -9,6 +9,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 
+import { buildVariantRows, type ProductVariantDraft } from "@/lib/product-variant-builder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -23,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 const variantSchema = z.object({
- sizes: z.array(z.string().min(1)).min(1, "Select at least one size"),
+ size: z.string().min(1, "Select a size"),
  colorName: z.string().min(1, "Color name is required"),
  colorCode: z
  .string()
@@ -86,6 +87,23 @@ const textAreaClassName =
  "min-h-28 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25 ";
 const fieldHelperClassName = "min-h-5 text-xs text-muted-foreground";
 
+function getInitialCustomColorOptions(initialValues?: ProductEditorValues) {
+ const seededVariants = initialValues?.variants ?? [];
+
+ return seededVariants
+ .map((variant) => ({
+ name: variant.colorName.trim(),
+ code: variant.colorCode.trim().toUpperCase(),
+ }))
+ .filter(
+ (colorOption, index, allColors) =>
+ colorOption.name &&
+ colorOption.code &&
+ !presetColorOptions.some((preset) => preset.code.toUpperCase() === colorOption.code) &&
+ allColors.findIndex((entry) => entry.code === colorOption.code) === index,
+ );
+}
+
 const defaultValues: DefaultValues<ProductEditorValues> = {
  name: "",
  slug: "",
@@ -97,7 +115,7 @@ const defaultValues: DefaultValues<ProductEditorValues> = {
  status: "active",
  variants: [
  {
- sizes: ["M"],
+ size: "M",
  colorName: "Black",
  colorCode: "#111827",
  image: "",
@@ -114,7 +132,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  const [bulkSelectedColorCodes, setBulkSelectedColorCodes] = useState<string[]>([]);
  const [customColorName, setCustomColorName] = useState("");
  const [customColorCode, setCustomColorCode] = useState("");
- const [customColorOptions, setCustomColorOptions] = useState<ColorOption[]>([]);
+ const [customColorOptions, setCustomColorOptions] = useState<ColorOption[]>(() => getInitialCustomColorOptions(initialValues));
 
  const form = useForm<ProductEditorValues>({
  resolver: zodResolver(productEditorSchema),
@@ -133,6 +151,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  const isSubmitting = form.formState.isSubmitting;
  const uploadedImages = useWatch({ control: form.control, name: "images" }) ?? [];
  const selectedCategory = useWatch({ control: form.control, name: "category" });
+ const watchedVariants = useWatch({ control: form.control, name: "variants" }) ?? [];
  const categoryOptions = productCategories.includes(selectedCategory as (typeof productCategories)[number])
  ? productCategories
  : selectedCategory
@@ -194,74 +213,22 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  return;
  }
 
- const variants = form.getValues("variants") ?? [];
- const existingVariants = new Set(
- variants.flatMap((variant) =>
- variant.sizes.map((size) => `${size.toUpperCase()}__${variant.colorCode.toUpperCase()}`),
- ),
- );
- const existingSkus = new Set(variants.map((variant) => variant.sku.toUpperCase()));
- const slugBase = form
- .getValues("slug")
- .trim()
- .toUpperCase()
- .replace(/[^A-Z0-9]+/g, "-")
- .replace(/^-+|-+$/g, "");
-
- let createdCount = 0;
- let skippedCount = 0;
-
- bulkSelectedSizes.forEach((size) => {
- bulkSelectedColorCodes.forEach((colorCode) => {
- const color = colorOptions.find((colorOption) => colorOption.code === colorCode);
-
- if (!color) {
- skippedCount += 1;
- return;
- }
-
- const variantKey = `${size.toUpperCase()}__${color.code.toUpperCase()}`;
- if (existingVariants.has(variantKey)) {
- skippedCount += 1;
- return;
- }
-
- const colorSkuPart = color.name
- .trim()
- .toUpperCase()
- .replace(/[^A-Z0-9]+/g, "-")
- .replace(/^-+|-+$/g, "")
- .slice(0, 12);
-
- let nextSku = `${slugBase || "PRODUCT"}-${size}-${colorSkuPart || "CLR"}`;
- let counter = 2;
-
- while (existingSkus.has(nextSku)) {
- nextSku = `${slugBase || "PRODUCT"}-${size}-${colorSkuPart || "CLR"}-${counter}`;
- counter += 1;
- }
-
- existingSkus.add(nextSku);
- existingVariants.add(variantKey);
-
- append({
- sizes: [size],
- colorName: color.name,
- colorCode: color.code,
- image: "",
- sku: nextSku,
- stock: 0,
+ const existingVariants = (form.getValues("variants") ?? []) as ProductVariantDraft[];
+ const { variants, skippedCount } = buildVariantRows({
+ selectedSizes: bulkSelectedSizes,
+ selectedColorCodes: bulkSelectedColorCodes,
+ colorOptions,
+ existingVariants,
+ slug: form.getValues("slug"),
  });
-
- createdCount += 1;
- });
- });
+ const createdCount = variants.length;
 
  if (createdCount === 0) {
  toast.error("Selected size/color combinations already exist.");
  return;
  }
 
+ append(variants);
  toast.success(
  `Added ${createdCount} variant${createdCount > 1 ? "s" : ""}${skippedCount ? ` • skipped ${skippedCount}` : ""}.`,
  );
@@ -319,25 +286,16 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  };
 
  const onSubmit = async (values: ProductEditorValues) => {
- const flattenedVariants = values.variants.flatMap((variant) => {
- const normalizedSizes = Array.from(new Set(variant.sizes.map((size) => size.trim().toUpperCase()))).filter(Boolean);
- const normalizedSku = variant.sku.trim().toUpperCase();
-
- return normalizedSizes.map((size) => {
- const nextSku = normalizedSizes.length === 1 ? normalizedSku : `${normalizedSku}-${size}`;
-
- return {
- size,
+ const flattenedVariants = values.variants.map((variant) => ({
+ size: variant.size.trim().toUpperCase(),
  color: {
  name: variant.colorName.trim(),
  code: variant.colorCode.trim().toUpperCase(),
  },
  image: variant.image && variant.image.length > 0 ? variant.image : undefined,
- sku: nextSku,
+ sku: variant.sku.trim().toUpperCase(),
  stock: variant.stock,
- };
- });
- });
+ }));
 
  const skuSet = new Set<string>();
  const hasDuplicateSku = flattenedVariants.some((variant) => {
@@ -405,14 +363,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  }
 
  onChange(Number(value));
- };
-
- const toggleVariantSize = (variantIndex: number, size: string) => {
- const currentSizes = form.getValues(`variants.${variantIndex}.sizes`) ?? [];
- const hasSize = currentSizes.includes(size);
- const nextSizes = hasSize ? currentSizes.filter((entry) => entry !== size) : [...currentSizes, size];
-
- form.setValue(`variants.${variantIndex}.sizes`, nextSizes, { shouldValidate: true, shouldDirty: true });
  };
 
  return (
@@ -649,7 +599,12 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
 
  <div className="space-y-3 rounded-xl border border-black/10 bg-muted/20 p-4 ">
  <div className="flex flex-wrap items-center justify-between gap-3">
+ <div className="space-y-1">
  <p className="text-sm font-medium">Variant Builder (Size + Color)</p>
+ <p className="text-xs text-muted-foreground">
+ Each row below saves one exact size/color combination. Use quick generate to create all combinations at once.
+ </p>
+ </div>
  <div className="flex items-center gap-2">
  <Button
  type="button"
@@ -657,7 +612,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  size="sm"
  onClick={() =>
  append({
- sizes: ["M"],
+ size: "M",
  colorName: "",
  colorCode: "#111827",
  image: "",
@@ -674,6 +629,10 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  <div className="space-y-3 rounded-lg border border-black/10 bg-white p-3 ">
  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
  Quick generate variants
+ </p>
+ <p className="text-xs text-muted-foreground">
+ Selected {bulkSelectedSizes.length} size(s) x {bulkSelectedColorCodes.length} color(s) ={" "}
+ {bulkSelectedSizes.length * bulkSelectedColorCodes.length} combination(s)
  </p>
  <div className="flex flex-wrap gap-2">
  {sizeOptions.map((sizeOption) => (
@@ -750,14 +709,31 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  </div>
  </div>
 
+ <div className="rounded-lg border border-dashed border-black/10 bg-white/70 px-3 py-2 text-xs text-muted-foreground">
+ {watchedVariants.length} saved combination(s) currently in this product.
+ </div>
+
  {variantFields.map((field, index) => (
  <div key={field.id} className="grid gap-2 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-3 ">
+ <div className="sm:col-span-3 flex items-center justify-between gap-3">
+ <div>
+ <p className="text-sm font-medium text-foreground">Variant {index + 1}</p>
+ <p className="text-xs text-muted-foreground">
+ {watchedVariants[index]?.size || "No size"} / {watchedVariants[index]?.colorName || "No color"}
+ </p>
+ </div>
+ {variantFields.length > 1 ? (
+ <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
+ Remove variant
+ </Button>
+ ) : null}
+ </div>
  <FormField
  control={form.control}
- name={`variants.${index}.sizes`}
+ name={`variants.${index}.size`}
  render={({ field: variantField }) => (
  <FormItem>
- <FormLabel>Sizes</FormLabel>
+ <FormLabel>Size</FormLabel>
  <FormControl>
  <div className="space-y-2 rounded-md border border-black/10 p-2 ">
  <div className="flex flex-wrap gap-2">
@@ -766,16 +742,16 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  key={`${field.id}-${sizeOption}`}
  type="button"
  size="sm"
- variant={variantField.value?.includes(sizeOption) ? "default" : "outline"}
+ variant={variantField.value === sizeOption ? "default" : "outline"}
  className="h-8 min-w-11"
- onClick={() => toggleVariantSize(index, sizeOption)}
+ onClick={() => form.setValue(`variants.${index}.size`, sizeOption, { shouldValidate: true, shouldDirty: true })}
  >
  {sizeOption}
  </Button>
  ))}
  </div>
  <p className="text-xs text-muted-foreground">
- Selected: {variantField.value?.length ? variantField.value.join(", ") : "None"}
+ Selected: {variantField.value || "None"}
  </p>
  </div>
  </FormControl>
@@ -838,12 +814,12 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  name={`variants.${index}.sku`}
  render={({ field: variantField }) => (
  <FormItem>
- <FormLabel>SKU Base</FormLabel>
+ <FormLabel>SKU</FormLabel>
  <FormControl>
  <Input placeholder="CT-BLK" className={fieldClassName} {...variantField} />
  </FormControl>
  <p className="text-xs text-muted-foreground">
- If multiple sizes are selected, we save as `SKU-SIZE` (example: `CT-BLK-M`).
+ One SKU per exact size/color combination.
  </p>
  <FormMessage />
  </FormItem>
@@ -869,13 +845,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  </FormItem>
  )}
  />
- {variantFields.length > 1 ? (
- <div className="sm:col-span-3">
- <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
- Remove variant
- </Button>
- </div>
- ) : null}
  </div>
  ))}
  </div>
