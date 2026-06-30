@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes, randomInt } from "node:crypto";
 
 import bcrypt from "bcryptjs";
 import { Types } from "mongoose";
@@ -25,6 +25,13 @@ export type AppUser = {
   role: UserRole;
 };
 
+export class UnverifiedEmailError extends Error {
+  constructor(message = "Verify your email address before logging in.") {
+    super(message);
+    this.name = "UnverifiedEmailError";
+  }
+}
+
 export class DuplicateUserError extends Error {
   constructor(message = "A user with this email already exists.") {
     super(message);
@@ -37,12 +44,29 @@ type PasswordChangeResult =
   | { ok: false; reason: "invalid-user" | "password-not-set" | "invalid-current-password" | "same-password" };
 
 type ProfileUpdateResult =
-  | { ok: true; user: AppUser; emailChanged: boolean; pendingEmail?: string; verificationToken?: string }
+  | {
+      ok: true;
+      user: AppUser;
+      emailChanged: boolean;
+      pendingEmail?: string;
+      verificationToken?: string;
+      verificationCode?: string;
+    }
   | { ok: false; reason: "invalid-user" | "duplicate-email" | "invalid-current-password" | "password-not-set" };
 
 type EmailVerificationResult =
   | { ok: true; user: AppUser }
   | { ok: false; reason: "invalid-token" | "duplicate-email" };
+
+type SignupVerificationResult =
+  | { ok: true; user: AppUser }
+  | { ok: false; reason: "invalid-code" };
+
+type SignupCreateResult = {
+  user: AppUser;
+  verificationCode: string;
+  alreadyPending: boolean;
+};
 
 function toAppUser(doc: {
   _id: unknown;
@@ -69,6 +93,8 @@ export async function findUserByEmail(email: string) {
   return {
     ...toAppUser(user),
     passwordHash: user.passwordHash,
+    emailVerifiedAt: user.emailVerifiedAt,
+    signupVerificationCodeHash: user.signupVerificationCodeHash,
   };
 }
 
@@ -88,6 +114,7 @@ export async function ensureAdminUserBootstrap() {
     configuredAdmin.name = configuredAdmin.name || adminName;
     configuredAdmin.role = "admin";
     configuredAdmin.passwordHash = passwordHash;
+    configuredAdmin.emailVerifiedAt = configuredAdmin.emailVerifiedAt ?? new Date();
     await configuredAdmin.save();
     return toAppUser(configuredAdmin);
   }
@@ -97,6 +124,7 @@ export async function ensureAdminUserBootstrap() {
     email: adminEmail,
     role: "admin",
     passwordHash,
+    emailVerifiedAt: new Date(),
   });
 
   return toAppUser(created);
@@ -118,6 +146,10 @@ export async function verifyUserCredentials(email: string, password: string) {
     return null;
   }
 
+  if (user.role === "customer" && !user.emailVerifiedAt && user.signupVerificationCodeHash) {
+    throw new UnverifiedEmailError();
+  }
+
   return {
     id: user.id,
     name: user.name,
@@ -126,36 +158,61 @@ export async function verifyUserCredentials(email: string, password: string) {
   } satisfies AppUser;
 }
 
+function createVerificationCode() {
+  return String(randomInt(0, 1_000_000)).padStart(6, "0");
+}
+
 export async function createCustomerUser(input: {
   name: string;
   email: string;
   password: string;
-}) {
+}): Promise<SignupCreateResult> {
   await connectToDatabase();
   await ensureAdminUserBootstrap();
 
   const normalizedEmail = input.email.trim().toLowerCase();
+  const trimmedName = input.name.trim();
+  const existing = await UserModel.findOne({ email: normalizedEmail });
 
-  const existing = await UserModel.findOne({ email: normalizedEmail }).lean();
-
-  if (existing) {
-    throw new DuplicateUserError();
-  }
+  const verificationCode = createVerificationCode();
+  const verificationCodeHash = createResetTokenHash(verificationCode);
+  const verificationExpiresAt = new Date(Date.now() + 1000 * 60 * 30);
 
   const passwordHash = await bcrypt.hash(input.password, 12);
+
+  if (existing) {
+    if (existing.role === "admin" || existing.emailVerifiedAt || !existing.signupVerificationCodeHash) {
+      throw new DuplicateUserError();
+    }
+
+    existing.name = trimmedName;
+    existing.passwordHash = passwordHash;
+    existing.role = "customer";
+    existing.signupVerificationCodeHash = verificationCodeHash;
+    existing.signupVerificationExpiresAt = verificationExpiresAt;
+    await existing.save();
+
+    return {
+      user: toAppUser(existing),
+      verificationCode,
+      alreadyPending: true,
+    };
+  }
+
   const created = await UserModel.create({
-    name: input.name.trim(),
+    name: trimmedName,
     email: normalizedEmail,
     passwordHash,
     role: "customer",
+    signupVerificationCodeHash: verificationCodeHash,
+    signupVerificationExpiresAt: verificationExpiresAt,
   });
 
   return {
-    id: String(created._id),
-    name: created.name,
-    email: created.email,
-    role: created.role,
-  } satisfies AppUser;
+    user: toAppUser(created),
+    verificationCode,
+    alreadyPending: false,
+  };
 }
 
 export async function upsertOAuthCustomerUser(input: {
@@ -183,8 +240,12 @@ export async function upsertOAuthCustomerUser(input: {
   if (existing) {
     if (!existing.name && displayName) {
       existing.name = displayName;
-      await existing.save();
     }
+
+    existing.emailVerifiedAt = existing.emailVerifiedAt ?? new Date();
+    existing.signupVerificationCodeHash = undefined;
+    existing.signupVerificationExpiresAt = undefined;
+    await existing.save();
 
     return {
       id: String(existing._id),
@@ -198,6 +259,9 @@ export async function upsertOAuthCustomerUser(input: {
     name: displayName,
     email: normalizedEmail,
     role: "customer",
+    emailVerifiedAt: new Date(),
+    signupVerificationCodeHash: undefined,
+    signupVerificationExpiresAt: undefined,
   });
 
   return {
@@ -206,6 +270,32 @@ export async function upsertOAuthCustomerUser(input: {
     email: created.email,
     role: created.role,
   } satisfies AppUser;
+}
+
+export async function verifySignupCode(input: { email: string; code: string }): Promise<SignupVerificationResult> {
+  await connectToDatabase();
+
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const codeHash = createResetTokenHash(input.code.trim());
+  const user = await UserModel.findOne({
+    email: normalizedEmail,
+    signupVerificationCodeHash: codeHash,
+    signupVerificationExpiresAt: { $gt: new Date() },
+  });
+
+  if (!user) {
+    return { ok: false, reason: "invalid-code" };
+  }
+
+  user.emailVerifiedAt = new Date();
+  user.signupVerificationCodeHash = undefined;
+  user.signupVerificationExpiresAt = undefined;
+  await user.save();
+
+  return {
+    ok: true,
+    user: toAppUser(user),
+  };
 }
 
 function createResetTokenHash(token: string) {
@@ -355,7 +445,10 @@ export async function updateProfileForUser(input: {
   }
 
   const verificationToken = randomBytes(32).toString("hex");
+  const verificationCode = createVerificationCode();
   user.pendingEmail = normalizedEmail;
+  user.pendingEmailChangeCodeHash = createResetTokenHash(verificationCode);
+  user.pendingEmailChangeCodeExpiresAt = new Date(Date.now() + 1000 * 60 * 30);
   user.pendingEmailChangeTokenHash = createResetTokenHash(verificationToken);
   user.pendingEmailChangeExpiresAt = new Date(Date.now() + 1000 * 60 * 30);
   await user.save();
@@ -371,6 +464,52 @@ export async function updateProfileForUser(input: {
     emailChanged: false,
     pendingEmail: user.pendingEmail,
     verificationToken,
+    verificationCode,
+  };
+}
+
+export async function verifyEmailChangeByCode(input: {
+  userId: string;
+  code: string;
+}): Promise<EmailVerificationResult> {
+  if (!Types.ObjectId.isValid(input.userId)) {
+    return { ok: false, reason: "invalid-token" };
+  }
+
+  await connectToDatabase();
+
+  const codeHash = createResetTokenHash(input.code.trim());
+  const user = await UserModel.findOne({
+    _id: new Types.ObjectId(input.userId),
+    pendingEmailChangeCodeHash: codeHash,
+    pendingEmailChangeCodeExpiresAt: { $gt: new Date() },
+  });
+
+  if (!user || !user.pendingEmail) {
+    return { ok: false, reason: "invalid-token" };
+  }
+
+  const duplicate = await UserModel.findOne({
+    _id: { $ne: user._id },
+    $or: [{ email: user.pendingEmail }, { pendingEmail: user.pendingEmail }],
+  }).lean();
+
+  if (duplicate) {
+    return { ok: false, reason: "duplicate-email" };
+  }
+
+  user.email = user.pendingEmail;
+  user.emailVerifiedAt = new Date();
+  user.pendingEmail = undefined;
+  user.pendingEmailChangeCodeHash = undefined;
+  user.pendingEmailChangeCodeExpiresAt = undefined;
+  user.pendingEmailChangeTokenHash = undefined;
+  user.pendingEmailChangeExpiresAt = undefined;
+  await user.save();
+
+  return {
+    ok: true,
+    user: toAppUser(user),
   };
 }
 
@@ -397,7 +536,10 @@ export async function verifyEmailChangeByToken(token: string): Promise<EmailVeri
   }
 
   user.email = user.pendingEmail;
+  user.emailVerifiedAt = new Date();
   user.pendingEmail = undefined;
+  user.pendingEmailChangeCodeHash = undefined;
+  user.pendingEmailChangeCodeExpiresAt = undefined;
   user.pendingEmailChangeTokenHash = undefined;
   user.pendingEmailChangeExpiresAt = undefined;
   await user.save();
@@ -410,5 +552,23 @@ export async function verifyEmailChangeByToken(token: string): Promise<EmailVeri
       email: user.email,
       role: user.role,
     },
+  };
+}
+
+export async function getAccountSettingsByUserId(userId: string) {
+  if (!Types.ObjectId.isValid(userId)) {
+    return null;
+  }
+
+  await connectToDatabase();
+  const user = await UserModel.findById(userId).lean();
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    ...toAppUser(user),
+    pendingEmail: user.pendingEmail ?? null,
   };
 }

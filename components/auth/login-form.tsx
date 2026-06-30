@@ -23,6 +23,10 @@ function getLoginErrorMessage(error?: string | null) {
  return "Login is temporarily unavailable. Check the authentication configuration and try again.";
  }
 
+ if (error === "EmailNotVerified") {
+ return "Verify your email with the confirmation code before logging in.";
+ }
+
  return "Login failed. Please try again.";
 }
 

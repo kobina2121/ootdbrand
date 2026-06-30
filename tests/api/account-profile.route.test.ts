@@ -188,6 +188,7 @@ describe("PATCH /api/account/profile", () => {
       ok: true,
       emailChanged: false,
       pendingEmail: "new@example.com",
+      verificationCode: "123456",
       verificationToken: "12345678901234567890123456789012",
       user: {
         id: "user-1",
@@ -220,6 +221,7 @@ describe("PATCH /api/account/profile", () => {
     });
     expect(mockSendEmailChangeVerificationEmail).toHaveBeenCalledWith({
       to: "new@example.com",
+      verificationCode: "123456",
       verifyUrl: expect.stringContaining("/verify-email-change?token=12345678901234567890123456789012"),
       brandName: "Tide",
       currentEmail: "old@example.com",

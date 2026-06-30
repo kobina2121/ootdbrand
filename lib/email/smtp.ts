@@ -8,9 +8,17 @@ type SendResetPasswordEmailInput = {
 
 type SendEmailChangeVerificationEmailInput = {
   to: string;
-  verifyUrl: string;
+  verificationCode: string;
   brandName?: string;
   currentEmail: string;
+  verifyUrl?: string;
+};
+
+type SendSignupVerificationEmailInput = {
+  to: string;
+  verificationCode: string;
+  brandName?: string;
+  verifyUrl?: string;
 };
 
 type SendAdminOrderEmailInput = {
@@ -118,28 +126,106 @@ export async function sendEmailChangeVerificationEmail(input: SendEmailChangeVer
 
   const brandName = input.brandName || "Tide";
   const safeBrandName = escapeHtml(brandName);
-  const safeVerifyUrl = escapeHtml(input.verifyUrl);
   const safeCurrentEmail = escapeHtml(input.currentEmail);
+  const safeVerificationCode = escapeHtml(input.verificationCode);
+  const safeVerifyUrl = input.verifyUrl ? escapeHtml(input.verifyUrl) : null;
 
   await transporter.sendMail({
     from: config.from,
     to: input.to,
     subject: `${brandName} email verification`,
-    text: `You requested to change the email on your account from ${input.currentEmail}.\n\nOpen this link to verify your new email address:\n${input.verifyUrl}\n\nIf you did not request this change, you can ignore this email.`,
+    text: [
+      `You requested to change the email on your account from ${input.currentEmail}.`,
+      "",
+      `Your verification code is: ${input.verificationCode}`,
+      "",
+      "Enter this code inside your signed-in profile to finish the change.",
+      ...(input.verifyUrl
+        ? [
+            "",
+            `You can also use this verification link: ${input.verifyUrl}`,
+          ]
+        : []),
+      "",
+      "If you did not request this change, you can ignore this email.",
+    ].join("\n"),
     html: `
       <div style="font-family: Arial, sans-serif; color: #1f1b18; line-height: 1.6;">
         <h2 style="margin: 0 0 12px;">Verify Your New ${safeBrandName} Email</h2>
         <p>You requested to change your account email from <strong>${safeCurrentEmail}</strong>.</p>
-        <p>
+        <p>Your verification code is:</p>
+        <p style="margin: 16px 0; font-size: 28px; font-weight: 700; letter-spacing: 0.3em;">${safeVerificationCode}</p>
+        <p style="font-size: 13px; color: #6b645e;">Enter this code inside your signed-in profile to finish the email change.</p>
+        ${
+          safeVerifyUrl
+            ? `<p>
           <a href="${safeVerifyUrl}" style="display: inline-block; padding: 10px 18px; border-radius: 999px; background: #1f1b18; color: #ffffff; text-decoration: none;">
-            Verify New Email
+            Verify with Link Instead
           </a>
         </p>
         <p style="font-size: 13px; color: #6b645e;">
           If the button does not work, copy and paste this link into your browser:<br/>
           <a href="${safeVerifyUrl}" style="color: #1f1b18;">${safeVerifyUrl}</a>
-        </p>
+        </p>`
+            : ""
+        }
         <p style="font-size: 13px; color: #6b645e;">If you did not request this change, you can safely ignore this email.</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendSignupVerificationEmail(input: SendSignupVerificationEmailInput) {
+  const config = getSmtpConfig();
+
+  if (!config) {
+    throw new Error("SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM.");
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: config.auth,
+  });
+
+  const brandName = input.brandName || "Tide";
+  const safeBrandName = escapeHtml(brandName);
+  const safeVerificationCode = escapeHtml(input.verificationCode);
+  const safeVerifyUrl = input.verifyUrl ? escapeHtml(input.verifyUrl) : null;
+
+  await transporter.sendMail({
+    from: config.from,
+    to: input.to,
+    subject: `${brandName} signup verification code`,
+    text: [
+      `Welcome to ${brandName}.`,
+      "",
+      `Your verification code is: ${input.verificationCode}`,
+      "",
+      "Enter this code to activate your account before logging in.",
+      ...(input.verifyUrl
+        ? [
+            "",
+            `Open this page to verify: ${input.verifyUrl}`,
+          ]
+        : []),
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #1f1b18; line-height: 1.6;">
+        <h2 style="margin: 0 0 12px;">Confirm Your ${safeBrandName} Account</h2>
+        <p>Use this verification code to finish creating your account:</p>
+        <p style="margin: 16px 0; font-size: 28px; font-weight: 700; letter-spacing: 0.3em;">${safeVerificationCode}</p>
+        <p style="font-size: 13px; color: #6b645e;">Enter this code before logging in.</p>
+        ${
+          safeVerifyUrl
+            ? `<p>
+          <a href="${safeVerifyUrl}" style="display: inline-block; padding: 10px 18px; border-radius: 999px; background: #1f1b18; color: #ffffff; text-decoration: none;">
+            Open Verification Page
+          </a>
+        </p>`
+            : ""
+        }
       </div>
     `,
   });

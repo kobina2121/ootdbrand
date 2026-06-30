@@ -97,6 +97,7 @@ export function SignupForm() {
  const json = (await response.json()) as {
  ok: boolean;
  message: string;
+ data?: { email?: string };
  };
 
  if (!response.ok || !json.ok) {
@@ -104,18 +105,8 @@ export function SignupForm() {
  return;
  }
 
- const loginResult = await signIn("credentials", {
- email: payload.email,
- password: payload.password,
- redirect: false,
- });
-
- if (!loginResult?.ok) {
- router.push("/login");
- return;
- }
-
- router.push("/orders");
+ const nextEmail = json.data?.email ?? payload.email;
+ router.push(`/verify-signup?email=${encodeURIComponent(nextEmail)}`);
  router.refresh();
  } catch {
  setErrorMessage("Signup failed. Please try again.");
@@ -195,7 +186,7 @@ export function SignupForm() {
  </div>
  {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
  <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
- {isSubmitting ? "Creating account..." : "Sign up"}
+ {isSubmitting ? "Sending code..." : "Sign up"}
  </Button>
  </form>
  <p className="mt-4 text-center text-sm text-muted-foreground">

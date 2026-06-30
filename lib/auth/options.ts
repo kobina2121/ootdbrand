@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
 import { getAuthSecret, getSessionTokenCookieName, shouldUseSecureAuthCookies } from "@/lib/auth/session-config";
-import { upsertOAuthCustomerUser, verifyUserCredentials } from "@/lib/services/user-service";
+import { UnverifiedEmailError, upsertOAuthCustomerUser, verifyUserCredentials } from "@/lib/services/user-service";
 
 const authSecret = getAuthSecret();
 const secureCookies = shouldUseSecureAuthCookies();
@@ -54,6 +54,10 @@ export const authOptions: NextAuthOptions = {
         try {
           user = await verifyUserCredentials(email, password);
         } catch (error) {
+          if (error instanceof UnverifiedEmailError) {
+            throw new Error("EmailNotVerified");
+          }
+
           console.error("Credentials authentication failed", error);
           throw new Error("AuthServiceUnavailable");
         }

@@ -86,13 +86,15 @@ export async function PATCH(request: Request) {
 
     const currentEmailForVerification = currentEmail ?? result.user.email;
 
-    if (result.verificationToken && result.pendingEmail && currentEmailForVerification) {
+    if (result.verificationCode && result.pendingEmail && currentEmailForVerification) {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-      const verifyUrl = `${appUrl}/verify-email-change?token=${result.verificationToken}`;
+      const verifyUrl =
+        result.verificationToken ? `${appUrl}/verify-email-change?token=${result.verificationToken}` : undefined;
 
       try {
         await sendEmailChangeVerificationEmail({
           to: result.pendingEmail,
+          verificationCode: result.verificationCode,
           verifyUrl,
           brandName: "Tide",
           currentEmail: currentEmailForVerification,

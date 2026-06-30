@@ -2,12 +2,18 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
+import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
-import { verifyEmailChangeByToken } from "@/lib/services/user-service";
+import { verifyEmailChangeByCode, verifyEmailChangeByToken } from "@/lib/services/user-service";
 
-const verifyEmailChangeSchema = z.object({
-  token: z.string().min(20, "Invalid verification token"),
-});
+const verifyEmailChangeSchema = z.union([
+  z.object({
+    token: z.string().min(20, "Invalid verification token"),
+  }),
+  z.object({
+    code: z.string().trim().length(6, "Enter the 6-digit code"),
+  }),
+]);
 
 export async function POST(request: Request) {
   try {
@@ -38,14 +44,36 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("Invalid email verification payload"), { status: 400 });
     }
 
-    const result = await verifyEmailChangeByToken(parsed.data.token);
+    let result:
+      | Awaited<ReturnType<typeof verifyEmailChangeByToken>>
+      | Awaited<ReturnType<typeof verifyEmailChangeByCode>>
+      | null;
+
+    if ("token" in parsed.data) {
+      result = await verifyEmailChangeByToken(parsed.data.token);
+    } else {
+      const session = await requireAuthenticatedUser();
+
+      if (!session?.user?.id) {
+        return NextResponse.json(failure("Unauthorized"), { status: 401 });
+      }
+
+      result = await verifyEmailChangeByCode({
+        userId: session.user.id,
+        code: parsed.data.code,
+      });
+    }
+
+    if (!result) {
+      return NextResponse.json(failure("Unauthorized"), { status: 401 });
+    }
 
     if (!result.ok) {
       if (result.reason === "duplicate-email") {
         return NextResponse.json(failure("That email is already in use."), { status: 409 });
       }
 
-      return NextResponse.json(failure("Verification link is invalid or has expired."), { status: 400 });
+      return NextResponse.json(failure("Verification code or link is invalid or has expired."), { status: 400 });
     }
 
     return NextResponse.json(success("Email verified successfully. Sign out and back in to refresh your session email.", {}));

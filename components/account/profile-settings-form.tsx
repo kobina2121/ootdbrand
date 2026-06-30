@@ -12,6 +12,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 type ProfileSettingsFormProps = {
  initialName: string;
  initialEmail: string;
+ initialPendingEmail?: string | null;
  role: "customer" | "admin";
 };
 
@@ -28,13 +29,20 @@ type UpdateProfileResponse = {
  };
 };
 
-export function ProfileSettingsForm({ initialName, initialEmail, role }: ProfileSettingsFormProps) {
+type VerifyEmailChangeResponse = {
+ ok: boolean;
+ message: string;
+};
+
+export function ProfileSettingsForm({ initialName, initialEmail, initialPendingEmail = null, role }: ProfileSettingsFormProps) {
  const [savedName, setSavedName] = useState(initialName);
  const [savedEmail, setSavedEmail] = useState(initialEmail);
  const [name, setName] = useState(initialName);
- const [email, setEmail] = useState(initialEmail);
+ const [email, setEmail] = useState(initialPendingEmail ?? initialEmail);
  const [currentPassword, setCurrentPassword] = useState("");
- const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+ const [pendingEmail, setPendingEmail] = useState<string | null>(initialPendingEmail);
+ const [verificationCode, setVerificationCode] = useState("");
+ const [isVerifyingCode, setIsVerifyingCode] = useState(false);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -110,6 +118,48 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
  }
  };
 
+ const onVerifyCode = async () => {
+ setErrorMessage(null);
+ setSuccessMessage(null);
+
+ if (!verificationCode.trim()) {
+ setErrorMessage("Enter the confirmation code sent to your new email.");
+ return;
+ }
+
+ setIsVerifyingCode(true);
+
+ try {
+ const response = await fetch("/api/account/verify-email-change", {
+ method: "POST",
+ headers: {
+ "Content-Type": "application/json",
+ },
+ body: JSON.stringify({ code: verificationCode.trim() }),
+ });
+
+ const json = (await response.json()) as VerifyEmailChangeResponse;
+
+ if (!response.ok || !json.ok) {
+ setErrorMessage(json.message || "Could not verify your new email.");
+ return;
+ }
+
+ const nextEmail = pendingEmail ?? savedEmail;
+ setSavedEmail(nextEmail);
+ setEmail(nextEmail);
+ setPendingEmail(null);
+ setVerificationCode("");
+ setCurrentPassword("");
+ setEmailChangedNotice(true);
+ setSuccessMessage(json.message);
+ } catch {
+ setErrorMessage("Could not verify your new email.");
+ } finally {
+ setIsVerifyingCode(false);
+ }
+ };
+
  return (
  <div className="space-y-6">
  <Card className="rounded-3xl border-black/10 bg-white/90 shadow-sm ">
@@ -163,9 +213,30 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
  </div>
  </div>
  {pendingEmail ? (
+ <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4">
  <p className="text-sm text-[#6b655f] ">
- Verification pending for <span className="font-medium">{pendingEmail}</span>. Open the verification link sent there to finish the email change.
+ Verification pending for <span className="font-medium">{pendingEmail}</span>. Enter the 6-digit code we sent there to finish the email change.
  </p>
+ <div className="space-y-2">
+ <label className="text-sm font-medium" htmlFor="profile-email-code">Confirmation code</label>
+ <Input
+ id="profile-email-code"
+ inputMode="numeric"
+ value={verificationCode}
+ onChange={(event) => setVerificationCode(event.target.value.replace(/\D+/g, "").slice(0, 6))}
+ className="h-11 rounded-xl border-black/15 text-center tracking-[0.3em] "
+ placeholder="123456"
+ />
+ </div>
+ <div className="flex flex-wrap gap-3">
+ <Button type="button" className="h-11 rounded-full px-6" disabled={isVerifyingCode} onClick={() => void onVerifyCode()}>
+ {isVerifyingCode ? "Verifying..." : "Verify New Email"}
+ </Button>
+ <p className="self-center text-xs text-muted-foreground">
+ Your login email will not change until the code is confirmed.
+ </p>
+ </div>
+ </div>
  ) : null}
  {requiresCurrentPassword ? (
  <div className="space-y-2">
@@ -187,9 +258,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, role }: Profile
  </p>
  ) : null}
  {!emailChangedNotice && pendingEmail ? (
- <p className="text-sm text-[#6b655f] ">
- Your login email will not change until you verify the new address.
- </p>
+ <p className="text-sm text-[#6b655f] ">Your login email will not change until you verify the new address.</p>
  ) : null}
  <div className="flex flex-wrap items-center gap-3">
  <Button type="submit" className="h-11 rounded-full px-6" disabled={isSubmitting || !hasChanges}>

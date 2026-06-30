@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
+import { isSmtpConfigured, sendSignupVerificationEmail } from "@/lib/email/smtp";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { createCustomerUser, DuplicateUserError } from "@/lib/services/user-service";
 
@@ -44,15 +45,38 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("Invalid signup details"), { status: 400 });
     }
 
-    const user = await createCustomerUser(parsed.data);
+    if (!isSmtpConfigured()) {
+      return NextResponse.json(
+        failure("Signup verification is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM."),
+        { status: 500 },
+      );
+    }
+
+    const result = await createCustomerUser(parsed.data);
+
+    try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+      const verifyUrl = `${appUrl}/verify-signup?email=${encodeURIComponent(result.user.email)}`;
+
+      await sendSignupVerificationEmail({
+        to: result.user.email,
+        verificationCode: result.verificationCode,
+        brandName: "Tide",
+        verifyUrl,
+      });
+    } catch (error) {
+      console.error("[auth.signup] Failed to send signup verification email", error);
+      return NextResponse.json(failure("Could not send signup verification code. Please try again."), { status: 502 });
+    }
 
     return NextResponse.json(
-      success("Account created successfully", {
+      success(result.alreadyPending ? "A new verification code has been sent to your email." : "Account created. Enter the verification code sent to your email.", {
+        email: result.user.email,
         user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+          id: result.user.id,
+          name: result.user.name,
+          email: result.user.email,
+          role: result.user.role,
         },
       }),
       { status: 201 },
