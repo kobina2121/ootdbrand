@@ -9,7 +9,7 @@ export default async function ProfilePage() {
  const session = await requireAuthenticatedUser();
 
  if (!session?.user) {
- redirect("/login?next=/profile");
+ redirect("/login");
  }
 
  const account = await getAccountSettingsByUserId(session.user.id);

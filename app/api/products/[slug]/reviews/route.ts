@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { failure, success } from "@/lib/api-response";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
+import { checkRateLimit } from "@/lib/security/guards";
 import { hasSuccessfulPurchaseForProduct } from "@/lib/services/order-service";
 import { createProductReview, listReviewsByProductSlug } from "@/lib/services/review-service";
 import { productReviewPayloadSchema } from "@/lib/validators/review";
@@ -22,6 +23,18 @@ export async function GET(_: Request, context: RouteContext) {
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const rateLimit = checkRateLimit(request, {
+    bucket: "products:reviews:create",
+    limit: 8,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!rateLimit.ok) {
+    return NextResponse.json(failure("Too many review attempts. Please wait and try again."), {
+      status: 429,
+      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    });
+  }
+
   const session = await requireAuthenticatedUser();
 
   if (!session?.user?.id) {

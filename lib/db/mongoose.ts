@@ -68,7 +68,7 @@ function logMongoConnection(kind: "direct" | "srv", uri: string) {
     return;
   }
 
-  const dbName = process.env.MONGODB_DB_NAME?.trim() || "tide-brand";
+  const dbName = process.env.MONGODB_DB_NAME?.trim() || "theootd-brand";
   const hosts = extractMongoHosts(uri);
 
   console.info(
@@ -112,7 +112,7 @@ function buildDirectMongoUri(rawUri: string, dbName: string) {
 
 export function buildMongoUri(rawUri: string) {
   const uri = rawUri.trim();
-  const dbName = process.env.MONGODB_DB_NAME?.trim() || "tide-brand";
+  const dbName = process.env.MONGODB_DB_NAME?.trim() || "theootd-brand";
 
   if (uri.startsWith("mongodb://")) {
     return buildDirectMongoUri(uri, dbName);

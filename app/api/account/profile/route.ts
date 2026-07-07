@@ -96,7 +96,7 @@ export async function PATCH(request: Request) {
           to: result.pendingEmail,
           verificationCode: result.verificationCode,
           verifyUrl,
-          brandName: "Tide",
+          brandName: "theootd.brand",
           currentEmail: currentEmailForVerification,
         });
       } catch (error) {

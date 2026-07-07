@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,8 @@ export function AddToCartForm({
  centered = false,
 }: AddToCartFormProps) {
  const [internalSku, setInternalSku] = useState(product.variants[0]?.sku ?? "");
- const [quantity, setQuantity] = useState(1);
+ const [quantity, setQuantity] = useState<number | "">(1);
+ const previousQuantityRef = useRef(1);
  const { addItem, userRole } = useCart();
  const isAdminUser = userRole === "admin";
  const activeSku = sku ?? internalSku;
@@ -68,7 +69,7 @@ export function AddToCartForm({
  size: variant.size,
  color: variant.color,
  unitPrice,
- quantity,
+ quantity: quantity === "" ? previousQuantityRef.current : quantity,
  });
 
  toast.success("Added to cart", {
@@ -112,8 +113,29 @@ export function AddToCartForm({
  min={1}
  max={variant.stock}
  value={quantity}
- onChange={(event) => setQuantity(Math.min(variant.stock, Math.max(1, Number(event.target.value) || 1)))}
- onFocus={(event) => event.currentTarget.select()}
+ onChange={(event) => {
+ const nextValue = event.target.value;
+ if (nextValue === "") {
+ setQuantity("");
+ return;
+ }
+
+ const normalizedQuantity = Math.min(variant.stock, Math.max(1, Number(nextValue) || 1));
+ previousQuantityRef.current = normalizedQuantity;
+ setQuantity(normalizedQuantity);
+ }}
+ onFocus={() => {
+ if (quantity !== "") {
+ previousQuantityRef.current = quantity;
+ }
+
+ setQuantity("");
+ }}
+ onBlur={() => {
+ if (quantity === "") {
+ setQuantity(Math.min(variant.stock, Math.max(1, previousQuantityRef.current)));
+ }
+ }}
  className={`h-11 rounded-xl border-black/15 bg-white text-center ${
  centered ? "mx-auto w-28" : "w-28"
  }`}

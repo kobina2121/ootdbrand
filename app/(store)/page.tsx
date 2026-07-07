@@ -109,7 +109,7 @@ export default async function HomePage() {
  <Image
  key={image}
  src={image}
-     alt={`Tide hero ${index + 1}`}
+     alt={`theootd.brand hero ${index + 1}`}
  fill
  sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), 1440px"
  className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"

@@ -128,6 +128,7 @@ const defaultValues: DefaultValues<ProductEditorValues> = {
 export function ProductForm({ mode, productId, initialValues }: ProductFormProps) {
  const router = useRouter();
  const [isUploadingImage, setIsUploadingImage] = useState(false);
+ const [numberInputDrafts, setNumberInputDrafts] = useState<Record<string, string>>({});
  const [bulkSelectedSizes, setBulkSelectedSizes] = useState<string[]>([]);
  const [bulkSelectedColorCodes, setBulkSelectedColorCodes] = useState<string[]>([]);
  const [customColorName, setCustomColorName] = useState("");
@@ -356,13 +357,30 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  }
  };
 
- const handleVariantStockInput = (value: string, onChange: (value: number | undefined) => void) => {
+ const handleNumberFieldInput = (fieldName: string, value: string, onChange: (value: number | undefined) => void) => {
+ setNumberInputDrafts((previous) => ({ ...previous, [fieldName]: value }));
+
  if (value === "") {
  onChange(undefined);
  return;
  }
 
- onChange(Number(value));
+ const numericValue = Number(value);
+ onChange(Number.isFinite(numericValue) ? numericValue : undefined);
+ };
+
+ const clearNumberField = (fieldName: string, onChange: (value: number | undefined) => void) => {
+ setNumberInputDrafts((previous) => ({ ...previous, [fieldName]: "" }));
+ onChange(undefined);
+ };
+
+ const finishNumberField = (fieldName: string, onBlur: () => void) => {
+ setNumberInputDrafts((previous) => {
+ const nextDrafts = { ...previous };
+ delete nextDrafts[fieldName];
+ return nextDrafts;
+ });
+ onBlur();
  };
 
  return (
@@ -416,9 +434,10 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  type="number"
  placeholder="42000"
  className={numericFieldClassName}
- value={field.value ?? ""}
- onChange={(event) => field.onChange(event.target.value === "" ? undefined : Number(event.target.value))}
- onFocus={(event) => event.currentTarget.select()}
+ value={numberInputDrafts.basePrice ?? field.value ?? ""}
+ onChange={(event) => handleNumberFieldInput("basePrice", event.target.value, field.onChange)}
+ onFocus={() => clearNumberField("basePrice", field.onChange)}
+ onBlur={() => finishNumberField("basePrice", field.onBlur)}
  />
  </FormControl>
  <p className={fieldHelperClassName}>One price applies to every size and color variant.</p>
@@ -836,9 +855,10 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  type="number"
  placeholder="10"
  className={numericFieldClassName}
- value={variantField.value ?? ""}
- onChange={(event) => handleVariantStockInput(event.target.value, variantField.onChange)}
- onFocus={(event) => event.currentTarget.select()}
+ value={numberInputDrafts[`variants.${index}.stock`] ?? variantField.value ?? ""}
+ onChange={(event) => handleNumberFieldInput(`variants.${index}.stock`, event.target.value, variantField.onChange)}
+ onFocus={() => clearNumberField(`variants.${index}.stock`, variantField.onChange)}
+ onBlur={() => finishNumberField(`variants.${index}.stock`, variantField.onBlur)}
  />
  </FormControl>
  <FormMessage />

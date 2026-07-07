@@ -82,7 +82,7 @@ export async function sendResetPasswordEmail(input: SendResetPasswordEmailInput)
     auth: config.auth,
   });
 
-  const brandName = input.brandName || "Tide";
+  const brandName = input.brandName || "theootd.brand";
   const safeBrandName = escapeHtml(brandName);
   const safeResetUrl = escapeHtml(input.resetUrl);
 
@@ -124,7 +124,7 @@ export async function sendEmailChangeVerificationEmail(input: SendEmailChangeVer
     auth: config.auth,
   });
 
-  const brandName = input.brandName || "Tide";
+  const brandName = input.brandName || "theootd.brand";
   const safeBrandName = escapeHtml(brandName);
   const safeCurrentEmail = escapeHtml(input.currentEmail);
   const safeVerificationCode = escapeHtml(input.verificationCode);
@@ -189,7 +189,7 @@ export async function sendSignupVerificationEmail(input: SendSignupVerificationE
     auth: config.auth,
   });
 
-  const brandName = input.brandName || "Tide";
+  const brandName = input.brandName || "theootd.brand";
   const safeBrandName = escapeHtml(brandName);
   const safeVerificationCode = escapeHtml(input.verificationCode);
   const safeVerifyUrl = input.verifyUrl ? escapeHtml(input.verifyUrl) : null;
@@ -258,7 +258,7 @@ export async function sendAdminOrderEmail(input: SendAdminOrderEmailInput) {
   await transporter.sendMail({
     from: config.from,
     to: adminEmail,
-    subject: `[Tide] New ${input.orderType} • ${input.reference}`,
+    subject: `[theootd.brand] New ${input.orderType} • ${input.reference}`,
     text: [
       `New ${input.orderType} received.`,
       `Reference: ${input.reference}`,

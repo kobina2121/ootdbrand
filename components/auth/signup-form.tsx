@@ -120,7 +120,7 @@ export function SignupForm() {
  setIsGoogleSubmitting(true);
 
  await signIn("google", {
- callbackUrl: "/orders",
+ callbackUrl: "/",
  });
  };
 

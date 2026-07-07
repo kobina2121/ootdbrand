@@ -53,13 +53,13 @@ describe("POST /api/cart", () => {
 
   it("returns synced totals with an applied coupon", async () => {
     process.env.STORE_DISCOUNT_CODES = JSON.stringify([
-      { code: "TIDE10", type: "percentage", value: 10 },
+      { code: "OOTD10", type: "percentage", value: 10 },
     ]);
 
     const request = new Request("http://localhost:3000/api/cart", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ...validCartPayload, discountCode: "TIDE10" }),
+      body: JSON.stringify({ ...validCartPayload, discountCode: "OOTD10" }),
     });
 
     const response = await POST(request);
@@ -78,8 +78,8 @@ describe("POST /api/cart", () => {
         total: 220,
       },
       discount: {
-        requestedCode: "TIDE10",
-        appliedCode: "TIDE10",
+        requestedCode: "OOTD10",
+        appliedCode: "OOTD10",
         amount: 24,
         message: null,
       },
@@ -88,7 +88,7 @@ describe("POST /api/cart", () => {
 
   it("keeps the cart valid while marking an invalid coupon", async () => {
     process.env.STORE_DISCOUNT_CODES = JSON.stringify([
-      { code: "TIDE10", type: "percentage", value: 10 },
+      { code: "OOTD10", type: "percentage", value: 10 },
     ]);
 
     const request = new Request("http://localhost:3000/api/cart", {

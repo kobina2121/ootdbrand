@@ -4,9 +4,34 @@ import GoogleProvider from "next-auth/providers/google";
 
 import { getAuthSecret, getSessionTokenCookieName, shouldUseSecureAuthCookies } from "@/lib/auth/session-config";
 import { UnverifiedEmailError, upsertOAuthCustomerUser, verifyUserCredentials } from "@/lib/services/user-service";
+import { checkRateLimitForKey } from "@/lib/security/guards";
 
 const authSecret = getAuthSecret();
 const secureCookies = shouldUseSecureAuthCookies();
+
+function getRequestHeader(headers: Headers | Record<string, string> | undefined, name: string) {
+  if (!headers) {
+    return undefined;
+  }
+
+  if (typeof (headers as Headers).get === "function") {
+    return (headers as Headers).get(name) ?? undefined;
+  }
+
+  return (headers as Record<string, string>)[name] ?? (headers as Record<string, string>)[name.toLowerCase()];
+}
+
+function getRequestIp(headers?: Headers | Record<string, string>) {
+  const forwarded = getRequestHeader(headers, "x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) {
+      return first;
+    }
+  }
+
+  return getRequestHeader(headers, "x-real-ip")?.trim() || "unknown";
+}
 
 export const authOptions: NextAuthOptions = {
   secret: authSecret,
@@ -42,9 +67,18 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         const email = credentials?.email?.toString().trim().toLowerCase();
         const password = credentials?.password?.toString();
+        const rateLimit = checkRateLimitForKey(getRequestIp(request.headers), {
+          bucket: "auth:login",
+          limit: 8,
+          windowMs: 15 * 60 * 1000,
+        });
+
+        if (!rateLimit.ok) {
+          throw new Error("TooManyLoginAttempts");
+        }
 
         if (!email || !password) {
           return null;

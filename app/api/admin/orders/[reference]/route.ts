@@ -5,6 +5,7 @@ import { failure, success } from "@/lib/api-response";
 import { requireAdminUser } from "@/lib/auth/guards";
 import { OrderModel } from "@/lib/db/models/order";
 import { connectToDatabase } from "@/lib/db/mongoose";
+import { checkRateLimit } from "@/lib/security/guards";
 
 const deliveryUpdateSchema = z.object({
   deliveryStatus: z.enum(["Pending", "Processing", "Shipped", "Delivered", "Cancelled"]).optional(),
@@ -20,6 +21,18 @@ type RouteContext = {
 };
 
 export async function PATCH(request: Request, context: RouteContext) {
+  const rateLimit = checkRateLimit(request, {
+    bucket: "admin:orders:update",
+    limit: 40,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!rateLimit.ok) {
+    return NextResponse.json(failure("Too many order update requests. Please retry shortly."), {
+      status: 429,
+      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    });
+  }
+
   const admin = await requireAdminUser();
   if (!admin) {
     return NextResponse.json(failure("Unauthorized"), { status: 403 });
@@ -73,7 +86,19 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 }
 
-export async function DELETE(_: Request, context: RouteContext) {
+export async function DELETE(request: Request, context: RouteContext) {
+  const rateLimit = checkRateLimit(request, {
+    bucket: "admin:orders:delete",
+    limit: 20,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!rateLimit.ok) {
+    return NextResponse.json(failure("Too many order delete requests. Please retry shortly."), {
+      status: 429,
+      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    });
+  }
+
   const admin = await requireAdminUser();
   if (!admin) {
     return NextResponse.json(failure("Unauthorized"), { status: 403 });

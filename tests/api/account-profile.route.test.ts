@@ -223,7 +223,7 @@ describe("PATCH /api/account/profile", () => {
       to: "new@example.com",
       verificationCode: "123456",
       verifyUrl: expect.stringContaining("/verify-email-change?token=12345678901234567890123456789012"),
-      brandName: "Tide",
+      brandName: "theootd.brand",
       currentEmail: "old@example.com",
     });
   });

@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 
 import { failure, success } from "@/lib/api-response";
 import { requireAdminUser } from "@/lib/auth/guards";
+import { checkRateLimit } from "@/lib/security/guards";
 
 export const runtime = "nodejs";
 
@@ -25,6 +26,18 @@ const extensionByMimeType: Record<string, string> = {
 };
 
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(request, {
+    bucket: "admin:uploads:product-image",
+    limit: 20,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!rateLimit.ok) {
+    return NextResponse.json(failure("Too many product image upload attempts. Please retry shortly."), {
+      status: 429,
+      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    });
+  }
+
   const admin = await requireAdminUser();
 
   if (!admin) {

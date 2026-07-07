@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 
 import { useCart } from "@/components/store/cart-provider";
@@ -41,6 +41,8 @@ export default function CartPage() {
  } = useCart();
  const [pendingSku, setPendingSku] = useState<string | null>(null);
  const [couponCodeInput, setCouponCodeInput] = useState(discountCode);
+ const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>({});
+ const previousQuantitiesRef = useRef<Record<string, number>>({});
  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
  const [suggestedProducts, setSuggestedProducts] = useState<SuggestedProduct[]>([]);
  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -234,13 +236,30 @@ export default function CartPage() {
  </div>
  <div className="flex items-center gap-2">
  <Input
- value={item.quantity}
+ value={quantityDrafts[item.sku] ?? item.quantity}
  type="number"
  min={1}
  className="h-9 w-20 rounded-lg border-black/15 "
- onFocus={(event) => event.currentTarget.select()}
+ onFocus={() => {
+ previousQuantitiesRef.current[item.sku] = item.quantity;
+ setQuantityDrafts((previous) => ({ ...previous, [item.sku]: "" }));
+ }}
+ onBlur={() => {
+ setQuantityDrafts((previous) => {
+ const next = { ...previous };
+ delete next[item.sku];
+ return next;
+ });
+ }}
  onChange={(event) => {
- const value = Number(event.target.value) || 1;
+ const rawValue = event.target.value;
+ setQuantityDrafts((previous) => ({ ...previous, [item.sku]: rawValue }));
+
+ if (rawValue === "") {
+ return;
+ }
+
+ const value = Math.max(1, Number(rawValue) || previousQuantitiesRef.current[item.sku] || 1);
  void handleQuantityUpdate(item.sku, value);
  }}
  />

@@ -7,19 +7,19 @@ describe("buildMongoUri", () => {
   });
 
   it("normalizes mongodb+srv URIs with a default database name and write params", async () => {
-    process.env.MONGODB_DB_NAME = "tide-brand";
+    process.env.MONGODB_DB_NAME = "theootd-brand";
 
     const { buildMongoUri } = await import("@/lib/db/mongoose");
 
     expect(
       buildMongoUri("mongodb+srv://user:pass@example.mongodb.net/?appName=theootd-brand"),
     ).toBe(
-      "mongodb+srv://user:pass@example.mongodb.net/tide-brand?appName=theootd-brand&retryWrites=true&w=majority",
+      "mongodb+srv://user:pass@example.mongodb.net/theootd-brand?appName=theootd-brand&retryWrites=true&w=majority",
     );
   });
 
   it("normalizes direct Atlas URIs with multiple hosts", async () => {
-    process.env.MONGODB_DB_NAME = "tide-brand";
+    process.env.MONGODB_DB_NAME = "theootd-brand";
 
     const { buildMongoUri } = await import("@/lib/db/mongoose");
 
@@ -28,7 +28,7 @@ describe("buildMongoUri", () => {
         "mongodb://user:pass@host-a.mongodb.net:27017,host-b.mongodb.net:27017,host-c.mongodb.net:27017/?ssl=true&replicaSet=atlas-abc123-shard-0&authSource=admin&appName=theootd-brand",
       ),
     ).toBe(
-      "mongodb://user:pass@host-a.mongodb.net:27017,host-b.mongodb.net:27017,host-c.mongodb.net:27017/tide-brand?ssl=true&replicaSet=atlas-abc123-shard-0&authSource=admin&appName=theootd-brand&retryWrites=true&w=majority",
+      "mongodb://user:pass@host-a.mongodb.net:27017,host-b.mongodb.net:27017,host-c.mongodb.net:27017/theootd-brand?ssl=true&replicaSet=atlas-abc123-shard-0&authSource=admin&appName=theootd-brand&retryWrites=true&w=majority",
     );
   });
 

@@ -27,6 +27,10 @@ function getLoginErrorMessage(error?: string | null) {
  return "Verify your email with the confirmation code before logging in.";
  }
 
+ if (error === "TooManyLoginAttempts") {
+ return "Too many login attempts. Please wait and try again.";
+ }
+
  return "Login failed. Please try again.";
 }
 
@@ -126,7 +130,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
  return;
  }
 
- router.push(nextPath);
+ router.push(nextPath.startsWith("/admin") ? nextPath : "/");
  router.refresh();
  };
 
@@ -135,7 +139,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
  setIsGoogleSubmitting(true);
 
  await signIn("google", {
- callbackUrl: nextPath.startsWith("/admin") ? "/" : nextPath || "/orders",
+ callbackUrl: "/",
  });
  };
 

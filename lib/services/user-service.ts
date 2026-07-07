@@ -25,6 +25,12 @@ export type AppUser = {
   role: UserRole;
 };
 
+export type AdminUserListItem = AppUser & {
+  pendingEmail?: string;
+  emailVerified: boolean;
+  createdAt: string;
+};
+
 export class UnverifiedEmailError extends Error {
   constructor(message = "Verify your email address before logging in.") {
     super(message);
@@ -95,6 +101,49 @@ export async function findUserByEmail(email: string) {
     passwordHash: user.passwordHash,
     emailVerifiedAt: user.emailVerifiedAt,
     signupVerificationCodeHash: user.signupVerificationCodeHash,
+  };
+}
+
+export async function countRegisteredUsers() {
+  await connectToDatabase();
+  return UserModel.countDocuments({});
+}
+
+export async function listRegisteredUsersForAdmin(input: {
+  page: number;
+  pageSize: number;
+}) {
+  await connectToDatabase();
+
+  const page = Math.max(1, input.page);
+  const pageSize = Math.max(1, input.pageSize);
+  const skip = (page - 1) * pageSize;
+  const [users, totalCount] = await Promise.all([
+    UserModel.find({})
+      .select("_id name email role emailVerifiedAt pendingEmail createdAt")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(pageSize)
+      .lean(),
+    UserModel.countDocuments({}),
+  ]);
+
+  return {
+    users: users.map((user) => ({
+      id: String(user._id),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      pendingEmail: user.pendingEmail ?? undefined,
+      emailVerified: Boolean(user.emailVerifiedAt),
+      createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : "",
+    })) satisfies AdminUserListItem[],
+    pagination: {
+      page,
+      pageSize,
+      totalCount,
+      totalPages: Math.max(1, Math.ceil(totalCount / pageSize)),
+    },
   };
 }
 

@@ -71,7 +71,7 @@ export async function POST(request: Request) {
         await sendResetPasswordEmail({
           to: effectiveEmail,
           resetUrl,
-          brandName: "Tide",
+          brandName: "theootd.brand",
         });
       } catch (error) {
         console.error("[auth.forgot-password] Failed to send reset email", error);

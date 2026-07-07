@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -44,7 +43,7 @@ export function AppShell({ children, user }: AppShellProps) {
  const nextPath = searchParams.get("next") ?? "";
  const isAdminLoginView = pathname === "/login" && nextPath.startsWith("/admin");
  const isAdminUser = user?.role === "admin";
- const profileHref = user ? "/profile" : "/login?next=/profile";
+ const profileHref = user ? "/profile" : "/login";
  const visibleNavLinks =
  isAdminLoginView
  ? [{ href: "/", label: "Store Home" }]
@@ -54,9 +53,9 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)] text-foreground transition-colors ">
  <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur ">
  <div className="page-container flex items-center justify-between gap-3 py-3 sm:py-4">
-            <Link href="/" className="shrink-0 pr-2 xl:pr-6" aria-label="tideofficial home">
+            <Link href="/" className="shrink-0 pr-2 xl:pr-6" aria-label="theootd.brand home">
  <span className="block text-[1.7rem] leading-none font-semibold tracking-[-0.04em] text-[#2f1d15] sm:text-[2rem]">
-                tideofficial
+                theootd.brand
  </span>
  </Link>
 
@@ -226,15 +225,10 @@ export function AppShell({ children, user }: AppShellProps) {
  <footer className="border-t border-black/10 bg-white ">
  <div className="page-container py-12 sm:py-16">
  <div className="pb-10 sm:pb-12">
- <Link href="/" aria-label="TIDE home" className="inline-flex">
- <Image
- src="/images/logo/tide-wordmark.png"
- alt="TIDE"
- width={336}
- height={96}
- className="h-auto w-40 object-contain sm:w-52 lg:w-60"
- loading="eager"
- />
+ <Link href="/" aria-label="theootd.brand home" className="inline-flex">
+ <span className="text-[2rem] leading-none font-semibold tracking-[-0.06em] text-[#2f1d15] sm:text-[2.5rem] lg:text-[2.9rem]">
+ theootd.brand
+ </span>
  </Link>
  <p className="mt-4 text-xs tracking-[0.28em] text-[#7d7771] ">
  ELEVATED WOMENSWEAR FOR EVERY STORY - MADE IN GHANA
@@ -259,7 +253,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="space-y-2 text-[#706963] ">
  <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">+233 53 647 7207</a>
  <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp Us</a>
-                <a href="https://www.instagram.com/tide/" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram DM</a>
+                <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram DM</a>
  <Link href="/orders" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Track Order</Link>
  </div>
  </div>
@@ -277,16 +271,16 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">FOLLOW US</p>
  <div className="space-y-2 text-[#706963] ">
-                <a href="https://www.instagram.com/tide/" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram →</a>
+                <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram →</a>
  <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp →</a>
-                <a href="https://www.tiktok.com/@tide" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">TikTok @Tide →</a>
+                <a href="https://www.tiktok.com/@theootd.brand" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">TikTok @theootd.brand →</a>
  </div>
  </div>
  </div>
  </div>
 
  <div className="mt-10 flex flex-col gap-2 border-t border-black/10 pt-6 text-sm text-[#8a847e] sm:flex-row sm:items-center sm:justify-between">
-              <p>© <span suppressHydrationWarning>{new Date().getFullYear()}</span> Tide. All rights reserved.</p>
+              <p>© <span suppressHydrationWarning>{new Date().getFullYear()}</span> theootd.brand. All rights reserved.</p>
  <p>Designed in Ghana. Built for comfort.</p>
  </div>
  </div>

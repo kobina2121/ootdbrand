@@ -4,11 +4,24 @@ import { getCurrentSession } from "@/lib/auth/guards";
 import { failure, success } from "@/lib/api-response";
 import { calculateCartTotals } from "@/lib/products";
 import { resolveDiscount } from "@/lib/discounts";
+import { checkRateLimit } from "@/lib/security/guards";
 import { resolveOrderItemsFromCart } from "@/lib/services/product-service";
 import { cartPayloadSchema } from "@/lib/validators/cart";
 
 export async function POST(request: Request) {
   try {
+    const rateLimit = checkRateLimit(request, {
+      bucket: "cart:sync",
+      limit: 60,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (!rateLimit.ok) {
+      return NextResponse.json(failure("Too many cart sync requests. Please wait and try again."), {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      });
+    }
+
     const session = await getCurrentSession();
     if (session?.user?.role === "admin") {
       return NextResponse.json(failure("Admin accounts cannot use cart checkout flows."), { status: 403 });

@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       await sendSignupVerificationEmail({
         to: result.user.email,
         verificationCode: result.verificationCode,
-        brandName: "Tide",
+        brandName: "theootd.brand",
         verifyUrl,
       });
     } catch (error) {

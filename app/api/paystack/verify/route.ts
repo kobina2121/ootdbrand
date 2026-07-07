@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
+import { checkRateLimit } from "@/lib/security/guards";
 import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
 import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { recordPaymentEvent } from "@/lib/services/payment-event-service";
@@ -13,6 +14,18 @@ const verifyPayloadSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const rateLimit = checkRateLimit(request, {
+      bucket: "paystack:verify",
+      limit: 20,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (!rateLimit.ok) {
+      return NextResponse.json(failure("Too many payment verification attempts. Please wait and try again."), {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      });
+    }
+
     const json = await request.json();
     const parsed = verifyPayloadSchema.safeParse(json);
 

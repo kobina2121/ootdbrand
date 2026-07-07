@@ -22,18 +22,18 @@ afterEach(() => {
 
 describe("discount resolution", () => {
   it("normalizes coupon codes before lookup", () => {
-    expect(normalizeDiscountCode(" tide10 ")).toBe("TIDE10");
+    expect(normalizeDiscountCode(" ootd10 ")).toBe("OOTD10");
     expect(normalizeDiscountCode("")).toBeNull();
   });
 
   it("applies percentage discount rules", () => {
     process.env.STORE_DISCOUNT_CODES = JSON.stringify([
-      { code: "TIDE10", type: "percentage", value: 10 },
+      { code: "OOTD10", type: "percentage", value: 10 },
     ]);
 
-    expect(resolveDiscount(items, "tide10")).toEqual({
-      requestedCode: "TIDE10",
-      appliedCode: "TIDE10",
+    expect(resolveDiscount(items, "ootd10")).toEqual({
+      requestedCode: "OOTD10",
+      appliedCode: "OOTD10",
       amount: 24,
       message: null,
     });
@@ -54,7 +54,7 @@ describe("discount resolution", () => {
 
   it("returns an invalid result for unknown codes", () => {
     process.env.STORE_DISCOUNT_CODES = JSON.stringify([
-      { code: "TIDE10", type: "percentage", value: 10 },
+      { code: "OOTD10", type: "percentage", value: 10 },
     ]);
 
     expect(resolveDiscount(items, "NOPE")).toEqual({

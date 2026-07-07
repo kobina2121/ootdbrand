@@ -16,7 +16,7 @@ type RateLimitCheck =
       retryAfterSeconds: number;
     };
 
-const RATE_LIMIT_STORE_KEY = "__tide_rate_limit_store__";
+const RATE_LIMIT_STORE_KEY = "__theootd_rate_limit_store__";
 
 function getStore() {
   const globalScope = globalThis as typeof globalThis & {
@@ -42,11 +42,10 @@ function getClientIp(request: Request) {
   return request.headers.get("x-real-ip")?.trim() || "unknown";
 }
 
-export function checkRateLimit(request: Request, options: RateLimitOptions): RateLimitCheck {
+export function checkRateLimitForKey(identifier: string, options: RateLimitOptions): RateLimitCheck {
   const now = Date.now();
   const store = getStore();
-  const ip = getClientIp(request);
-  const key = `${options.bucket}:${ip}`;
+  const key = `${options.bucket}:${identifier || "unknown"}`;
   const existing = store.get(key);
 
   if (!existing || existing.resetAt <= now) {
@@ -64,6 +63,10 @@ export function checkRateLimit(request: Request, options: RateLimitOptions): Rat
   existing.count += 1;
   store.set(key, existing);
   return { ok: true };
+}
+
+export function checkRateLimit(request: Request, options: RateLimitOptions): RateLimitCheck {
+  return checkRateLimitForKey(getClientIp(request), options);
 }
 
 export function isTrustedOrigin(request: Request) {

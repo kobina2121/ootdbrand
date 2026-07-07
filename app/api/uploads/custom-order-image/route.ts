@@ -5,6 +5,7 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 
 import { failure, success } from "@/lib/api-response";
+import { checkRateLimit } from "@/lib/security/guards";
 
 export const runtime = "nodejs";
 
@@ -29,6 +30,18 @@ const extensionByMimeType: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
+    const rateLimit = checkRateLimit(request, {
+      bucket: "uploads:custom-order-image",
+      limit: 10,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (!rateLimit.ok) {
+      return NextResponse.json(failure("Too many image upload attempts. Please wait and try again."), {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      });
+    }
+
     const formData = await request.formData();
     const fileEntry = formData.get("file");
 
