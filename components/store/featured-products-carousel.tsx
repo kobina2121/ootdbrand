@@ -152,7 +152,7 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  href={`/products/${product.slug}`}
  className={cn(
  buttonVariants({ variant: "outline", size: "sm" }),
- "rounded-full border-black/20 px-5 text-[#1f2937] hover:border-black hover:bg-black hover:text-white ",
+ "min-h-11 rounded-full border-black/20 px-5 text-[#1f2937] hover:border-black hover:bg-black hover:text-white ",
  )}
  >
  View Product
@@ -183,12 +183,16 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  key={dot}
  type="button"
  onClick={() => goTo(dot)}
- className={`rounded-full transition-all ${activeIndex === dot ? "h-4 w-4 border border-[#1f2937] bg-transparent " : "h-2.5 w-2.5 bg-[#1f2937]/80 "}`}
+ className="flex h-11 min-w-11 items-center justify-center rounded-full transition-all"
  aria-label={`Go to featured product ${dot + 1}`}
  >
  {activeIndex === dot ? (
- <span className="mx-auto mt-[4px] block h-1.5 w-1.5 rounded-full bg-[#1f2937] " />
- ) : null}
+ <span className="flex h-4 w-4 items-center justify-center rounded-full border border-[#1f2937] bg-transparent">
+ <span className="block h-1.5 w-1.5 rounded-full bg-[#1f2937] " />
+ </span>
+ ) : (
+ <span className="block h-2.5 w-2.5 rounded-full bg-[#1f2937]/80 " />
+ )}
  </button>
  ))}
  </div>

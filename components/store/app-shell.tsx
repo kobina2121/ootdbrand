@@ -53,7 +53,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)] text-foreground transition-colors ">
  <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur ">
  <div className="page-container flex items-center justify-between gap-3 py-3 sm:py-4">
-            <Link href="/" className="shrink-0 pr-2 xl:pr-6" aria-label="theootd.brand home">
+            <Link href="/" className="flex min-h-11 shrink-0 items-center pr-2 xl:pr-6" aria-label="theootd.brand home">
  <span className="block text-[1.7rem] leading-none font-semibold tracking-[-0.04em] text-[#2f1d15] sm:text-[2rem]">
                 theootd.brand
  </span>
@@ -161,7 +161,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
 
  <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
- <DialogTrigger className="inline-flex rounded-full border border-black/10 bg-white/80 p-2 shadow-sm lg:hidden">
+ <DialogTrigger className="inline-flex size-11 items-center justify-center rounded-full border border-black/10 bg-white/80 shadow-sm lg:hidden">
  <Menu className="h-4 w-4" />
  <span className="sr-only">Open menu</span>
  </DialogTrigger>
@@ -240,21 +240,21 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">QUICK LINKS</p>
  <div className="space-y-2 text-[#706963] ">
- <Link href="/products" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Shop All</Link>
- <Link href="/products?category=TOPS" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Tops</Link>
- <Link href="/products?category=MAXI" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Maxi</Link>
- <Link href="/products?category=MIDI" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Midi</Link>
- <Link href="/custom-order" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Custom Order</Link>
+ <Link href="/products" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Shop All</Link>
+ <Link href="/products?category=TOPS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Tops</Link>
+ <Link href="/products?category=MAXI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Maxi</Link>
+ <Link href="/products?category=MIDI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Midi</Link>
+ <Link href="/custom-order" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Custom Order</Link>
  </div>
  </div>
 
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">NEED HELP</p>
  <div className="space-y-2 text-[#706963] ">
- <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">+233 53 647 7207</a>
- <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp Us</a>
-                <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram DM</a>
- <Link href="/orders" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Track Order</Link>
+ <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">+233 53 647 7207</a>
+ <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp Us</a>
+                <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram DM</a>
+ <Link href="/orders" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Track Order</Link>
  </div>
  </div>
 
@@ -271,9 +271,9 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">FOLLOW US</p>
  <div className="space-y-2 text-[#706963] ">
-                <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram →</a>
- <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp →</a>
-                <a href="https://www.tiktok.com/@theootd.brand" target="_blank" rel="noreferrer" className="block transition hover:translate-x-1 hover:text-[#1d1b1a] ">TikTok @theootd.brand →</a>
+                <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram →</a>
+ <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp →</a>
+                <a href="https://www.tiktok.com/@theootd.brand" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">TikTok @theootd.brand →</a>
  </div>
  </div>
  </div>
@@ -295,7 +295,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <li key={tab.href}>
  <Link
  href={tab.href}
- className={`flex flex-col items-center gap-1 py-2 text-[11px] ${active ? "text-foreground" : "text-muted-foreground"}`}
+ className={`flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[11px] ${active ? "text-foreground" : "text-muted-foreground"}`}
  >
  <span className={`rounded-full p-1 ${active ? "bg-black/10 " : ""}`}>
  <Icon className="size-4" />

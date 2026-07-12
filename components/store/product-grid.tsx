@@ -104,7 +104,7 @@ function ProductCard({ product }: { product: Product }) {
  key={`${product.slug}-${size}`}
  type="button"
  onClick={() => setSelectedSize(size)}
- className={`min-w-11 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+ className={`min-h-11 min-w-11 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${
  isSelected
  ? "border-[#1f1b18] bg-[#1f1b18] text-white shadow-sm "
  : "border-black/15 bg-white text-[#4f4841] hover:border-black/35 hover:bg-black/[0.03] "

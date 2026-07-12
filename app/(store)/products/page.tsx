@@ -102,8 +102,8 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  </div>
  <div className="flex flex-wrap items-center gap-2">
  {categories.map((entry) => (
- <Link key={entry} href={buildProductsHref(entry, sort)}>
- <Badge variant={entry === category ? "default" : "outline"} className="rounded-full px-3 py-1">
+ <Link key={entry} href={buildProductsHref(entry, sort)} className="inline-flex min-h-11 items-center">
+ <Badge variant={entry === category ? "default" : "outline"} className="rounded-full px-4 py-2">
  {entry === "all" ? "All" : entry}
  </Badge>
  </Link>

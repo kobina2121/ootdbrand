@@ -30,7 +30,7 @@ Issue: The quantity input on product detail has a visual "Quantity" text but no 
 Why it matters: Quantity is a purchase-critical control, so it needs a reliable accessible name and a comfortable touch target. Mobile touch target best practice is at least 44x44 CSS pixels.
 Suggested fix: Use `label htmlFor="product-quantity"` with a matching input id, or add `aria-label="Quantity"`. Increase the primary add-to-cart button height to at least `h-11`.
 
-5. Location: components/ui/button.tsx, components/store/app-shell.tsx, app/(store)/products/page.tsx, components/store/product-grid.tsx
+5. [Done] Location: components/ui/button.tsx, components/store/app-shell.tsx, app/(store)/products/page.tsx, components/store/product-grid.tsx
 Issue: Many interactive controls are below the recommended 44x44 touch target. Live examples included the mobile menu button at 34x34, desktop/tablet icon buttons at 32x32, product filters at around 25-36px tall, carousel dots at 10x10, and footer links at around 25px tall.
 Why it matters: Small targets are harder to tap accurately, especially on phones, and violate common mobile usability guidance. This affects navigation, filters, carousel controls, and checkout-adjacent actions.
 Suggested fix: Raise shared defaults in `components/ui/button.tsx` to `h-11` for default/large buttons and `size-11` for icon buttons where possible. For text links and badges used as filters, add padding or wrap them in 44px minimum-height anchors/buttons. Increase carousel dot hit areas while keeping the visual dot small with an inner element.
