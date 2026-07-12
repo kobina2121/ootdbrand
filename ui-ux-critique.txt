@@ -67,7 +67,7 @@ Suggested fix: Increase quantity controls to at least `h-11`, add `aria-label="Q
 
 Minor
 
-1. Location: app/(store)/page.tsx and app/(store)/products/page.tsx
+1. [Done] Location: app/(store)/page.tsx and app/(store)/products/page.tsx
 Issue: Empty/loading coverage is uneven. Products has a loading skeleton and a good empty state, but home page product sections load server-side without a matching route-level loading state.
 Why it matters: Consistent loading states reduce perceived wait time and make the app feel reliable during slow database or network responses.
 Suggested fix: Add `app/(store)/loading.tsx` or route/section-level skeletons for homepage catalog sections, using the existing product skeleton style.
