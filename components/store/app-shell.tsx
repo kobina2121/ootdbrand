@@ -15,13 +15,13 @@ const navLinks = [
  { href: "/products", label: "Shop" },
  { href: "/about", label: "About" },
  { href: "/custom-order", label: "Custom Order" },
- { href: "/orders", label: "Orders" },
+ { href: "/orders", label: "Track Order" },
  { href: "/cart", label: "Cart" },
 ];
 
 const mobileTabs = [
  { href: "/", icon: Home, label: "Home" },
- { href: "/products", icon: Search, label: "Search" },
+ { href: "/products", icon: Search, label: "Shop" },
  { href: "/cart", icon: ShoppingBag, label: "Cart" },
  { href: "/profile", icon: UserRound, label: "Profile" },
 ];
@@ -83,7 +83,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <Link href="/products">
  <Button size="icon" variant="ghost">
  <Search className="h-4 w-4" />
- <span className="sr-only">Search</span>
+ <span className="sr-only">Shop</span>
  </Button>
  </Link>
  <Link href={profileHref}>
@@ -133,7 +133,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <Link href="/products">
  <Button size="icon" variant="ghost">
  <Search className="h-4 w-4" />
- <span className="sr-only">Search</span>
+ <span className="sr-only">Shop</span>
  </Button>
  </Link>
  <Link href={profileHref}>

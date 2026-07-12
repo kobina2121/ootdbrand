@@ -55,7 +55,7 @@ Issue: Validation feedback is mostly summary-level or toast-based, with little p
 Why it matters: Long forms need field-level error messages so users can recover quickly. Summary-only errors force users to scan the entire form and can be missed by assistive technology.
 Suggested fix: Track field errors in component state or use a form library. Mark invalid controls with `aria-invalid`, connect messages with `aria-describedby`, and render the message directly below each affected field.
 
-10. Location: components/store/app-shell.tsx
+10. [Done] Location: components/store/app-shell.tsx
 Issue: Navigation exposes both "Shop" and a bottom-tab "Search" that both route to `/products`, while "Orders" is present in top navigation even for guests and likely requires sign-in.
 Why it matters: Reusing different labels for the same destination can make the information architecture feel unclear. Guest-visible protected destinations can also create avoidable dead ends.
 Suggested fix: Use one label consistently, such as "Shop" or "Search & Shop". Consider showing "Orders" as "Track Order" with a clearer sign-in expectation, or move it behind profile/account for guests.
