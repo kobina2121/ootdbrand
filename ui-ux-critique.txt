@@ -35,7 +35,7 @@ Issue: Many interactive controls are below the recommended 44x44 touch target. L
 Why it matters: Small targets are harder to tap accurately, especially on phones, and violate common mobile usability guidance. This affects navigation, filters, carousel controls, and checkout-adjacent actions.
 Suggested fix: Raise shared defaults in `components/ui/button.tsx` to `h-11` for default/large buttons and `size-11` for icon buttons where possible. For text links and badges used as filters, add padding or wrap them in 44px minimum-height anchors/buttons. Increase carousel dot hit areas while keeping the visual dot small with an inner element.
 
-6. Location: app/(store)/page.tsx; live homepage at tablet and desktop widths
+6. [Done] Location: app/(store)/page.tsx; live homepage at tablet and desktop widths
 Issue: The live audit detected horizontal overflow on the homepage at 768px and 1440px widths, while other pages did not overflow.
 Why it matters: Horizontal overflow causes accidental sideways scrolling and can make layouts feel unstable. It is usually caused by absolute decorative elements, wide animated content, or max-content CTA groups exceeding the viewport.
 Suggested fix: Audit the homepage decorative blobs, hero CTA wrapper, and carousel sections. Add `overflow-x-hidden` to the page-level wrapper only if the overflow is purely decorative; otherwise constrain wide children with `max-w-full`, safer transforms, or responsive wrapping.

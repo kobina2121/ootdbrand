@@ -100,7 +100,7 @@ export default async function HomePage() {
  );
 
  return (
- <div className="relative space-y-10 sm:space-y-12">
+ <div className="relative max-w-full overflow-x-clip space-y-10 sm:space-y-12">
  <div className="pointer-events-none absolute -left-20 top-20 hidden h-52 w-52 rounded-full bg-[#c8d4bc]/40 blur-3xl md:block animate-drift-x" />
  <div className="pointer-events-none absolute -right-16 top-[28rem] hidden h-64 w-64 rounded-full bg-[#d8c8ba]/35 blur-3xl md:block animate-drift-x-reverse" />
 
