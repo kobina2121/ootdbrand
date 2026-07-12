@@ -15,7 +15,7 @@ Issue: The email and password fields rely on placeholders only and do not have v
 Why it matters: Placeholder-only form design violates accessibility best practices because placeholders disappear once users type, are not a substitute for labels, and can make screen-reader navigation unclear. WCAG form guidance expects controls to have clear labels or equivalent accessible names.
 Suggested fix: Wrap each field in a labelled group like the signup form does. Add `label htmlFor="login-email"` and `label htmlFor="login-password"`, set matching `id` values on `Input` and `PasswordInput`, and keep placeholders as examples only.
 
-2. Location: app/(store)/custom-order/page.tsx; live page /custom-order
+2. [Done] Location: app/(store)/custom-order/page.tsx; live page /custom-order
 Issue: Many form controls use nearby `<p>` text as visual labels but are not connected to the input/select/textarea elements. The live audit flagged the category, product, customer details, body measurements, upload, delivery address, and notes controls as unlabeled.
 Why it matters: Screen readers and browser autofill/validation cannot reliably associate plain text with fields. This increases friction in a long, high-effort order form and violates accessible form design expectations.
 Suggested fix: Replace label-like `<p>` elements with `<label htmlFor="...">`, add unique `id` values to each control, and add `aria-describedby` for helper/error text where present. For grouped measurement fields, use a `<fieldset>` and `<legend>` for "Body Measurements".

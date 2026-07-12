@@ -334,8 +334,11 @@ export default function CustomOrderPage() {
  <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
  <p className="form-section-title">Selected Product *</p>
  <div className="space-y-2">
- <p className="text-sm font-medium text-[#1f1b18] ">Category *</p>
+ <label htmlFor="custom-order-category" className="text-sm font-medium text-[#1f1b18] ">
+ Category *
+ </label>
  <select
+ id="custom-order-category"
  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] "
  value={selectedCategory}
  disabled={isCatalogLoading}
@@ -357,7 +360,12 @@ export default function CustomOrderPage() {
  </select>
  </div>
 
+ <div className="space-y-2">
+ <label htmlFor="custom-order-product" className="text-sm font-medium text-[#1f1b18] ">
+ Product *
+ </label>
  <select
+ id="custom-order-product"
  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] "
  value={selectedProductSlug}
  disabled={isCatalogLoading || !selectedCategory}
@@ -377,6 +385,7 @@ export default function CustomOrderPage() {
  </>
  ) : null}
  </select>
+ </div>
 
  {selectedProduct ? (
  <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[140px_1fr]">
@@ -416,8 +425,11 @@ export default function CustomOrderPage() {
  <p className="form-section-title">Customer Details</p>
  <div className="grid gap-4 sm:grid-cols-2">
  <div className="space-y-2">
- <p className="text-sm font-medium text-[#1f1b18] ">Full Name *</p>
+ <label htmlFor="custom-order-name" className="text-sm font-medium text-[#1f1b18] ">
+ Full Name *
+ </label>
  <Input
+ id="custom-order-name"
  value={name}
  onChange={(event) => setName(event.target.value)}
  placeholder="Your full name"
@@ -425,8 +437,11 @@ export default function CustomOrderPage() {
  />
  </div>
  <div className="space-y-2">
- <p className="text-sm font-medium text-[#1f1b18] ">Email *</p>
+ <label htmlFor="custom-order-email" className="text-sm font-medium text-[#1f1b18] ">
+ Email *
+ </label>
  <Input
+ id="custom-order-email"
  type="email"
  value={email}
  onChange={(event) => setEmail(event.target.value)}
@@ -436,8 +451,11 @@ export default function CustomOrderPage() {
  </div>
  </div>
  <div className="space-y-2">
- <p className="text-sm font-medium text-[#1f1b18] ">Telephone Number *</p>
+ <label htmlFor="custom-order-phone" className="text-sm font-medium text-[#1f1b18] ">
+ Telephone Number *
+ </label>
  <Input
+ id="custom-order-phone"
  type="tel"
  value={phone}
  onChange={(event) => setPhone(event.target.value)}
@@ -451,8 +469,11 @@ export default function CustomOrderPage() {
  <p className="form-section-title">Customization</p>
  <div className="grid gap-4 sm:grid-cols-2">
  <div className="space-y-2">
- <p className="text-sm font-medium text-[#1f1b18] ">Type</p>
+ <label htmlFor="custom-order-type" className="text-sm font-medium text-[#1f1b18] ">
+ Type
+ </label>
  <select
+ id="custom-order-type"
  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] "
  value={type}
  onChange={(event) => setType(event.target.value)}
@@ -468,14 +489,19 @@ export default function CustomOrderPage() {
  </select>
  </div>
  <div className="space-y-2">
- <p className="text-sm font-medium text-[#1f1b18] ">Category</p>
- <Input value={selectedProduct?.category ?? ""} disabled className="rounded-xl border-black/15 bg-white " />
+ <label htmlFor="custom-order-selected-category" className="text-sm font-medium text-[#1f1b18] ">
+ Category
+ </label>
+ <Input id="custom-order-selected-category" value={selectedProduct?.category ?? ""} disabled className="rounded-xl border-black/15 bg-white " />
  </div>
  </div>
  <div className="grid gap-4 sm:grid-cols-2">
  <div className="space-y-2">
- <p className="text-sm font-medium text-[#1f1b18] ">Size *</p>
+ <label htmlFor="custom-order-size" className="text-sm font-medium text-[#1f1b18] ">
+ Size *
+ </label>
  <Input
+ id="custom-order-size"
  value={preferredSize}
  onChange={(event) => setPreferredSize(event.target.value)}
  placeholder="e.g. XS, S, M, L, XL or custom size"
@@ -484,8 +510,11 @@ export default function CustomOrderPage() {
  />
  </div>
  <div className="space-y-2">
- <p className="text-sm font-medium text-[#1f1b18] ">Color *</p>
+ <label htmlFor="custom-order-color" className="text-sm font-medium text-[#1f1b18] ">
+ Color *
+ </label>
  <Input
+ id="custom-order-color"
  value={preferredColor}
  onChange={(event) => setPreferredColor(event.target.value)}
  placeholder="e.g. Wine, Ivory, Sage Green, Custom Mix"
@@ -494,27 +523,44 @@ export default function CustomOrderPage() {
  />
  </div>
  </div>
- <div className="space-y-3">
- <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] ">
+ <fieldset className="space-y-3">
+ <legend className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] ">
  <Ruler className="size-4" />
  Body Measurements *
- </p>
+ </legend>
  <div className="grid gap-3 sm:grid-cols-3">
+ <div className="space-y-2">
+ <label htmlFor="custom-order-bust" className="sr-only">
+ Bust size
+ </label>
  <Input
+ id="custom-order-bust"
  value={bustSize}
  onChange={(event) => setBustSize(event.target.value)}
  placeholder="Bust size (in/cm)"
  className="rounded-xl border-black/15 "
  disabled={!selectedProduct}
  />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="custom-order-waist" className="sr-only">
+ Waist size
+ </label>
  <Input
+ id="custom-order-waist"
  value={waistSize}
  onChange={(event) => setWaistSize(event.target.value)}
  placeholder="Waist size (in/cm)"
  className="rounded-xl border-black/15 "
  disabled={!selectedProduct}
  />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="custom-order-hip" className="sr-only">
+ Hip size
+ </label>
  <Input
+ id="custom-order-hip"
  value={hipSize}
  onChange={(event) => setHipSize(event.target.value)}
  placeholder="Hip size (in/cm)"
@@ -522,7 +568,12 @@ export default function CustomOrderPage() {
  disabled={!selectedProduct}
  />
  </div>
+ </div>
+ <label htmlFor="custom-order-additional-measurements" className="sr-only">
+ Additional measurements
+ </label>
  <Textarea
+ id="custom-order-additional-measurements"
  rows={3}
  value={additionalMeasurements}
  onChange={(event) => setAdditionalMeasurements(event.target.value)}
@@ -530,13 +581,14 @@ export default function CustomOrderPage() {
  className="rounded-xl border-black/15 "
  disabled={!selectedProduct}
  />
- </div>
+ </fieldset>
  <div className="space-y-2">
- <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] ">
+ <label htmlFor="custom-order-reference-images" className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] ">
  <ImagePlus className="size-4" />
  Upload Reference Images
- </p>
+ </label>
  <Input
+ id="custom-order-reference-images"
  type="file"
  accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif"
  multiple
@@ -598,7 +650,11 @@ export default function CustomOrderPage() {
  <MapPin className="size-4" />
  Delivery Address *
  </p>
+ <label htmlFor="custom-order-address-line" className="sr-only">
+ Street address or house number
+ </label>
  <Input
+ id="custom-order-address-line"
  value={deliveryAddress.addressLine}
  onChange={(event) =>
  setDeliveryAddress((previous) => ({ ...previous, addressLine: event.target.value }))
@@ -607,13 +663,24 @@ export default function CustomOrderPage() {
  className="rounded-xl border-black/15 "
  />
  <div className="grid gap-3 sm:grid-cols-2">
+ <div className="space-y-2">
+ <label htmlFor="custom-order-city" className="sr-only">
+ City
+ </label>
  <Input
+ id="custom-order-city"
  value={deliveryAddress.city}
  onChange={(event) => setDeliveryAddress((previous) => ({ ...previous, city: event.target.value }))}
  placeholder="City"
  className="rounded-xl border-black/15 "
  />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="custom-order-region" className="sr-only">
+ State or region
+ </label>
  <Input
+ id="custom-order-region"
  value={deliveryAddress.stateRegion}
  onChange={(event) =>
  setDeliveryAddress((previous) => ({ ...previous, stateRegion: event.target.value }))
@@ -622,7 +689,12 @@ export default function CustomOrderPage() {
  className="rounded-xl border-black/15 "
  />
  </div>
+ </div>
+ <label htmlFor="custom-order-country" className="sr-only">
+ Country
+ </label>
  <Input
+ id="custom-order-country"
  value={deliveryAddress.country}
  onChange={(event) => setDeliveryAddress((previous) => ({ ...previous, country: event.target.value }))}
  placeholder="Country"
@@ -631,11 +703,12 @@ export default function CustomOrderPage() {
  </div>
 
  <div className="space-y-2">
- <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] ">
+ <label htmlFor="custom-order-notes" className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] ">
  <Shirt className="size-4" />
  Extra Notes
- </p>
+ </label>
  <Textarea
+ id="custom-order-notes"
  rows={4}
  value={notes}
  onChange={(event) => setNotes(event.target.value)}
