@@ -60,7 +60,7 @@ Issue: Navigation exposes both "Shop" and a bottom-tab "Search" that both route 
 Why it matters: Reusing different labels for the same destination can make the information architecture feel unclear. Guest-visible protected destinations can also create avoidable dead ends.
 Suggested fix: Use one label consistently, such as "Shop" or "Search & Shop". Consider showing "Orders" as "Track Order" with a clearer sign-in expectation, or move it behind profile/account for guests.
 
-11. Location: app/(store)/cart/page.tsx
+11. [Done] Location: app/(store)/cart/page.tsx
 Issue: Cart quantity inputs are `h-9 w-20`, and the coupon field lacks a programmatic label.
 Why it matters: Cart quantity and coupon entry are core commerce controls. They should be easy to tap, easy to identify, and accessible to assistive technologies.
 Suggested fix: Increase quantity controls to at least `h-11`, add `aria-label="Quantity for {item.name}"`, and add a real label or `aria-label="Coupon code"` to the coupon input.

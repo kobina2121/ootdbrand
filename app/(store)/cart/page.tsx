@@ -239,7 +239,8 @@ export default function CartPage() {
  value={quantityDrafts[item.sku] ?? item.quantity}
  type="number"
  min={1}
- className="h-9 w-20 rounded-lg border-black/15 "
+ aria-label={`Quantity for ${item.name}`}
+ className="h-11 w-24 rounded-lg border-black/15 "
  onFocus={() => {
  previousQuantitiesRef.current[item.sku] = item.quantity;
  setQuantityDrafts((previous) => ({ ...previous, [item.sku]: "" }));
@@ -279,9 +280,12 @@ export default function CartPage() {
  </CardHeader>
  <CardContent className="space-y-4">
  <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3">
- <p className="text-sm font-medium text-[#1f1b18] ">Coupon code</p>
+ <label htmlFor="cart-coupon-code" className="text-sm font-medium text-[#1f1b18] ">
+ Coupon code
+ </label>
  <div className="flex flex-col gap-2 sm:flex-row">
  <Input
+ id="cart-coupon-code"
  value={couponCodeInput}
  placeholder="Enter coupon"
  className="h-10 rounded-lg border-black/15 uppercase "
