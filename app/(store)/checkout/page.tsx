@@ -33,6 +33,7 @@ export default function CheckoutPage() {
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const router = useRouter();
+ const hasValidationError = Boolean(errorMessage);
 
  useEffect(() => {
  if (!isClientReady || userRole === "admin") {
@@ -165,22 +166,110 @@ export default function CheckoutPage() {
  <p className="text-sm text-[#6e6761] ">Use the same format as your delivery address for fast dispatch.</p>
  </CardHeader>
  <CardContent className="space-y-4">
- <Input name="fullName" placeholder="Full name" required className="rounded-xl border-black/15 " />
- <Input name="email" placeholder="Email" type="email" required className="rounded-xl border-black/15 " />
- <Input name="phone" placeholder="Phone" required className="rounded-xl border-black/15 " />
+ <div className="space-y-2">
+ <label htmlFor="checkout-full-name" className="text-sm font-medium text-[#1f1b18]">
+ Full name
+ </label>
+ <Input
+ id="checkout-full-name"
+ name="fullName"
+ placeholder="Full name"
+ required
+ aria-invalid={hasValidationError}
+ aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ className="rounded-xl border-black/15 "
+ />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="checkout-email" className="text-sm font-medium text-[#1f1b18]">
+ Email
+ </label>
+ <Input
+ id="checkout-email"
+ name="email"
+ placeholder="Email"
+ type="email"
+ required
+ aria-invalid={hasValidationError}
+ aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ className="rounded-xl border-black/15 "
+ />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="checkout-phone" className="text-sm font-medium text-[#1f1b18]">
+ Phone
+ </label>
+ <Input
+ id="checkout-phone"
+ name="phone"
+ placeholder="Phone"
+ required
+ aria-invalid={hasValidationError}
+ aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ className="rounded-xl border-black/15 "
+ />
+ </div>
  <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
  <p className="form-section-title">Delivery Address</p>
+ <div className="space-y-2">
+ <label htmlFor="checkout-address-line" className="text-sm font-medium text-[#1f1b18]">
+ Street address / House number
+ </label>
  <Input
+ id="checkout-address-line"
  name="addressLine"
  placeholder="Street address / House number"
  required
+ aria-invalid={hasValidationError}
+ aria-describedby={hasValidationError ? "checkout-error" : undefined}
  className="rounded-xl border-black/15 "
  />
- <div className="grid gap-3 sm:grid-cols-2">
- <Input name="city" placeholder="City" required className="rounded-xl border-black/15 " />
- <Input name="stateRegion" placeholder="State / Region" required className="rounded-xl border-black/15 " />
  </div>
- <Input name="country" placeholder="Country" defaultValue="Ghana" required className="rounded-xl border-black/15 " />
+ <div className="grid gap-3 sm:grid-cols-2">
+ <div className="space-y-2">
+ <label htmlFor="checkout-city" className="text-sm font-medium text-[#1f1b18]">
+ City
+ </label>
+ <Input
+ id="checkout-city"
+ name="city"
+ placeholder="City"
+ required
+ aria-invalid={hasValidationError}
+ aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ className="rounded-xl border-black/15 "
+ />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="checkout-region" className="text-sm font-medium text-[#1f1b18]">
+ State / Region
+ </label>
+ <Input
+ id="checkout-region"
+ name="stateRegion"
+ placeholder="State / Region"
+ required
+ aria-invalid={hasValidationError}
+ aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ className="rounded-xl border-black/15 "
+ />
+ </div>
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="checkout-country" className="text-sm font-medium text-[#1f1b18]">
+ Country
+ </label>
+ <Input
+ id="checkout-country"
+ name="country"
+ placeholder="Country"
+ defaultValue="Ghana"
+ required
+ aria-invalid={hasValidationError}
+ aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ className="rounded-xl border-black/15 "
+ />
+ </div>
  </div>
  <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
  <p className="form-section-title">Payment Method</p>
@@ -211,7 +300,11 @@ export default function CheckoutPage() {
  </button>
  </div>
  </div>
- {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
+ {errorMessage ? (
+ <p id="checkout-error" className="text-sm text-destructive">
+ {errorMessage}
+ </p>
+ ) : null}
  </CardContent>
  </Card>
 

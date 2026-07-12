@@ -20,7 +20,7 @@ Issue: Many form controls use nearby `<p>` text as visual labels but are not con
 Why it matters: Screen readers and browser autofill/validation cannot reliably associate plain text with fields. This increases friction in a long, high-effort order form and violates accessible form design expectations.
 Suggested fix: Replace label-like `<p>` elements with `<label htmlFor="...">`, add unique `id` values to each control, and add `aria-describedby` for helper/error text where present. For grouped measurement fields, use a `<fieldset>` and `<legend>` for "Body Measurements".
 
-3. Location: app/(store)/checkout/page.tsx; live checkout flow when cart has items
+3. [Done] Location: app/(store)/checkout/page.tsx; live checkout flow when cart has items
 Issue: Checkout fields use placeholders for "Full name", "Email", "Phone", and address fields without visible labels.
 Why it matters: Checkout is a conversion-critical form. Placeholder-only labels increase mistakes, especially on mobile after the placeholder disappears, and are weaker for assistive technology.
 Suggested fix: Add visible labels to every checkout input, keep placeholders as examples, and set `aria-invalid` plus `aria-describedby` when validation fails.
