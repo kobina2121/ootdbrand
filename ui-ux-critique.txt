@@ -92,7 +92,7 @@ Issue: Footer links rely mainly on hover translation/color changes, with no cust
 Why it matters: Keyboard users benefit from strong, consistent focus states, especially in dense link groups.
 Suggested fix: Add `focus-visible:outline`, `focus-visible:ring`, or a shared footer-link class with visible focus styling.
 
-6. Location: app/(store)/page.tsx
+6. [Done] Location: app/(store)/page.tsx
 Issue: Homepage hero uses continuous carousel/zoom/floating/pulse animations without an apparent reduced-motion fallback.
 Why it matters: Continuous motion can cause discomfort for some users. Best practice is to respect `prefers-reduced-motion`.
 Suggested fix: Add CSS under `@media (prefers-reduced-motion: reduce)` to disable or simplify `animate-hero-carousel`, `animate-hero-zoom`, `animate-soft-float`, and `animate-pulse-glow`.

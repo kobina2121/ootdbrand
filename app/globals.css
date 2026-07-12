@@ -312,4 +312,27 @@
  transition-duration: 1ms !important;
  scroll-behavior: auto !important;
  }
+
+ .animate-fade-up,
+ .animate-fade-up-delay-1,
+ .animate-fade-up-delay-2,
+ .animate-soft-float,
+ .animate-pulse-glow,
+ .animate-hero-zoom,
+ .animate-drift-x,
+ .animate-drift-x-reverse {
+ animation: none !important;
+ opacity: 1 !important;
+ transform: none !important;
+ }
+
+ .animate-hero-carousel {
+ animation: none !important;
+ opacity: 0 !important;
+ transform: none !important;
+ }
+
+ .animate-hero-carousel:first-of-type {
+ opacity: 1 !important;
+ }
 }
