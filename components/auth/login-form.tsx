@@ -199,19 +199,31 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
  </>
  ) : null}
  <form className="space-y-4" onSubmit={onSubmit}>
+ <div className="space-y-2">
+ <label htmlFor="login-email" className="text-sm font-medium">
+ Email
+ </label>
  <Input
+ id="login-email"
  name="email"
  type="email"
  placeholder={nextPath.startsWith("/admin") ? "admin email" : "you@example.com"}
  className="h-11 rounded-xl border-black/15 "
  required
  />
+ </div>
+ <div className="space-y-2">
+ <label htmlFor="login-password" className="text-sm font-medium">
+ Password
+ </label>
  <PasswordInput
+ id="login-password"
  name="password"
  placeholder="Password"
  className="h-11 rounded-xl border-black/15 "
  required
  />
+ </div>
  {!nextPath.startsWith("/admin") ? (
  <div className="text-center">
  <Link href="/forgot-password" className="text-sm font-medium text-foreground underline underline-offset-4 ">
