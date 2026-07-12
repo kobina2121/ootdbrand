@@ -72,7 +72,7 @@ Issue: Empty/loading coverage is uneven. Products has a loading skeleton and a g
 Why it matters: Consistent loading states reduce perceived wait time and make the app feel reliable during slow database or network responses.
 Suggested fix: Add `app/(store)/loading.tsx` or route/section-level skeletons for homepage catalog sections, using the existing product skeleton style.
 
-2. Location: app/(store)/error.tsx
+2. [Done] Location: app/(store)/error.tsx
 Issue: The storefront error boundary renders raw `error.message` to users.
 Why it matters: Raw error messages can be technical, inconsistent, or occasionally reveal implementation details. UX best practice is to give a calm, actionable message.
 Suggested fix: Show a friendly generic message by default and log detailed errors server-side. Keep the "Try again" action.
