@@ -87,7 +87,7 @@ Issue: Product cards include size selection buttons on listing cards, but the se
 Why it matters: This creates a small expectation mismatch: users may think their size choice will be remembered when they open the product.
 Suggested fix: Either remove size selection from listing cards and show sizes as noninteractive chips, or pass the selected size through the product URL/query and initialize the detail page from it.
 
-5. Location: components/store/app-shell.tsx
+5. [Done] Location: components/store/app-shell.tsx
 Issue: Footer links rely mainly on hover translation/color changes, with no custom focus-visible treatment beyond default browser focus.
 Why it matters: Keyboard users benefit from strong, consistent focus states, especially in dense link groups.
 Suggested fix: Add `focus-visible:outline`, `focus-visible:ring`, or a shared footer-link class with visible focus styling.

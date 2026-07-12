@@ -124,6 +124,12 @@
  transition: color 180ms ease;
  }
 
+ footer a:focus-visible {
+ outline: 2px solid color-mix(in oklch, var(--foreground) 45%, transparent);
+ outline-offset: 4px;
+ border-radius: 0.75rem;
+ }
+
  ::selection {
  background: color-mix(in oklch, var(--primary) 22%, white);
  color: var(--foreground);
