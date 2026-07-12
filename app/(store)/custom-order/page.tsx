@@ -15,6 +15,23 @@ import { calculateCustomOrderTotal, resolveTransactionFeeGhs } from "@/lib/custo
 import { formatPriceNgn } from "@/lib/products";
 
 const typeOptions = ["Dress", "Top", "Skirt", "Set", "Jumpsuit"] as const;
+const customOrderFieldLabels = {
+ product: "Product",
+ name: "Full name",
+ email: "Email",
+ phone: "Telephone number",
+ preferredSize: "Size",
+ preferredColor: "Color",
+ bustSize: "Bust size",
+ waistSize: "Waist size",
+ hipSize: "Hip size",
+ addressLine: "Street address",
+ city: "City",
+ stateRegion: "State / Region",
+ country: "Country",
+} as const;
+
+type CustomOrderFieldName = keyof typeof customOrderFieldLabels;
 
 type DeliveryAddress = {
  addressLine: string;
@@ -66,6 +83,7 @@ export default function CustomOrderPage() {
  const [type, setType] = useState("");
  const [notes, setNotes] = useState("");
  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+ const [fieldErrors, setFieldErrors] = useState<Partial<Record<CustomOrderFieldName, string>>>({});
  const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>({
  addressLine: "",
  city: "",
@@ -95,6 +113,22 @@ export default function CustomOrderPage() {
  const selectedProductUnitPrice = selectedProduct?.basePrice ?? 0;
  const transactionFee = resolveTransactionFeeGhs();
  const selectedCustomOrderTotal = calculateCustomOrderTotal(selectedProductUnitPrice, customizationFee, transactionFee);
+ const getFieldErrorProps = (field: CustomOrderFieldName) => ({
+ "aria-invalid": Boolean(fieldErrors[field]),
+ "aria-describedby": fieldErrors[field] ? `custom-order-${field}-error` : undefined,
+ });
+
+ const clearFieldError = (field: CustomOrderFieldName) => {
+ setFieldErrors((previous) => {
+ if (!previous[field]) {
+ return previous;
+ }
+
+ const next = { ...previous };
+ delete next[field];
+ return next;
+ });
+ };
 
  const photoPreviews = useMemo(
  () =>
@@ -220,23 +254,39 @@ export default function CustomOrderPage() {
 
  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
  event.preventDefault();
+ setFieldErrors({});
 
- if (
- !selectedProduct ||
- !name ||
- !email ||
- !phone ||
- !preferredSize ||
- !preferredColor ||
- !bustSize ||
- !waistSize ||
- !hipSize ||
- !deliveryAddress.addressLine ||
- !deliveryAddress.city ||
- !deliveryAddress.stateRegion ||
- !deliveryAddress.country
- ) {
- toast.error("Please fill in all required fields.");
+ const requiredFields = {
+ product: selectedProduct?.slug ?? "",
+ name: name.trim(),
+ email: email.trim(),
+ phone: phone.trim(),
+ preferredSize: preferredSize.trim(),
+ preferredColor: preferredColor.trim(),
+ bustSize: bustSize.trim(),
+ waistSize: waistSize.trim(),
+ hipSize: hipSize.trim(),
+ addressLine: deliveryAddress.addressLine.trim(),
+ city: deliveryAddress.city.trim(),
+ stateRegion: deliveryAddress.stateRegion.trim(),
+ country: deliveryAddress.country.trim(),
+ } satisfies Record<CustomOrderFieldName, string>;
+ const nextFieldErrors = Object.fromEntries(
+ (Object.entries(requiredFields) as Array<[CustomOrderFieldName, string]>)
+ .filter(([, value]) => value.length === 0)
+ .map(([field]) => [field, `${customOrderFieldLabels[field]} is required.`]),
+ ) as Partial<Record<CustomOrderFieldName, string>>;
+
+ if (Object.keys(nextFieldErrors).length > 0) {
+ setFieldErrors(nextFieldErrors);
+ toast.error("Please complete the highlighted required fields.");
+ return;
+ }
+ const productToOrder = selectedProduct;
+
+ if (!productToOrder) {
+ setFieldErrors({ product: "Product is required." });
+ toast.error("Please select a product.");
  return;
  }
 
@@ -250,7 +300,7 @@ export default function CustomOrderPage() {
  "Content-Type": "application/json",
  },
  body: JSON.stringify({
- productSlug: selectedProduct.slug,
+ productSlug: productToOrder.slug,
  fullName: name.trim(),
  email: email.trim(),
  phone: phone.trim(),
@@ -369,7 +419,11 @@ export default function CustomOrderPage() {
  className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] "
  value={selectedProductSlug}
  disabled={isCatalogLoading || !selectedCategory}
- onChange={(event) => handleProductChange(event.target.value)}
+ {...getFieldErrorProps("product")}
+ onChange={(event) => {
+ handleProductChange(event.target.value);
+ clearFieldError("product");
+ }}
  >
  {isCatalogLoading ? <option>Loading products...</option> : null}
  {!isCatalogLoading ? (
@@ -385,6 +439,11 @@ export default function CustomOrderPage() {
  </>
  ) : null}
  </select>
+ {fieldErrors.product ? (
+ <p id="custom-order-product-error" className="text-sm text-destructive">
+ {fieldErrors.product}
+ </p>
+ ) : null}
  </div>
 
  {selectedProduct ? (
@@ -431,10 +490,19 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-name"
  value={name}
- onChange={(event) => setName(event.target.value)}
+ {...getFieldErrorProps("name")}
+ onChange={(event) => {
+ setName(event.target.value);
+ clearFieldError("name");
+ }}
  placeholder="Your full name"
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.name ? (
+ <p id="custom-order-name-error" className="text-sm text-destructive">
+ {fieldErrors.name}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-2">
  <label htmlFor="custom-order-email" className="text-sm font-medium text-[#1f1b18] ">
@@ -444,10 +512,19 @@ export default function CustomOrderPage() {
  id="custom-order-email"
  type="email"
  value={email}
- onChange={(event) => setEmail(event.target.value)}
+ {...getFieldErrorProps("email")}
+ onChange={(event) => {
+ setEmail(event.target.value);
+ clearFieldError("email");
+ }}
  placeholder="you@example.com"
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.email ? (
+ <p id="custom-order-email-error" className="text-sm text-destructive">
+ {fieldErrors.email}
+ </p>
+ ) : null}
  </div>
  </div>
  <div className="space-y-2">
@@ -458,10 +535,19 @@ export default function CustomOrderPage() {
  id="custom-order-phone"
  type="tel"
  value={phone}
- onChange={(event) => setPhone(event.target.value)}
+ {...getFieldErrorProps("phone")}
+ onChange={(event) => {
+ setPhone(event.target.value);
+ clearFieldError("phone");
+ }}
  placeholder="+233 53 647 7207"
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.phone ? (
+ <p id="custom-order-phone-error" className="text-sm text-destructive">
+ {fieldErrors.phone}
+ </p>
+ ) : null}
  </div>
  </div>
 
@@ -503,11 +589,20 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-size"
  value={preferredSize}
- onChange={(event) => setPreferredSize(event.target.value)}
+ {...getFieldErrorProps("preferredSize")}
+ onChange={(event) => {
+ setPreferredSize(event.target.value);
+ clearFieldError("preferredSize");
+ }}
  placeholder="e.g. XS, S, M, L, XL or custom size"
  className="rounded-xl border-black/15 "
  disabled={!selectedProduct}
  />
+ {fieldErrors.preferredSize ? (
+ <p id="custom-order-preferredSize-error" className="text-sm text-destructive">
+ {fieldErrors.preferredSize}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-2">
  <label htmlFor="custom-order-color" className="text-sm font-medium text-[#1f1b18] ">
@@ -516,11 +611,20 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-color"
  value={preferredColor}
- onChange={(event) => setPreferredColor(event.target.value)}
+ {...getFieldErrorProps("preferredColor")}
+ onChange={(event) => {
+ setPreferredColor(event.target.value);
+ clearFieldError("preferredColor");
+ }}
  placeholder="e.g. Wine, Ivory, Sage Green, Custom Mix"
  className="rounded-xl border-black/15 "
  disabled={!selectedProduct}
  />
+ {fieldErrors.preferredColor ? (
+ <p id="custom-order-preferredColor-error" className="text-sm text-destructive">
+ {fieldErrors.preferredColor}
+ </p>
+ ) : null}
  </div>
  </div>
  <fieldset className="space-y-3">
@@ -536,11 +640,20 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-bust"
  value={bustSize}
- onChange={(event) => setBustSize(event.target.value)}
+ {...getFieldErrorProps("bustSize")}
+ onChange={(event) => {
+ setBustSize(event.target.value);
+ clearFieldError("bustSize");
+ }}
  placeholder="Bust size (in/cm)"
  className="rounded-xl border-black/15 "
  disabled={!selectedProduct}
  />
+ {fieldErrors.bustSize ? (
+ <p id="custom-order-bustSize-error" className="text-sm text-destructive">
+ {fieldErrors.bustSize}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-2">
  <label htmlFor="custom-order-waist" className="sr-only">
@@ -549,11 +662,20 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-waist"
  value={waistSize}
- onChange={(event) => setWaistSize(event.target.value)}
+ {...getFieldErrorProps("waistSize")}
+ onChange={(event) => {
+ setWaistSize(event.target.value);
+ clearFieldError("waistSize");
+ }}
  placeholder="Waist size (in/cm)"
  className="rounded-xl border-black/15 "
  disabled={!selectedProduct}
  />
+ {fieldErrors.waistSize ? (
+ <p id="custom-order-waistSize-error" className="text-sm text-destructive">
+ {fieldErrors.waistSize}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-2">
  <label htmlFor="custom-order-hip" className="sr-only">
@@ -562,11 +684,20 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-hip"
  value={hipSize}
- onChange={(event) => setHipSize(event.target.value)}
+ {...getFieldErrorProps("hipSize")}
+ onChange={(event) => {
+ setHipSize(event.target.value);
+ clearFieldError("hipSize");
+ }}
  placeholder="Hip size (in/cm)"
  className="rounded-xl border-black/15 "
  disabled={!selectedProduct}
  />
+ {fieldErrors.hipSize ? (
+ <p id="custom-order-hipSize-error" className="text-sm text-destructive">
+ {fieldErrors.hipSize}
+ </p>
+ ) : null}
  </div>
  </div>
  <label htmlFor="custom-order-additional-measurements" className="sr-only">
@@ -656,12 +787,21 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-address-line"
  value={deliveryAddress.addressLine}
+ {...getFieldErrorProps("addressLine")}
  onChange={(event) =>
- setDeliveryAddress((previous) => ({ ...previous, addressLine: event.target.value }))
+ {
+ setDeliveryAddress((previous) => ({ ...previous, addressLine: event.target.value }));
+ clearFieldError("addressLine");
+ }
  }
  placeholder="Street address / House number"
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.addressLine ? (
+ <p id="custom-order-addressLine-error" className="text-sm text-destructive">
+ {fieldErrors.addressLine}
+ </p>
+ ) : null}
  <div className="grid gap-3 sm:grid-cols-2">
  <div className="space-y-2">
  <label htmlFor="custom-order-city" className="sr-only">
@@ -670,10 +810,19 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-city"
  value={deliveryAddress.city}
- onChange={(event) => setDeliveryAddress((previous) => ({ ...previous, city: event.target.value }))}
+ {...getFieldErrorProps("city")}
+ onChange={(event) => {
+ setDeliveryAddress((previous) => ({ ...previous, city: event.target.value }));
+ clearFieldError("city");
+ }}
  placeholder="City"
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.city ? (
+ <p id="custom-order-city-error" className="text-sm text-destructive">
+ {fieldErrors.city}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-2">
  <label htmlFor="custom-order-region" className="sr-only">
@@ -682,12 +831,19 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-region"
  value={deliveryAddress.stateRegion}
- onChange={(event) =>
- setDeliveryAddress((previous) => ({ ...previous, stateRegion: event.target.value }))
- }
+ {...getFieldErrorProps("stateRegion")}
+ onChange={(event) => {
+ setDeliveryAddress((previous) => ({ ...previous, stateRegion: event.target.value }));
+ clearFieldError("stateRegion");
+ }}
  placeholder="State / Region"
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.stateRegion ? (
+ <p id="custom-order-stateRegion-error" className="text-sm text-destructive">
+ {fieldErrors.stateRegion}
+ </p>
+ ) : null}
  </div>
  </div>
  <label htmlFor="custom-order-country" className="sr-only">
@@ -696,10 +852,19 @@ export default function CustomOrderPage() {
  <Input
  id="custom-order-country"
  value={deliveryAddress.country}
- onChange={(event) => setDeliveryAddress((previous) => ({ ...previous, country: event.target.value }))}
+ {...getFieldErrorProps("country")}
+ onChange={(event) => {
+ setDeliveryAddress((previous) => ({ ...previous, country: event.target.value }));
+ clearFieldError("country");
+ }}
  placeholder="Country"
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.country ? (
+ <p id="custom-order-country-error" className="text-sm text-destructive">
+ {fieldErrors.country}
+ </p>
+ ) : null}
  </div>
 
  <div className="space-y-2">

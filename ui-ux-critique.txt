@@ -50,7 +50,7 @@ Issue: Footer metadata and several muted text treatments are close to or below A
 Why it matters: Small muted text below 4.5:1 can be difficult to read, especially on mobile and bright screens.
 Suggested fix: Darken muted brand text tokens such as `#8a847e`, `#7d7771`, and similar footer colors, or map them to a stronger semantic token. Keep decorative muted text above 4.5:1 unless it is purely nonessential.
 
-9. Location: app/(store)/custom-order/page.tsx and app/(store)/checkout/page.tsx
+9. [Done] Location: app/(store)/custom-order/page.tsx and app/(store)/checkout/page.tsx
 Issue: Validation feedback is mostly summary-level or toast-based, with little per-field guidance. Custom order shows "Please fill in all required fields" without marking which fields are missing.
 Why it matters: Long forms need field-level error messages so users can recover quickly. Summary-only errors force users to scan the entire form and can be missed by assistive technology.
 Suggested fix: Track field errors in component state or use a form library. Mark invalid controls with `aria-invalid`, connect messages with `aria-describedby`, and render the message directly below each affected field.

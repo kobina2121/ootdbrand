@@ -11,6 +11,18 @@ import { Input } from "@/components/ui/input";
 import { formatPriceNgn } from "@/lib/products";
 import { checkoutInitSchema } from "@/lib/validators/checkout";
 
+const checkoutFieldLabels = {
+ fullName: "Full name",
+ email: "Email",
+ phone: "Phone",
+ addressLine: "Street address",
+ city: "City",
+ stateRegion: "State / Region",
+ country: "Country",
+} as const;
+
+type CheckoutFieldName = keyof typeof checkoutFieldLabels;
+
 export default function CheckoutPage() {
  const {
  items,
@@ -32,8 +44,25 @@ export default function CheckoutPage() {
  const [paymentMethod, setPaymentMethod] = useState<"card" | "mobile_money">("card");
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+ const [fieldErrors, setFieldErrors] = useState<Partial<Record<CheckoutFieldName, string>>>({});
  const router = useRouter();
- const hasValidationError = Boolean(errorMessage);
+
+ const getFieldErrorProps = (field: CheckoutFieldName) => ({
+ "aria-invalid": Boolean(fieldErrors[field]),
+ "aria-describedby": fieldErrors[field] ? `checkout-${field}-error` : undefined,
+ });
+
+ const clearFieldError = (field: CheckoutFieldName) => {
+ setFieldErrors((previous) => {
+ if (!previous[field]) {
+ return previous;
+ }
+
+ const next = { ...previous };
+ delete next[field];
+ return next;
+ });
+ };
 
  useEffect(() => {
  if (!isClientReady || userRole === "admin") {
@@ -91,17 +120,38 @@ export default function CheckoutPage() {
  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
  event.preventDefault();
  setErrorMessage(null);
+ setFieldErrors({});
 
  const formData = new FormData(event.currentTarget);
  const addressLine = String(formData.get("addressLine") ?? "").trim();
  const city = String(formData.get("city") ?? "").trim();
  const stateRegion = String(formData.get("stateRegion") ?? "").trim();
  const country = String(formData.get("country") ?? "").trim();
+ const requiredFields = {
+ fullName: String(formData.get("fullName") ?? "").trim(),
+ email: String(formData.get("email") ?? "").trim(),
+ phone: String(formData.get("phone") ?? "").trim(),
+ addressLine,
+ city,
+ stateRegion,
+ country,
+ } satisfies Record<CheckoutFieldName, string>;
+ const nextFieldErrors = Object.fromEntries(
+ (Object.entries(requiredFields) as Array<[CheckoutFieldName, string]>)
+ .filter(([, value]) => value.length === 0)
+ .map(([field]) => [field, `${checkoutFieldLabels[field]} is required.`]),
+ ) as Partial<Record<CheckoutFieldName, string>>;
+
+ if (Object.keys(nextFieldErrors).length > 0) {
+ setFieldErrors(nextFieldErrors);
+ setErrorMessage("Please complete the highlighted required fields.");
+ return;
+ }
 
  const payload = {
- fullName: String(formData.get("fullName") ?? ""),
- email: String(formData.get("email") ?? ""),
- phone: String(formData.get("phone") ?? ""),
+ fullName: requiredFields.fullName,
+ email: requiredFields.email,
+ phone: requiredFields.phone,
  address: [addressLine, city, stateRegion, country].filter(Boolean).join(", "),
  paymentMethod,
  discountCode,
@@ -111,6 +161,11 @@ export default function CheckoutPage() {
  const parsed = checkoutInitSchema.safeParse(payload);
 
  if (!parsed.success) {
+ setFieldErrors({
+ fullName: "Check your contact details.",
+ email: "Enter a valid email address.",
+ phone: "Enter a valid phone number.",
+ });
  setErrorMessage("Please complete all required fields with valid details.");
  return;
  }
@@ -175,10 +230,15 @@ export default function CheckoutPage() {
  name="fullName"
  placeholder="Full name"
  required
- aria-invalid={hasValidationError}
- aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ {...getFieldErrorProps("fullName")}
+ onChange={() => clearFieldError("fullName")}
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.fullName ? (
+ <p id="checkout-fullName-error" className="text-sm text-destructive">
+ {fieldErrors.fullName}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-2">
  <label htmlFor="checkout-email" className="text-sm font-medium text-[#1f1b18]">
@@ -190,10 +250,15 @@ export default function CheckoutPage() {
  placeholder="Email"
  type="email"
  required
- aria-invalid={hasValidationError}
- aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ {...getFieldErrorProps("email")}
+ onChange={() => clearFieldError("email")}
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.email ? (
+ <p id="checkout-email-error" className="text-sm text-destructive">
+ {fieldErrors.email}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-2">
  <label htmlFor="checkout-phone" className="text-sm font-medium text-[#1f1b18]">
@@ -204,10 +269,15 @@ export default function CheckoutPage() {
  name="phone"
  placeholder="Phone"
  required
- aria-invalid={hasValidationError}
- aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ {...getFieldErrorProps("phone")}
+ onChange={() => clearFieldError("phone")}
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.phone ? (
+ <p id="checkout-phone-error" className="text-sm text-destructive">
+ {fieldErrors.phone}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
  <p className="form-section-title">Delivery Address</p>
@@ -220,10 +290,15 @@ export default function CheckoutPage() {
  name="addressLine"
  placeholder="Street address / House number"
  required
- aria-invalid={hasValidationError}
- aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ {...getFieldErrorProps("addressLine")}
+ onChange={() => clearFieldError("addressLine")}
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.addressLine ? (
+ <p id="checkout-addressLine-error" className="text-sm text-destructive">
+ {fieldErrors.addressLine}
+ </p>
+ ) : null}
  </div>
  <div className="grid gap-3 sm:grid-cols-2">
  <div className="space-y-2">
@@ -235,10 +310,15 @@ export default function CheckoutPage() {
  name="city"
  placeholder="City"
  required
- aria-invalid={hasValidationError}
- aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ {...getFieldErrorProps("city")}
+ onChange={() => clearFieldError("city")}
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.city ? (
+ <p id="checkout-city-error" className="text-sm text-destructive">
+ {fieldErrors.city}
+ </p>
+ ) : null}
  </div>
  <div className="space-y-2">
  <label htmlFor="checkout-region" className="text-sm font-medium text-[#1f1b18]">
@@ -249,10 +329,15 @@ export default function CheckoutPage() {
  name="stateRegion"
  placeholder="State / Region"
  required
- aria-invalid={hasValidationError}
- aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ {...getFieldErrorProps("stateRegion")}
+ onChange={() => clearFieldError("stateRegion")}
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.stateRegion ? (
+ <p id="checkout-stateRegion-error" className="text-sm text-destructive">
+ {fieldErrors.stateRegion}
+ </p>
+ ) : null}
  </div>
  </div>
  <div className="space-y-2">
@@ -265,10 +350,15 @@ export default function CheckoutPage() {
  placeholder="Country"
  defaultValue="Ghana"
  required
- aria-invalid={hasValidationError}
- aria-describedby={hasValidationError ? "checkout-error" : undefined}
+ {...getFieldErrorProps("country")}
+ onChange={() => clearFieldError("country")}
  className="rounded-xl border-black/15 "
  />
+ {fieldErrors.country ? (
+ <p id="checkout-country-error" className="text-sm text-destructive">
+ {fieldErrors.country}
+ </p>
+ ) : null}
  </div>
  </div>
  <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
