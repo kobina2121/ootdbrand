@@ -363,9 +363,11 @@ export default function CheckoutPage() {
  </div>
  <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
  <p className="form-section-title">Payment Method</p>
- <div className="grid gap-2 sm:grid-cols-2">
+ <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Payment method">
  <button
  type="button"
+ role="radio"
+ aria-checked={paymentMethod === "card"}
  onClick={() => setPaymentMethod("card")}
  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
  paymentMethod === "card"
@@ -378,6 +380,8 @@ export default function CheckoutPage() {
  </button>
  <button
  type="button"
+ role="radio"
+ aria-checked={paymentMethod === "mobile_money"}
  onClick={() => setPaymentMethod("mobile_money")}
  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
  paymentMethod === "mobile_money"

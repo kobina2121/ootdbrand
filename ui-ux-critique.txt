@@ -107,7 +107,7 @@ Issue: Admin summary cards label some metrics as "(page)" while total users/prod
 Why it matters: Mixed scopes are technically correct but easy to misread at a glance.
 Suggested fix: Rename all page-scoped metrics consistently, or add a small caption explaining that role/status counts reflect the current page while total count reflects all matches.
 
-9. Location: app/(store)/checkout/page.tsx and app/(store)/custom-order/page.tsx
+9. [Done] Location: app/(store)/checkout/page.tsx and app/(store)/custom-order/page.tsx
 Issue: Payment method buttons show selected state visually, but they are plain buttons rather than radio-group semantics.
 Why it matters: Assistive technologies understand mutually exclusive choices better as radio groups.
 Suggested fix: Use a `<fieldset>`/`<legend>` with native radio inputs styled as cards, or add appropriate `role="radiogroup"`/`role="radio"` and `aria-checked` semantics.
