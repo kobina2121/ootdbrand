@@ -230,7 +230,7 @@ export function AppShell({ children, user }: AppShellProps) {
  theootd.brand
  </span>
  </Link>
- <p className="mt-4 text-xs tracking-[0.28em] text-[#7d7771] ">
+ <p className="mt-4 text-xs tracking-[0.28em] text-[#5f5954] ">
  ELEVATED WOMENSWEAR FOR EVERY STORY - MADE IN GHANA
  </p>
  </div>
@@ -239,7 +239,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">QUICK LINKS</p>
- <div className="space-y-2 text-[#706963] ">
+ <div className="space-y-2 text-[#4f4944] ">
  <Link href="/products" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Shop All</Link>
  <Link href="/products?category=TOPS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Tops</Link>
  <Link href="/products?category=MAXI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Maxi</Link>
@@ -250,7 +250,7 @@ export function AppShell({ children, user }: AppShellProps) {
 
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">NEED HELP</p>
- <div className="space-y-2 text-[#706963] ">
+ <div className="space-y-2 text-[#4f4944] ">
  <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">+233 53 647 7207</a>
  <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp Us</a>
                 <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram DM</a>
@@ -260,7 +260,7 @@ export function AppShell({ children, user }: AppShellProps) {
 
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">OUR POLICY</p>
- <div className="space-y-2 text-[#706963] ">
+ <div className="space-y-2 text-[#4f4944] ">
  <p className="text-[1.15rem] text-[#2b2724] ">48-Hour Returns</p>
  <p className="max-w-xs leading-relaxed">
  Not satisfied? Return within 48 hours of delivery for a full refund.
@@ -270,7 +270,7 @@ export function AppShell({ children, user }: AppShellProps) {
 
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">FOLLOW US</p>
- <div className="space-y-2 text-[#706963] ">
+ <div className="space-y-2 text-[#4f4944] ">
                 <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram →</a>
  <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp →</a>
                 <a href="https://www.tiktok.com/@theootd.brand" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">TikTok @theootd.brand →</a>
@@ -279,7 +279,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
  </div>
 
- <div className="mt-10 flex flex-col gap-2 border-t border-black/10 pt-6 text-sm text-[#8a847e] sm:flex-row sm:items-center sm:justify-between">
+ <div className="mt-10 flex flex-col gap-2 border-t border-black/10 pt-6 text-sm text-[#5f5954] sm:flex-row sm:items-center sm:justify-between">
               <p>© <span suppressHydrationWarning>{new Date().getFullYear()}</span> theootd.brand. All rights reserved.</p>
  <p>Designed in Ghana. Built for comfort.</p>
  </div>

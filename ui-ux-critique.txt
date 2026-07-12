@@ -45,7 +45,7 @@ Issue: Some white text sits on changing light imagery or pale backgrounds. The l
 Why it matters: Text over images must remain readable across all image frames and viewport crops. WCAG AA requires at least 4.5:1 for normal text and 3:1 for large text.
 Suggested fix: Strengthen image overlays behind text, add a localized dark scrim/gradient behind the text block, or use a darker text treatment where the background is pale. Re-test each hero frame and the about image caption with a contrast checker.
 
-8. Location: components/store/app-shell.tsx and app/globals.css
+8. [Done] Location: components/store/app-shell.tsx and app/globals.css
 Issue: Footer metadata and several muted text treatments are close to or below AA contrast. Live examples included footer copyright/body text around 3.7:1 and small all-caps text around 4.42:1 on white.
 Why it matters: Small muted text below 4.5:1 can be difficult to read, especially on mobile and bright screens.
 Suggested fix: Darken muted brand text tokens such as `#8a847e`, `#7d7771`, and similar footer colors, or map them to a stronger semantic token. Keep decorative muted text above 4.5:1 unless it is purely nonessential.
