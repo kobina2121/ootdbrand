@@ -40,7 +40,7 @@ Issue: The live audit detected horizontal overflow on the homepage at 768px and 
 Why it matters: Horizontal overflow causes accidental sideways scrolling and can make layouts feel unstable. It is usually caused by absolute decorative elements, wide animated content, or max-content CTA groups exceeding the viewport.
 Suggested fix: Audit the homepage decorative blobs, hero CTA wrapper, and carousel sections. Add `overflow-x-hidden` to the page-level wrapper only if the overflow is purely decorative; otherwise constrain wide children with `max-w-full`, safer transforms, or responsive wrapping.
 
-7. Location: app/(store)/page.tsx and app/(store)/about/page.tsx; live home hero and about owner image caption
+7. [Done] Location: app/(store)/page.tsx and app/(store)/about/page.tsx; live home hero and about owner image caption
 Issue: Some white text sits on changing light imagery or pale backgrounds. The live contrast check found the hero heading and the "Adeline" overlay could fall far below WCAG AA contrast when the underlying image/background is light.
 Why it matters: Text over images must remain readable across all image frames and viewport crops. WCAG AA requires at least 4.5:1 for normal text and 3:1 for large text.
 Suggested fix: Strengthen image overlays behind text, add a localized dark scrim/gradient behind the text block, or use a darker text treatment where the background is pale. Re-test each hero frame and the about image caption with a contrast checker.
