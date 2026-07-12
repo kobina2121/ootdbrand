@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/store/cart-provider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { UserLogoutButton } from "@/components/store/user-logout-button";
+import { socialLinks } from "@/lib/social-links";
 
 const navLinks = [
  { href: "/", label: "Home" },
@@ -251,9 +252,9 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">NEED HELP</p>
  <div className="space-y-2 text-[#4f4944] ">
- <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">+233 53 647 7207</a>
- <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp Us</a>
-                <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram DM</a>
+ <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">+233 53 647 7207</a>
+ <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp Us</a>
+                <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram DM</a>
  <Link href="/orders" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Track Order</Link>
  </div>
  </div>
@@ -271,9 +272,9 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="space-y-4">
  <p className="text-xs tracking-[0.24em] text-[#5f5954] ">FOLLOW US</p>
  <div className="space-y-2 text-[#4f4944] ">
-                <a href="https://www.instagram.com/theootd.brand/" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram →</a>
- <a href="https://api.whatsapp.com/send/?phone=233536477207&text&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp →</a>
-                <a href="https://www.tiktok.com/@theootd.brand" target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">TikTok @theootd.brand →</a>
+                <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram →</a>
+ <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp →</a>
+                <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">TikTok @theootd.brand →</a>
  </div>
  </div>
  </div>

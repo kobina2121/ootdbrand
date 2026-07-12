@@ -112,7 +112,7 @@ Issue: Payment method buttons show selected state visually, but they are plain b
 Why it matters: Assistive technologies understand mutually exclusive choices better as radio groups.
 Suggested fix: Use a `<fieldset>`/`<legend>` with native radio inputs styled as cards, or add appropriate `role="radiogroup"`/`role="radio"` and `aria-checked` semantics.
 
-10. Location: components/store/app-shell.tsx
+10. [Done] Location: components/store/app-shell.tsx
 Issue: Live footer Instagram links on the deployed site still displayed `https://www.instagram.com/theootd.brand/`, while the local code has the newer QR-tracking URL in one footer location.
 Why it matters: Inconsistent social URLs are minor UX friction and make it harder to verify that users land on the intended social profile.
 Suggested fix: Centralize social links in a single constants file and reuse it across header/footer/contact sections before the next deployment.
