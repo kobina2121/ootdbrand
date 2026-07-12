@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,9 +32,6 @@ export function ProductGrid({ products }: { products: Product[] }) {
 }
 
 function ProductCard({ product }: { product: Product }) {
- const initialSize = useMemo(() => product.sizes[0] ?? null, [product.sizes]);
- const [selectedSize, setSelectedSize] = useState<string | null>(initialSize);
-
  const stockTone =
  product.stockStatus === "Out of Stock"
  ? "border-rose-500/20 bg-rose-500/10 text-rose-700 "
@@ -97,33 +93,19 @@ function ProductCard({ product }: { product: Product }) {
  {product.sizes.length > 0 ? (
  <div className="flex flex-wrap items-center justify-center gap-2">
  {product.sizes.map((size) => {
- const isSelected = selectedSize === size;
-
  return (
- <button
+ <span
  key={`${product.slug}-${size}`}
- type="button"
- onClick={() => setSelectedSize(size)}
- className={`min-h-11 min-w-11 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${
- isSelected
- ? "border-[#1f1b18] bg-[#1f1b18] text-white shadow-sm "
- : "border-black/15 bg-white text-[#4f4841] hover:border-black/35 hover:bg-black/[0.03] "
- }`}
- aria-pressed={isSelected}
+ className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-black/15 bg-white px-3 py-2 text-xs font-medium text-[#4f4841]"
  >
  {size}
- </button>
+ </span>
  );
  })}
  </div>
  ) : (
  <p className="text-sm text-[#7c736b] ">One tailored size set is available.</p>
  )}
- {selectedSize ? (
- <p className="text-xs uppercase tracking-[0.22em] text-[#8a7a6d] ">
- Selected size: {selectedSize}
- </p>
- ) : null}
  </div>
  </CardContent>
 

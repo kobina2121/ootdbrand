@@ -82,7 +82,7 @@ Issue: Filter/status badges are implemented as links wrapping Badge visuals. The
 Why it matters: Filters are interactive controls and should look/tap like controls. Ambiguous affordance can slow product discovery and admin filtering.
 Suggested fix: Use button-like styles with `min-h-11`, clear active states, and `aria-current="page"` or `aria-pressed` semantics where appropriate.
 
-4. Location: components/store/product-grid.tsx
+4. [Done] Location: components/store/product-grid.tsx
 Issue: Product cards include size selection buttons on listing cards, but the selected size does not carry into "View Product" or add-to-cart from that card.
 Why it matters: This creates a small expectation mismatch: users may think their size choice will be remembered when they open the product.
 Suggested fix: Either remove size selection from listing cards and show sizes as noninteractive chips, or pass the selected size through the product URL/query and initialize the detail page from it.
