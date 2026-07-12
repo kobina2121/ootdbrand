@@ -43,15 +43,15 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
  <p className="text-lg font-semibold">{pagination.totalCount}</p>
  </div>
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
- <p className="text-xs uppercase tracking-wide text-muted-foreground">Customers (page)</p>
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Customers on this page</p>
  <p className="text-lg font-semibold">{customerCount}</p>
  </div>
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
- <p className="text-xs uppercase tracking-wide text-muted-foreground">Admins (page)</p>
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Admins on this page</p>
  <p className="text-lg font-semibold">{adminCount}</p>
  </div>
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
- <p className="text-xs uppercase tracking-wide text-muted-foreground">Verified (page)</p>
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Verified on this page</p>
  <p className="text-lg font-semibold">{verifiedCount}</p>
  </div>
  </div>

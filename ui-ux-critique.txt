@@ -102,7 +102,7 @@ Issue: Some secondary text such as review counts, size labels, and category meta
 Why it matters: All-caps microcopy with wide tracking can be harder to read at 12px and below, especially when paired with muted colors.
 Suggested fix: Keep all-caps labels to short metadata only, use at least 12-13px for important text, and avoid low-contrast muted colors for product information.
 
-8. Location: app/(admin)/admin/users/page.tsx and app/(admin)/admin/products/page.tsx
+8. [Done] Location: app/(admin)/admin/users/page.tsx and app/(admin)/admin/products/page.tsx
 Issue: Admin summary cards label some metrics as "(page)" while total users/products is global.
 Why it matters: Mixed scopes are technically correct but easy to misread at a glance.
 Suggested fix: Rename all page-scoped metrics consistently, or add a small caption explaining that role/status counts reflect the current page while total count reflects all matches.

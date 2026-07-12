@@ -74,11 +74,11 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
  <p className="text-lg font-semibold">{pagination.totalCount}</p>
  </div>
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
- <p className="text-xs uppercase tracking-wide text-muted-foreground">Active (page)</p>
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Active on this page</p>
  <p className="text-lg font-semibold">{activeCount}</p>
  </div>
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
- <p className="text-xs uppercase tracking-wide text-muted-foreground">Inactive (page)</p>
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Inactive on this page</p>
  <p className="text-lg font-semibold">{draftCount}</p>
  </div>
  </div>
