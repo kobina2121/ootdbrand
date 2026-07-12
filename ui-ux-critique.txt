@@ -97,7 +97,7 @@ Issue: Homepage hero uses continuous carousel/zoom/floating/pulse animations wit
 Why it matters: Continuous motion can cause discomfort for some users. Best practice is to respect `prefers-reduced-motion`.
 Suggested fix: Add CSS under `@media (prefers-reduced-motion: reduce)` to disable or simplify `animate-hero-carousel`, `animate-hero-zoom`, `animate-soft-float`, and `animate-pulse-glow`.
 
-7. Location: app/(store)/products/page.tsx and components/store/product-grid.tsx
+7. [Done] Location: app/(store)/products/page.tsx and components/store/product-grid.tsx
 Issue: Some secondary text such as review counts, size labels, and category metadata uses very small all-caps tracking.
 Why it matters: All-caps microcopy with wide tracking can be harder to read at 12px and below, especially when paired with muted colors.
 Suggested fix: Keep all-caps labels to short metadata only, use at least 12-13px for important text, and avoid low-contrast muted colors for product information.

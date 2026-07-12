@@ -58,11 +58,11 @@ function ProductCard({ product }: { product: Product }) {
  <div className="flex flex-wrap items-center justify-center gap-2">
  <Badge
  variant="secondary"
- className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-[0.68rem] uppercase tracking-[0.24em] text-[#5c554f] "
+ className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-xs uppercase tracking-[0.16em] text-[#4f4944] "
  >
  {product.category}
  </Badge>
- <Badge className={`rounded-full border px-3 py-1 text-[0.68rem] uppercase tracking-[0.2em] ${stockTone}`}>
+ <Badge className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.16em] ${stockTone}`}>
  {product.stockStatus ?? "In Stock"}
  </Badge>
  </div>
@@ -80,7 +80,7 @@ function ProductCard({ product }: { product: Product }) {
  <p className="text-sm tracking-wide text-[#a47531] ">
  {"★★★★★"} <span className="font-medium">({(product.rating ?? 5).toFixed(1)})</span>
  </p>
- <p className="text-xs uppercase tracking-[0.24em] text-[#94867a] ">
+ <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">
  {product.reviewCount ?? 0} reviews
  </p>
  </div>
@@ -89,7 +89,7 @@ function ProductCard({ product }: { product: Product }) {
  <p className="text-3xl font-semibold tracking-tight text-[#1f1b18] ">
  {formatPriceNgn(product.price)}
  </p>
- <p className="text-xs uppercase tracking-[0.28em] text-[#94867a] ">Available sizes</p>
+ <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">Available sizes</p>
  {product.sizes.length > 0 ? (
  <div className="flex flex-wrap items-center justify-center gap-2">
  {product.sizes.map((size) => {
