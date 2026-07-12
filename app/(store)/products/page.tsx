@@ -102,23 +102,28 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  </div>
  <div className="flex flex-wrap items-center gap-2">
  {categories.map((entry) => (
- <Link key={entry} href={buildProductsHref(entry, sort)} className="inline-flex min-h-11 items-center">
+ <Link
+ key={entry}
+ href={buildProductsHref(entry, sort)}
+ aria-current={entry === category ? "page" : undefined}
+ className="inline-flex min-h-11 items-center rounded-full"
+ >
  <Badge variant={entry === category ? "default" : "outline"} className="rounded-full px-4 py-2">
  {entry === "all" ? "All" : entry}
  </Badge>
  </Link>
  ))}
- <Link href={buildProductsHref(category, "latest")}>
+ <Link href={buildProductsHref(category, "latest")} aria-current={sort === "latest" ? "page" : undefined}>
  <Button variant={sort === "latest" ? "default" : "outline"} className="rounded-full">
  Sort: Latest
  </Button>
  </Link>
- <Link href={buildProductsHref(category, "price-asc")}>
+ <Link href={buildProductsHref(category, "price-asc")} aria-current={sort === "price-asc" ? "page" : undefined}>
  <Button variant={sort === "price-asc" ? "default" : "outline"} className="rounded-full">
  Price ↑
  </Button>
  </Link>
- <Link href={buildProductsHref(category, "price-desc")}>
+ <Link href={buildProductsHref(category, "price-desc")} aria-current={sort === "price-desc" ? "page" : undefined}>
  <Button variant={sort === "price-desc" ? "default" : "outline"} className="rounded-full">
  Price ↓
  </Button>

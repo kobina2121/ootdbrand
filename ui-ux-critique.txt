@@ -77,7 +77,7 @@ Issue: The storefront error boundary renders raw `error.message` to users.
 Why it matters: Raw error messages can be technical, inconsistent, or occasionally reveal implementation details. UX best practice is to give a calm, actionable message.
 Suggested fix: Show a friendly generic message by default and log detailed errors server-side. Keep the "Try again" action.
 
-3. Location: app/(store)/products/page.tsx and app/(admin)/admin/products/page.tsx
+3. [Done] Location: app/(store)/products/page.tsx and app/(admin)/admin/products/page.tsx
 Issue: Filter/status badges are implemented as links wrapping Badge visuals. They look like compact tags rather than controls and often fall below 44px height.
 Why it matters: Filters are interactive controls and should look/tap like controls. Ambiguous affordance can slow product discovery and admin filtering.
 Suggested fix: Use button-like styles with `min-h-11`, clear active states, and `aria-current="page"` or `aria-pressed` semantics where appropriate.
