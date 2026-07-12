@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,7 @@ export function AddToCartForm({
  const [internalSku, setInternalSku] = useState(product.variants[0]?.sku ?? "");
  const [quantity, setQuantity] = useState<number | "">(1);
  const previousQuantityRef = useRef(1);
+ const quantityInputId = useId();
  const { addItem, userRole } = useCart();
  const isAdminUser = userRole === "admin";
  const activeSku = sku ?? internalSku;
@@ -107,8 +108,11 @@ export function AddToCartForm({
  )}
 
  <div className={centered ? "flex w-full flex-col items-center text-center" : ""}>
- <p className="mb-2 text-sm font-medium text-[#1f1b18] ">Quantity</p>
+ <label htmlFor={quantityInputId} className="mb-2 text-sm font-medium text-[#1f1b18] ">
+ Quantity
+ </label>
  <Input
+ id={quantityInputId}
  type="number"
  min={1}
  max={variant.stock}
@@ -145,7 +149,7 @@ export function AddToCartForm({
 
  <Button
  size="lg"
- className={`rounded-full ${centered ? "mx-auto flex w-full max-w-[19rem]" : "w-full sm:w-auto"}`}
+ className={`h-11 rounded-full ${centered ? "mx-auto flex w-full max-w-[19rem]" : "w-full sm:w-auto"}`}
  onClick={onAddToCart}
  disabled={isAdminUser}
  >

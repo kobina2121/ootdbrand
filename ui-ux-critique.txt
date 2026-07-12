@@ -25,7 +25,7 @@ Issue: Checkout fields use placeholders for "Full name", "Email", "Phone", and a
 Why it matters: Checkout is a conversion-critical form. Placeholder-only labels increase mistakes, especially on mobile after the placeholder disappears, and are weaker for assistive technology.
 Suggested fix: Add visible labels to every checkout input, keep placeholders as examples, and set `aria-invalid` plus `aria-describedby` when validation fails.
 
-4. Location: components/store/add-to-cart-form.tsx and components/store/product-detail-client.tsx; live page /products/top
+4. [Done] Location: components/store/add-to-cart-form.tsx and components/store/product-detail-client.tsx; live page /products/top
 Issue: The quantity input on product detail has a visual "Quantity" text but no associated label. The live audit also measured the add-to-cart button at 40px tall on mobile.
 Why it matters: Quantity is a purchase-critical control, so it needs a reliable accessible name and a comfortable touch target. Mobile touch target best practice is at least 44x44 CSS pixels.
 Suggested fix: Use `label htmlFor="product-quantity"` with a matching input id, or add `aria-label="Quantity"`. Increase the primary add-to-cart button height to at least `h-11`.
