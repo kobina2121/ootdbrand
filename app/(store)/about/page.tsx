@@ -91,7 +91,7 @@ export default function AboutPage() {
  </div>
  </div>
  </div>
- <div className="relative min-h-[420px] border-t border-black/10 bg-[#ded8d0] lg:border-l lg:border-t-0">
+ <div className="relative min-h-[420px] overflow-hidden border-t border-black/10 lg:border-l lg:border-t-0">
  <Image
  src={ownerProfile.image}
  alt={`${ownerProfile.name}, ${ownerProfile.title} of theootd.brand`}
