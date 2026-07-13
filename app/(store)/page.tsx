@@ -100,7 +100,7 @@ export default async function HomePage() {
  );
 
  return (
- <div className="relative space-y-10 sm:space-y-12">
+ <div className="relative max-w-full overflow-x-clip space-y-10 sm:space-y-12">
  <div className="pointer-events-none absolute -left-20 top-20 hidden h-52 w-52 rounded-full bg-[#c8d4bc]/40 blur-3xl md:block animate-drift-x" />
  <div className="pointer-events-none absolute -right-16 top-[28rem] hidden h-64 w-64 rounded-full bg-[#d8c8ba]/35 blur-3xl md:block animate-drift-x-reverse" />
 
@@ -117,10 +117,10 @@ export default async function HomePage() {
  priority={index === 0}
  />
  ))}
- <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/45 lg:from-black/10 lg:to-black/30" />
- <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.26),transparent_36%)]" />
+ <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/70 lg:from-black/25 lg:via-black/5 lg:to-black/60" />
+ <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.18),transparent_38%)]" />
 
- <div className="animate-fade-up-delay-1 absolute bottom-24 left-1/2 z-10 w-full max-w-4xl -translate-x-1/2 px-5 text-center text-white sm:bottom-28 lg:bottom-20">
+ <div className="animate-fade-up-delay-1 absolute bottom-24 left-1/2 z-10 w-[calc(100%-2rem)] max-w-4xl -translate-x-1/2 rounded-[2rem] bg-black/25 px-5 py-5 text-center text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-[2px] sm:bottom-28 sm:w-full lg:bottom-20">
  <p className="mb-2 text-xs tracking-[0.35em] text-white/85 sm:text-sm">NEW COLLECTION</p>
  <h1 className="font-heading text-[clamp(2.2rem,8vw,5.7rem)] font-semibold leading-[0.95] drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
  Wear Your Story

@@ -100,9 +100,9 @@ export default function AboutPage() {
  sizes="(min-width: 1024px) 42vw, 100vw"
  priority
  />
- <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/45 to-transparent p-6 text-white">
- <p className="font-heading text-3xl leading-none">{ownerProfile.name}</p>
- <p className="mt-1 text-xs uppercase tracking-[0.22em] text-white/80">{ownerProfile.title}</p>
+ <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent p-6 text-white">
+ <p className="font-heading text-3xl leading-none drop-shadow-md">{ownerProfile.name}</p>
+ <p className="mt-1 text-xs uppercase tracking-[0.22em] text-white drop-shadow-md">{ownerProfile.title}</p>
  </div>
  </div>
  </div>

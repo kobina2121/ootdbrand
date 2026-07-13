@@ -70,7 +70,7 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-5 shadow-sm sm:p-7">
  <div className="flex flex-wrap items-start justify-between gap-4">
  <div className="space-y-2">
- <p className="text-xs tracking-[0.26em] text-muted-foreground">THEOOTD SHOP</p>
+ <p className="text-[0.8rem] tracking-[0.18em] text-[#5f5954]">THEOOTD SHOP</p>
  <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">All Products</h1>
  <p className="section-subtitle max-w-xl">
  Discover signature silhouettes crafted for confidence, comfort, and timeless elegance.
@@ -95,30 +95,35 @@ export default async function ProductListPage({ searchParams }: PageProps) {
 
  <section className="rounded-2xl border border-black/10 bg-white/80 p-4 shadow-sm ">
  <div className="mb-3 flex items-center justify-between gap-3">
- <p className="text-xs tracking-[0.22em] text-muted-foreground uppercase">
+ <p className="text-[0.8rem] tracking-[0.16em] text-[#5f5954] uppercase">
  {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"} available
  </p>
  {q ? <Badge variant="secondary" className="rounded-full px-3 py-1">Search: {q}</Badge> : null}
  </div>
  <div className="flex flex-wrap items-center gap-2">
  {categories.map((entry) => (
- <Link key={entry} href={buildProductsHref(entry, sort)}>
- <Badge variant={entry === category ? "default" : "outline"} className="rounded-full px-3 py-1">
+ <Link
+ key={entry}
+ href={buildProductsHref(entry, sort)}
+ aria-current={entry === category ? "page" : undefined}
+ className="inline-flex min-h-11 items-center rounded-full"
+ >
+ <Badge variant={entry === category ? "default" : "outline"} className="rounded-full px-4 py-2">
  {entry === "all" ? "All" : entry}
  </Badge>
  </Link>
  ))}
- <Link href={buildProductsHref(category, "latest")}>
+ <Link href={buildProductsHref(category, "latest")} aria-current={sort === "latest" ? "page" : undefined}>
  <Button variant={sort === "latest" ? "default" : "outline"} className="rounded-full">
  Sort: Latest
  </Button>
  </Link>
- <Link href={buildProductsHref(category, "price-asc")}>
+ <Link href={buildProductsHref(category, "price-asc")} aria-current={sort === "price-asc" ? "page" : undefined}>
  <Button variant={sort === "price-asc" ? "default" : "outline"} className="rounded-full">
  Price ↑
  </Button>
  </Link>
- <Link href={buildProductsHref(category, "price-desc")}>
+ <Link href={buildProductsHref(category, "price-desc")} aria-current={sort === "price-desc" ? "page" : undefined}>
  <Button variant={sort === "price-desc" ? "default" : "outline"} className="rounded-full">
  Price ↓
  </Button>

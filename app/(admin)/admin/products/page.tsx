@@ -74,11 +74,11 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
  <p className="text-lg font-semibold">{pagination.totalCount}</p>
  </div>
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
- <p className="text-xs uppercase tracking-wide text-muted-foreground">Active (page)</p>
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Active on this page</p>
  <p className="text-lg font-semibold">{activeCount}</p>
  </div>
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
- <p className="text-xs uppercase tracking-wide text-muted-foreground">Inactive (page)</p>
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Inactive on this page</p>
  <p className="text-lg font-semibold">{draftCount}</p>
  </div>
  </div>
@@ -93,26 +93,26 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
  />
  </form>
  <div className="flex flex-wrap gap-2">
- <Link href={buildHref(1, "all")}>
+ <Link href={buildHref(1, "all")} aria-current={status === "all" ? "page" : undefined} className="inline-flex min-h-11 items-center rounded-full">
  <Badge
  variant={status === "all" ? "default" : "outline"}
- className="rounded-full px-3 py-1 "
+ className="rounded-full px-4 py-2 "
  >
  All
  </Badge>
  </Link>
- <Link href={buildHref(1, "active")}>
+ <Link href={buildHref(1, "active")} aria-current={status === "active" ? "page" : undefined} className="inline-flex min-h-11 items-center rounded-full">
  <Badge
  variant={status === "active" ? "default" : "outline"}
- className="rounded-full px-3 py-1 "
+ className="rounded-full px-4 py-2 "
  >
  Active
  </Badge>
  </Link>
- <Link href={buildHref(1, "inactive")}>
+ <Link href={buildHref(1, "inactive")} aria-current={status === "inactive" ? "page" : undefined} className="inline-flex min-h-11 items-center rounded-full">
  <Badge
  variant={status === "inactive" ? "default" : "outline"}
- className="rounded-full px-3 py-1 "
+ className="rounded-full px-4 py-2 "
  >
  Inactive
  </Badge>

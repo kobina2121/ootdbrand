@@ -1,0 +1,118 @@
+UI/UX Critique for theootd.brand
+Reviewed live URL: https://ootdbrand.vercel.app/
+Reviewed breakpoints: mobile 390x844, tablet 768x1024, desktop 1440x1000
+
+Critical
+
+None found.
+
+No issue observed appears to fully block browsing, product discovery, cart access, or account creation from the reviewed public pages. The most important issues are accessibility and mobile usability problems listed under Moderate.
+
+Moderate
+
+1. [Done] Location: components/auth/login-form.tsx; live pages /login and admin login state
+Issue: The email and password fields rely on placeholders only and do not have visible or programmatic labels.
+Why it matters: Placeholder-only form design violates accessibility best practices because placeholders disappear once users type, are not a substitute for labels, and can make screen-reader navigation unclear. WCAG form guidance expects controls to have clear labels or equivalent accessible names.
+Suggested fix: Wrap each field in a labelled group like the signup form does. Add `label htmlFor="login-email"` and `label htmlFor="login-password"`, set matching `id` values on `Input` and `PasswordInput`, and keep placeholders as examples only.
+
+2. [Done] Location: app/(store)/custom-order/page.tsx; live page /custom-order
+Issue: Many form controls use nearby `<p>` text as visual labels but are not connected to the input/select/textarea elements. The live audit flagged the category, product, customer details, body measurements, upload, delivery address, and notes controls as unlabeled.
+Why it matters: Screen readers and browser autofill/validation cannot reliably associate plain text with fields. This increases friction in a long, high-effort order form and violates accessible form design expectations.
+Suggested fix: Replace label-like `<p>` elements with `<label htmlFor="...">`, add unique `id` values to each control, and add `aria-describedby` for helper/error text where present. For grouped measurement fields, use a `<fieldset>` and `<legend>` for "Body Measurements".
+
+3. [Done] Location: app/(store)/checkout/page.tsx; live checkout flow when cart has items
+Issue: Checkout fields use placeholders for "Full name", "Email", "Phone", and address fields without visible labels.
+Why it matters: Checkout is a conversion-critical form. Placeholder-only labels increase mistakes, especially on mobile after the placeholder disappears, and are weaker for assistive technology.
+Suggested fix: Add visible labels to every checkout input, keep placeholders as examples, and set `aria-invalid` plus `aria-describedby` when validation fails.
+
+4. [Done] Location: components/store/add-to-cart-form.tsx and components/store/product-detail-client.tsx; live page /products/top
+Issue: The quantity input on product detail has a visual "Quantity" text but no associated label. The live audit also measured the add-to-cart button at 40px tall on mobile.
+Why it matters: Quantity is a purchase-critical control, so it needs a reliable accessible name and a comfortable touch target. Mobile touch target best practice is at least 44x44 CSS pixels.
+Suggested fix: Use `label htmlFor="product-quantity"` with a matching input id, or add `aria-label="Quantity"`. Increase the primary add-to-cart button height to at least `h-11`.
+
+5. [Done] Location: components/ui/button.tsx, components/store/app-shell.tsx, app/(store)/products/page.tsx, components/store/product-grid.tsx
+Issue: Many interactive controls are below the recommended 44x44 touch target. Live examples included the mobile menu button at 34x34, desktop/tablet icon buttons at 32x32, product filters at around 25-36px tall, carousel dots at 10x10, and footer links at around 25px tall.
+Why it matters: Small targets are harder to tap accurately, especially on phones, and violate common mobile usability guidance. This affects navigation, filters, carousel controls, and checkout-adjacent actions.
+Suggested fix: Raise shared defaults in `components/ui/button.tsx` to `h-11` for default/large buttons and `size-11` for icon buttons where possible. For text links and badges used as filters, add padding or wrap them in 44px minimum-height anchors/buttons. Increase carousel dot hit areas while keeping the visual dot small with an inner element.
+
+6. [Done] Location: app/(store)/page.tsx; live homepage at tablet and desktop widths
+Issue: The live audit detected horizontal overflow on the homepage at 768px and 1440px widths, while other pages did not overflow.
+Why it matters: Horizontal overflow causes accidental sideways scrolling and can make layouts feel unstable. It is usually caused by absolute decorative elements, wide animated content, or max-content CTA groups exceeding the viewport.
+Suggested fix: Audit the homepage decorative blobs, hero CTA wrapper, and carousel sections. Add `overflow-x-hidden` to the page-level wrapper only if the overflow is purely decorative; otherwise constrain wide children with `max-w-full`, safer transforms, or responsive wrapping.
+
+7. [Done] Location: app/(store)/page.tsx and app/(store)/about/page.tsx; live home hero and about owner image caption
+Issue: Some white text sits on changing light imagery or pale backgrounds. The live contrast check found the hero heading and the "Adeline" overlay could fall far below WCAG AA contrast when the underlying image/background is light.
+Why it matters: Text over images must remain readable across all image frames and viewport crops. WCAG AA requires at least 4.5:1 for normal text and 3:1 for large text.
+Suggested fix: Strengthen image overlays behind text, add a localized dark scrim/gradient behind the text block, or use a darker text treatment where the background is pale. Re-test each hero frame and the about image caption with a contrast checker.
+
+8. [Done] Location: components/store/app-shell.tsx and app/globals.css
+Issue: Footer metadata and several muted text treatments are close to or below AA contrast. Live examples included footer copyright/body text around 3.7:1 and small all-caps text around 4.42:1 on white.
+Why it matters: Small muted text below 4.5:1 can be difficult to read, especially on mobile and bright screens.
+Suggested fix: Darken muted brand text tokens such as `#8a847e`, `#7d7771`, and similar footer colors, or map them to a stronger semantic token. Keep decorative muted text above 4.5:1 unless it is purely nonessential.
+
+9. [Done] Location: app/(store)/custom-order/page.tsx and app/(store)/checkout/page.tsx
+Issue: Validation feedback is mostly summary-level or toast-based, with little per-field guidance. Custom order shows "Please fill in all required fields" without marking which fields are missing.
+Why it matters: Long forms need field-level error messages so users can recover quickly. Summary-only errors force users to scan the entire form and can be missed by assistive technology.
+Suggested fix: Track field errors in component state or use a form library. Mark invalid controls with `aria-invalid`, connect messages with `aria-describedby`, and render the message directly below each affected field.
+
+10. [Done] Location: components/store/app-shell.tsx
+Issue: Navigation exposes both "Shop" and a bottom-tab "Search" that both route to `/products`, while "Orders" is present in top navigation even for guests and likely requires sign-in.
+Why it matters: Reusing different labels for the same destination can make the information architecture feel unclear. Guest-visible protected destinations can also create avoidable dead ends.
+Suggested fix: Use one label consistently, such as "Shop" or "Search & Shop". Consider showing "Orders" as "Track Order" with a clearer sign-in expectation, or move it behind profile/account for guests.
+
+11. [Done] Location: app/(store)/cart/page.tsx
+Issue: Cart quantity inputs are `h-9 w-20`, and the coupon field lacks a programmatic label.
+Why it matters: Cart quantity and coupon entry are core commerce controls. They should be easy to tap, easy to identify, and accessible to assistive technologies.
+Suggested fix: Increase quantity controls to at least `h-11`, add `aria-label="Quantity for {item.name}"`, and add a real label or `aria-label="Coupon code"` to the coupon input.
+
+Minor
+
+1. [Done] Location: app/(store)/page.tsx and app/(store)/products/page.tsx
+Issue: Empty/loading coverage is uneven. Products has a loading skeleton and a good empty state, but home page product sections load server-side without a matching route-level loading state.
+Why it matters: Consistent loading states reduce perceived wait time and make the app feel reliable during slow database or network responses.
+Suggested fix: Add `app/(store)/loading.tsx` or route/section-level skeletons for homepage catalog sections, using the existing product skeleton style.
+
+2. [Done] Location: app/(store)/error.tsx
+Issue: The storefront error boundary renders raw `error.message` to users.
+Why it matters: Raw error messages can be technical, inconsistent, or occasionally reveal implementation details. UX best practice is to give a calm, actionable message.
+Suggested fix: Show a friendly generic message by default and log detailed errors server-side. Keep the "Try again" action.
+
+3. [Done] Location: app/(store)/products/page.tsx and app/(admin)/admin/products/page.tsx
+Issue: Filter/status badges are implemented as links wrapping Badge visuals. They look like compact tags rather than controls and often fall below 44px height.
+Why it matters: Filters are interactive controls and should look/tap like controls. Ambiguous affordance can slow product discovery and admin filtering.
+Suggested fix: Use button-like styles with `min-h-11`, clear active states, and `aria-current="page"` or `aria-pressed` semantics where appropriate.
+
+4. [Done] Location: components/store/product-grid.tsx
+Issue: Product cards include size selection buttons on listing cards, but the selected size does not carry into "View Product" or add-to-cart from that card.
+Why it matters: This creates a small expectation mismatch: users may think their size choice will be remembered when they open the product.
+Suggested fix: Either remove size selection from listing cards and show sizes as noninteractive chips, or pass the selected size through the product URL/query and initialize the detail page from it.
+
+5. [Done] Location: components/store/app-shell.tsx
+Issue: Footer links rely mainly on hover translation/color changes, with no custom focus-visible treatment beyond default browser focus.
+Why it matters: Keyboard users benefit from strong, consistent focus states, especially in dense link groups.
+Suggested fix: Add `focus-visible:outline`, `focus-visible:ring`, or a shared footer-link class with visible focus styling.
+
+6. [Done] Location: app/(store)/page.tsx
+Issue: Homepage hero uses continuous carousel/zoom/floating/pulse animations without an apparent reduced-motion fallback.
+Why it matters: Continuous motion can cause discomfort for some users. Best practice is to respect `prefers-reduced-motion`.
+Suggested fix: Add CSS under `@media (prefers-reduced-motion: reduce)` to disable or simplify `animate-hero-carousel`, `animate-hero-zoom`, `animate-soft-float`, and `animate-pulse-glow`.
+
+7. [Done] Location: app/(store)/products/page.tsx and components/store/product-grid.tsx
+Issue: Some secondary text such as review counts, size labels, and category metadata uses very small all-caps tracking.
+Why it matters: All-caps microcopy with wide tracking can be harder to read at 12px and below, especially when paired with muted colors.
+Suggested fix: Keep all-caps labels to short metadata only, use at least 12-13px for important text, and avoid low-contrast muted colors for product information.
+
+8. [Done] Location: app/(admin)/admin/users/page.tsx and app/(admin)/admin/products/page.tsx
+Issue: Admin summary cards label some metrics as "(page)" while total users/products is global.
+Why it matters: Mixed scopes are technically correct but easy to misread at a glance.
+Suggested fix: Rename all page-scoped metrics consistently, or add a small caption explaining that role/status counts reflect the current page while total count reflects all matches.
+
+9. [Done] Location: app/(store)/checkout/page.tsx and app/(store)/custom-order/page.tsx
+Issue: Payment method buttons show selected state visually, but they are plain buttons rather than radio-group semantics.
+Why it matters: Assistive technologies understand mutually exclusive choices better as radio groups.
+Suggested fix: Use a `<fieldset>`/`<legend>` with native radio inputs styled as cards, or add appropriate `role="radiogroup"`/`role="radio"` and `aria-checked` semantics.
+
+10. [Done] Location: components/store/app-shell.tsx
+Issue: Live footer Instagram links on the deployed site still displayed `https://www.instagram.com/theootd.brand/`, while the local code has the newer QR-tracking URL in one footer location.
+Why it matters: Inconsistent social URLs are minor UX friction and make it harder to verify that users land on the intended social profile.
+Suggested fix: Centralize social links in a single constants file and reuse it across header/footer/contact sections before the next deployment.

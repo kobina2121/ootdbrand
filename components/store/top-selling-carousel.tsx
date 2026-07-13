@@ -125,9 +125,11 @@ export function TopSellingCarousel({ items }: { items: Slide[] }) {
             key={dot}
             type="button"
             onClick={() => goTo(dot)}
-            className={`h-2.5 rounded-full transition-all ${activeIndex === dot ? "w-7 bg-foreground" : "w-2.5 bg-foreground/30"}`}
+            className="flex h-11 min-w-11 items-center justify-center rounded-full transition-all"
             aria-label={`Go to slide ${dot + 1}`}
-          />
+          >
+            <span className={`block h-2.5 rounded-full transition-all ${activeIndex === dot ? "w-7 bg-foreground" : "w-2.5 bg-foreground/30"}`} />
+          </button>
         ))}
       </div>
     </div>
