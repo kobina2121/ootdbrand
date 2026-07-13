@@ -54,7 +54,7 @@ const processSteps = [
 const ownerProfile = {
  name: "Adeline",
  title: "Creative Director",
- image: "/images/about/adeline-owner.jpeg",
+ image: "/images/about/adeline-creative-director.jpg",
 };
 
 export default function AboutPage() {
