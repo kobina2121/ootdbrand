@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PaymentStatusVerifier } from "@/components/store/payment-status-verifier";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { formatPriceNgn } from "@/lib/products";
 import { getOrdersByUserId } from "@/lib/services/order-service";
@@ -32,9 +33,14 @@ export default async function AccountOrdersPage() {
  getOrdersByUserId(session.user.id),
  getCustomOrdersByUserId(session.user.id),
  ]);
+ const pendingPaymentReferences = [
+ ...orders.filter((order) => order.status === "Pending").map((order) => order.paymentReference),
+ ...customOrders.filter((order) => order.status === "Pending").map((order) => order.paymentReference),
+ ];
 
  return (
  <div className="space-y-6">
+ <PaymentStatusVerifier references={pendingPaymentReferences} />
  <section className="surface-strong p-5 sm:p-7">
  <p className="heading-kicker">ACCOUNT</p>
  <h1 className="mt-2 font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">My Orders</h1>

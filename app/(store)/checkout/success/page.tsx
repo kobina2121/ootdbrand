@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ClearCartOnSuccess } from "@/components/store/clear-cart-on-success";
+import { PaymentStatusVerifier } from "@/components/store/payment-status-verifier";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
@@ -128,6 +129,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
  return (
  <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <PaymentStatusVerifier references={reference ? [reference] : []} maxAttempts={6} />
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Payment Pending</CardTitle>
  </CardHeader>

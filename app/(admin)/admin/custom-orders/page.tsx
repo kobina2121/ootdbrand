@@ -6,6 +6,7 @@ import { OrderTableActions } from "@/components/admin/order-table-actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PaymentStatusVerifier } from "@/components/store/payment-status-verifier";
 import {
  Table,
  TableBody,
@@ -33,6 +34,9 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  const totalPages = Math.max(1, Math.ceil(allCustomOrders.length / pageSize));
  const safePage = Math.min(page, totalPages);
  const customOrders = allCustomOrders.slice((safePage - 1) * pageSize, safePage * pageSize);
+ const pendingPaymentReferences = customOrders
+ .filter((order) => order.status === "Pending")
+ .map((order) => order.paymentReference);
 
  const successCount = allCustomOrders.filter((order) => order.status === "Success").length;
  const pendingCount = allCustomOrders.filter((order) => order.status === "Pending").length;
@@ -50,6 +54,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
 
  return (
  <div className="space-y-5">
+ <PaymentStatusVerifier references={pendingPaymentReferences} />
  <Card className="border-black/10 bg-white/85 shadow-sm ">
  <CardHeader className="space-y-4">
  <div>
