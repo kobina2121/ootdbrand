@@ -202,8 +202,16 @@ export default function AboutPage() {
  </CardContent>
  </Card>
 
- <section className="flex min-h-[340px] items-end rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#211c18_0%,#4b3d35_100%)] p-6 text-white shadow-sm sm:p-8">
- <div className="max-w-lg space-y-5">
+ <section className="relative flex min-h-[520px] overflow-hidden rounded-3xl border border-black/10 text-white shadow-sm">
+ <Image
+ src="/images/about/presence-cta.jpg"
+ alt="Woman in a yellow dress from theootd.brand"
+ fill
+ className="object-cover object-center"
+ sizes="(min-width: 1024px) 40vw, 100vw"
+ />
+ <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+ <div className="relative z-10 mt-auto max-w-lg space-y-5 p-6 sm:p-8">
  <Target className="size-8 text-white/75" />
  <h2 className="font-heading text-4xl font-semibold leading-none sm:text-5xl">
  Made for women who dress with presence.
