@@ -19,7 +19,7 @@ const heroImages = [
 const categoryHighlights = [
  {
  title: "Look 1",
- image: "/images/categories/womens.jpg",
+ image: "/images/top-selling/look-01-red-white-tops.jpg",
  },
  {
  title: "Look 2",
