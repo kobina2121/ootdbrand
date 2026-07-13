@@ -192,7 +192,10 @@ export default async function AdminOrderTablePage({ searchParams }: AdminOrdersP
  </TableCell>
  <TableCell>
  <div className="space-y-1">
- <Badge variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}>
+ <Badge
+ variant={order.status === "Failed" ? "destructive" : "default"}
+ className={order.status === "Success" ? "bg-emerald-600 text-white hover:bg-emerald-600" : undefined}
+ >
  {order.status}
  </Badge>
  <p className="text-xs text-muted-foreground">Delivery: {order.deliveryStatus}</p>

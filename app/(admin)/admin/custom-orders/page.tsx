@@ -277,7 +277,8 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  <TableCell className="align-top">
  <div className="space-y-1">
  <Badge
- variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}
+ variant={order.status === "Failed" ? "destructive" : "default"}
+ className={order.status === "Success" ? "bg-emerald-600 text-white hover:bg-emerald-600" : undefined}
  >
  {order.status}
  </Badge>
