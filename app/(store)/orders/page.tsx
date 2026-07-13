@@ -9,6 +9,18 @@ import { formatPriceNgn } from "@/lib/products";
 import { getOrdersByUserId } from "@/lib/services/order-service";
 import { getCustomOrdersByUserId } from "@/lib/services/custom-order-service";
 
+function paymentStatusBadgeClass(status: string) {
+ if (status === "Success") {
+ return "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50";
+ }
+
+ if (status === "Failed") {
+ return "";
+ }
+
+ return "";
+}
+
 export default async function AccountOrdersPage() {
  const session = await requireAuthenticatedUser();
 
@@ -73,7 +85,7 @@ export default async function AccountOrdersPage() {
  <div className="flex flex-wrap gap-2">
  <Badge
  variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}
- className=" "
+ className={paymentStatusBadgeClass(order.status)}
  >
  Payment: {order.status}
  </Badge>
@@ -159,7 +171,7 @@ export default async function AccountOrdersPage() {
  <div className="flex flex-wrap gap-2">
  <Badge
  variant={order.status === "Success" ? "secondary" : order.status === "Failed" ? "destructive" : "default"}
- className=" "
+ className={paymentStatusBadgeClass(order.status)}
  >
  Payment: {order.status}
  </Badge>
