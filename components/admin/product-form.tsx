@@ -4,13 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { uploadPresigned } from "@vercel/blob/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { DefaultValues } from "react-hook-form";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 
 import { buildImageBlobPath } from "@/lib/blob-upload";
+import { catalogColorOptions, type ColorOption } from "@/lib/color-options";
 import { buildVariantRows, type ProductVariantDraft } from "@/lib/product-variant-builder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,15 +70,6 @@ type ProductFormProps = {
 
 const productCategories = ["TOPS", "MAXI", "MIDI", "MINI"] as const;
 const sizeOptions = ["XS", "S", "M", "L", "XL"] as const;
-type ColorOption = { name: string; code: string };
-const presetColorOptions: ColorOption[] = [
- { name: "Black", code: "#111827" },
- { name: "White", code: "#F9FAFB" },
- { name: "Brown", code: "#7C2D12" },
- { name: "Wine", code: "#7F1D1D" },
- { name: "Navy", code: "#1E3A8A" },
- { name: "Olive", code: "#4D7C0F" },
-];
 
 const fieldClassName =
  "h-11 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25 ";
@@ -93,7 +85,7 @@ const productImageMimeTypes = new Set(["image/jpeg", "image/png", "image/webp", 
 const productImageTypeMessage = "Use a JPEG, PNG, WebP, or AVIF image for product photos.";
 const productImageSizeMessage = "Product images must be 10MB or smaller.";
 
-function getInitialCustomColorOptions(initialValues?: ProductEditorValues) {
+function getInitialProductColorOptions(initialValues?: ProductEditorValues) {
  const seededVariants = initialValues?.variants ?? [];
 
  return seededVariants
@@ -105,7 +97,7 @@ function getInitialCustomColorOptions(initialValues?: ProductEditorValues) {
  (colorOption, index, allColors) =>
  colorOption.name &&
  colorOption.code &&
- !presetColorOptions.some((preset) => preset.code.toUpperCase() === colorOption.code) &&
+ !catalogColorOptions.some((catalogColor) => catalogColor.code.toUpperCase() === colorOption.code) &&
  allColors.findIndex((entry) => entry.code === colorOption.code) === index,
  );
 }
@@ -137,9 +129,8 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  const [numberInputDrafts, setNumberInputDrafts] = useState<Record<string, string>>({});
  const [bulkSelectedSizes, setBulkSelectedSizes] = useState<string[]>([]);
  const [bulkSelectedColorCodes, setBulkSelectedColorCodes] = useState<string[]>([]);
- const [customColorName, setCustomColorName] = useState("");
- const [customColorCode, setCustomColorCode] = useState("");
- const [customColorOptions, setCustomColorOptions] = useState<ColorOption[]>(() => getInitialCustomColorOptions(initialValues));
+ const [colorSearch, setColorSearch] = useState("");
+ const [initialProductColorOptions] = useState<ColorOption[]>(() => getInitialProductColorOptions(initialValues));
 
  const form = useForm<ProductEditorValues>({
  resolver: zodResolver(productEditorSchema),
@@ -164,7 +155,29 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  : selectedCategory
  ? [selectedCategory, ...productCategories]
  : productCategories;
- const colorOptions = [...presetColorOptions, ...customColorOptions];
+ const colorOptions = useMemo(() => {
+ const colorsByCode = new Map<string, ColorOption>();
+
+ [...catalogColorOptions, ...initialProductColorOptions].forEach((colorOption) => {
+ colorsByCode.set(colorOption.code.toUpperCase(), colorOption);
+ });
+
+ return Array.from(colorsByCode.values()).sort((a, b) => a.name.localeCompare(b.name));
+ }, [initialProductColorOptions]);
+ const filteredColorOptions = useMemo(() => {
+ const query = colorSearch.trim().toLowerCase();
+ const matches = query
+ ? colorOptions.filter(
+ (colorOption) =>
+ colorOption.name.toLowerCase().includes(query) || colorOption.code.toLowerCase().includes(query),
+ )
+ : colorOptions;
+
+ return matches.slice(0, 80);
+ }, [colorOptions, colorSearch]);
+ const selectedBulkColors = bulkSelectedColorCodes
+ .map((colorCode) => colorOptions.find((colorOption) => colorOption.code.toUpperCase() === colorCode.toUpperCase()))
+ .filter((colorOption): colorOption is ColorOption => Boolean(colorOption));
 
  const toggleBulkSize = (size: string) => {
  setBulkSelectedSizes((previous) =>
@@ -176,37 +189,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  setBulkSelectedColorCodes((previous) =>
  previous.includes(colorCode) ? previous.filter((entry) => entry !== colorCode) : [...previous, colorCode],
  );
- };
-
- const addCustomColor = () => {
- const trimmedName = customColorName.trim();
- const normalizedCode = customColorCode.trim().toUpperCase();
-
- if (!trimmedName) {
- toast.error("Enter a color name.");
- return;
- }
-
- if (!/^#([0-9A-F]{3}|[0-9A-F]{6})$/.test(normalizedCode)) {
- toast.error("Use a valid hex code like #8B5CF6.");
- return;
- }
-
- const exists = colorOptions.some(
- (colorOption) =>
- colorOption.code.toUpperCase() === normalizedCode || colorOption.name.toLowerCase() === trimmedName.toLowerCase(),
- );
-
- if (exists) {
- toast.error("This color already exists.");
- return;
- }
-
- setCustomColorOptions((previous) => [...previous, { name: trimmedName, code: normalizedCode }]);
- setBulkSelectedColorCodes((previous) => [...previous, normalizedCode]);
- setCustomColorName("");
- setCustomColorCode("");
- toast.success("Color added.");
  };
 
  const addSizeColorVariants = () => {
@@ -239,11 +221,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  toast.success(
  `Added ${createdCount} variant${createdCount > 1 ? "s" : ""}${skippedCount ? ` • skipped ${skippedCount}` : ""}.`,
  );
- };
-
- const removeCustomColor = (colorCode: string) => {
- setCustomColorOptions((previous) => previous.filter((entry) => entry.code !== colorCode));
- setBulkSelectedColorCodes((previous) => previous.filter((entry) => entry !== colorCode));
  };
 
  const handleImageUpload = async (files: FileList | File[]) => {
@@ -676,14 +653,24 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  ))}
  </div>
  <div className="space-y-2">
+ <div className="flex flex-wrap items-center justify-between gap-2">
  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Select colors</p>
- <div className="flex flex-wrap gap-2">
- {colorOptions.map((colorOption) => (
+ <p className="text-xs text-muted-foreground">{bulkSelectedColorCodes.length} selected</p>
+ </div>
+ <Input
+ placeholder="Search color name or hex code"
+ className={fieldClassName}
+ value={colorSearch}
+ onChange={(event) => setColorSearch(event.target.value)}
+ />
+ {selectedBulkColors.length > 0 ? (
+ <div className="flex flex-wrap gap-2 rounded-xl border border-black/10 bg-muted/20 p-2">
+ {selectedBulkColors.map((colorOption) => (
  <Button
- key={colorOption.code}
+ key={`selected-color-${colorOption.code}`}
  type="button"
+ variant="default"
  size="sm"
- variant={bulkSelectedColorCodes.includes(colorOption.code) ? "default" : "outline"}
  className="h-8"
  onClick={() => toggleBulkColor(colorOption.code)}
  >
@@ -691,44 +678,43 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  className="mr-2 inline-block h-3 w-3 rounded-full border border-black/20"
  style={{ backgroundColor: colorOption.code }}
  />
- {colorOption.name}
- </Button>
- ))}
- </div>
- </div>
- <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
- <Input
- placeholder="Custom color name"
- className={fieldClassName}
- value={customColorName}
- onChange={(event) => setCustomColorName(event.target.value)}
- />
- <Input
- placeholder="#9F1239"
- className={fieldClassName}
- value={customColorCode}
- onChange={(event) => setCustomColorCode(event.target.value)}
- />
- <Button type="button" variant="outline" onClick={addCustomColor}>
- Add color
- </Button>
- </div>
- {customColorOptions.length > 0 ? (
- <div className="flex flex-wrap gap-2">
- {customColorOptions.map((colorOption) => (
- <Button
- key={`remove-${colorOption.code}`}
- type="button"
- variant="ghost"
- size="sm"
- className="h-7 px-2 text-xs"
- onClick={() => removeCustomColor(colorOption.code)}
- >
- Remove {colorOption.name}
+ {colorOption.name} x
  </Button>
  ))}
  </div>
  ) : null}
+ <div className="max-h-64 overflow-y-auto rounded-xl border border-black/10 bg-white p-2">
+ {filteredColorOptions.length > 0 ? (
+ <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+ {filteredColorOptions.map((colorOption) => {
+ const isSelected = bulkSelectedColorCodes.includes(colorOption.code);
+
+ return (
+ <Button
+ key={colorOption.code}
+ type="button"
+ variant={isSelected ? "default" : "outline"}
+ size="sm"
+ className="h-10 justify-start"
+ onClick={() => toggleBulkColor(colorOption.code)}
+ >
+ <span
+ className="mr-2 inline-block h-3.5 w-3.5 rounded-full border border-black/20"
+ style={{ backgroundColor: colorOption.code }}
+ />
+ <span className="truncate">{colorOption.name}</span>
+ </Button>
+ );
+ })}
+ </div>
+ ) : (
+ <p className="px-2 py-3 text-sm text-muted-foreground">No colors found. Try another color name.</p>
+ )}
+ </div>
+ <p className="text-xs text-muted-foreground">
+ Search and select multiple colors, then generate all selected size/color combinations.
+ </p>
+ </div>
  <div>
  <Button type="button" size="sm" onClick={addSizeColorVariants}>
  Generate size + color variants
