@@ -37,6 +37,8 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
 
  const activeCount = products.filter((product) => product.isActive).length;
  const draftCount = products.length - activeCount;
+ const availableStockCount = products.reduce((sum, product) => sum + product.availableStock, 0);
+ const soldQuantityCount = products.reduce((sum, product) => sum + product.soldQuantity, 0);
  const buildHref = (nextPage: number, nextStatus = status) => {
  const query = new URLSearchParams();
  query.set("page", String(nextPage));
@@ -68,7 +70,7 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
  </Button>
  </Link>
  </div>
- <div className="grid gap-3 sm:grid-cols-3">
+ <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
  <p className="text-xs uppercase tracking-wide text-muted-foreground">Matching products</p>
  <p className="text-lg font-semibold">{pagination.totalCount}</p>
@@ -80,6 +82,14 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
  <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
  <p className="text-xs uppercase tracking-wide text-muted-foreground">Inactive on this page</p>
  <p className="text-lg font-semibold">{draftCount}</p>
+ </div>
+ <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Available stock</p>
+ <p className="text-lg font-semibold">{availableStockCount}</p>
+ </div>
+ <div className="rounded-xl border border-black/10 bg-white px-3 py-2 ">
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Units ordered</p>
+ <p className="text-lg font-semibold">{soldQuantityCount}</p>
  </div>
  </div>
  <div className="space-y-3">
@@ -138,13 +148,16 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
  <TableHead>Category</TableHead>
  <TableHead>Status</TableHead>
  <TableHead>Variants</TableHead>
+ <TableHead>Available</TableHead>
+ <TableHead>Ordered</TableHead>
+ <TableHead>Order lines</TableHead>
  <TableHead className="text-right">Actions</TableHead>
  </TableRow>
  </TableHeader>
  <TableBody>
  {products.length === 0 ? (
  <TableRow>
- <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+ <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
  <div className="flex flex-col items-center gap-2">
  <Package className="size-6 text-muted-foreground" />
  <p>No products found.</p>
@@ -169,6 +182,9 @@ export default async function AdminProductTablePage({ searchParams }: AdminProdu
  </Badge>
  </TableCell>
  <TableCell>{product.variantsCount}</TableCell>
+ <TableCell>{product.availableStock}</TableCell>
+ <TableCell>{product.soldQuantity}</TableCell>
+ <TableCell>{product.orderCount}</TableCell>
  <TableCell className="text-right">
  <ProductTableActions productId={product.id} productName={product.name} />
  </TableCell>

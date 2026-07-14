@@ -5,6 +5,9 @@ export type ProductVariant = {
   image?: string;
   sku: string;
   stock: number;
+  stockOnHand?: number;
+  soldQuantity?: number;
+  orderCount?: number;
   priceOverride?: number;
 };
 

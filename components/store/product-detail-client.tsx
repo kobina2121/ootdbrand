@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import { AddToCartForm } from "@/components/store/add-to-cart-form";
-import { Badge } from "@/components/ui/badge";
 import { type Product } from "@/lib/products";
 
 type ProductDetailClientProps = {
@@ -32,9 +31,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  return Array.from(colorMap.values());
  }, [product.variants]);
 
- const firstVariant = product.variants[0];
+ const firstVariant = product.variants.find((variant) => variant.stock > 0) ?? product.variants[0];
  const [selectedColor, setSelectedColor] = useState(firstVariant?.color ?? "");
  const [selectedSize, setSelectedSize] = useState(firstVariant?.size ?? "");
+ const [hasSelectedVariant, setHasSelectedVariant] = useState(false);
 
  const variantsForColor = useMemo(
  () => product.variants.filter((variant) => variant.color === selectedColor),
@@ -55,19 +55,34 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  return variantsForColor[0] ?? product.variants[0];
  }, [product.variants, selectedSize, variantsForColor]);
 
- const inStock = product.variants.some((variant) => variant.stock > 0);
+ const selectedVariantInStock = Boolean(selectedVariant && selectedVariant.stock > 0);
+ const showSelectedStatus = hasSelectedVariant && selectedVariant;
  const galleryImages = useMemo(() => {
  const ordered = [
  selectedVariant?.image,
- ...variantsForColor.map((variant) => variant.image),
+ ...product.variants.map((variant) => variant.image),
  ...baseImages,
  product.image,
  ].filter((value): value is string => Boolean(value));
 
  return Array.from(new Set(ordered));
- }, [baseImages, product.image, selectedVariant?.image, variantsForColor]);
+ }, [baseImages, product.image, product.variants, selectedVariant?.image]);
 
  const [selectedImage, setSelectedImage] = useState<string>(firstVariant?.image ?? galleryImages[0] ?? product.image);
+ const selectImage = (image: string) => {
+ setSelectedImage(image);
+ const imageVariant =
+ product.variants.find((variant) => variant.image === image && variant.stock > 0) ??
+ product.variants.find((variant) => variant.image === image);
+
+ if (!imageVariant) {
+ return;
+ }
+
+ setHasSelectedVariant(true);
+ setSelectedColor(imageVariant.color);
+ setSelectedSize(imageVariant.size);
+ };
 
  return (
  <div className="grid gap-8 rounded-3xl border border-black/10 bg-white/85 p-4 shadow-sm lg:grid-cols-[1.15fr_0.85fr] lg:p-6">
@@ -92,7 +107,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  <button
  key={`${image}-${index}`}
  type="button"
- onClick={() => setSelectedImage(image)}
+ onClick={() => selectImage(image)}
  className={`group relative w-[7.25rem] overflow-hidden rounded-2xl border bg-[#f7f1eb] transition-all sm:w-[7.75rem] ${
  isActive
  ? "border-black shadow-[0_10px_25px_rgba(20,17,15,0.14)] "
@@ -117,13 +132,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  </div>
 
  <section className="mx-auto flex w-full max-w-[34rem] flex-col items-center space-y-5 text-center">
- <Badge
- variant={inStock ? "default" : "destructive"}
- className="mx-auto rounded-full "
- >
- {inStock ? "In Stock" : "Out of Stock"}
- </Badge>
-
  <h1 className="max-w-[14ch] font-heading text-5xl leading-none text-[#1f1b18] sm:max-w-[13ch]">
  {product.name}
  </h1>
@@ -132,19 +140,26 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  <div className="space-y-3">
  <p className="text-sm tracking-[0.18em] text-muted-foreground ">SELECT COLOR</p>
  <div className="flex flex-wrap justify-center gap-2">
- {colorOptions.map((colorOption) => (
+ {colorOptions.map((colorOption) => {
+ const colorIsSelected = selectedColor === colorOption.name;
+
+ return (
  <button
  key={`color-${colorOption.name}`}
  type="button"
- className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
- selectedColor === colorOption.name
+ className={`inline-flex min-h-12 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
+ colorIsSelected
  ? "border-black bg-black text-white shadow-sm "
  : "border-black/20 bg-white text-black hover:border-black/40 "
  }`}
  onClick={() => {
+ setHasSelectedVariant(true);
  setSelectedColor(colorOption.name);
- const firstSizeForColor = product.variants.find((variant) => variant.color === colorOption.name)?.size;
- const firstImageForColor = product.variants.find((variant) => variant.color === colorOption.name)?.image;
+ const firstVariantForColor =
+ product.variants.find((variant) => variant.color === colorOption.name && variant.stock > 0) ??
+ product.variants.find((variant) => variant.color === colorOption.name);
+ const firstSizeForColor = firstVariantForColor?.size;
+ const firstImageForColor = firstVariantForColor?.image;
  if (firstSizeForColor) {
  setSelectedSize(firstSizeForColor);
  }
@@ -155,9 +170,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  className="inline-block h-3 w-3 rounded-full border border-black/20"
  style={{ backgroundColor: colorOption.code }}
  />
- {colorOption.name}
+ <span className="flex flex-col items-start leading-tight">
+ <span>{colorOption.name}</span>
+ </span>
  </button>
- ))}
+ );
+ })}
  </div>
  {selectedColor ? (
  <p className="text-sm text-[#6c655f] ">
@@ -169,20 +187,33 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  <div className="space-y-3">
  <p className="text-sm tracking-[0.18em] text-muted-foreground ">AVAILABLE SIZES</p>
  <div className="flex flex-wrap justify-center gap-2">
- {availableSizes.map((size) => (
+ {availableSizes.map((size) => {
+ const sizeVariant = variantsForColor.find((variant) => variant.size === size);
+ const isSelectedSize = selectedSize === size;
+ const isSizeInStock = Boolean(sizeVariant && sizeVariant.stock > 0);
+
+ return (
  <button
  key={`size-${size}`}
  type="button"
- className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition ${
- selectedSize === size
+ className={`inline-flex min-h-12 min-w-16 flex-col items-center justify-center rounded-2xl border px-4 py-2 text-sm font-medium leading-tight transition ${
+ isSelectedSize && hasSelectedVariant && !isSizeInStock
+ ? "border-red-600 bg-red-50 text-red-700 shadow-sm "
+ : isSelectedSize
  ? "border-black bg-black text-white shadow-sm "
  : "border-black/20 bg-white text-black hover:border-black/40 "
  }`}
- onClick={() => setSelectedSize(size)}
+ onClick={() => {
+ setHasSelectedVariant(true);
+ setSelectedSize(size);
+ }}
+ aria-pressed={isSelectedSize}
+ aria-label={`${size} ${isSizeInStock ? "in stock" : "out of stock"}`}
  >
- {size}
+ <span>{size}</span>
  </button>
- ))}
+ );
+ })}
  </div>
  </div>
 
@@ -192,7 +223,24 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  )}
  </p>
 
- {inStock && selectedVariant ? (
+ {showSelectedStatus ? (
+ <div
+ className={`w-full max-w-[23rem] rounded-2xl border px-4 py-3 text-sm ${
+ selectedVariantInStock
+ ? "border-green-200 bg-green-50 text-green-700"
+ : "border-red-200 bg-red-50 text-red-700"
+ }`}
+ >
+ <p className="font-semibold">
+ {selectedVariantInStock ? "Selected option is available" : "Selected option is out of stock"}
+ </p>
+ <p className="mt-1 text-xs text-muted-foreground">
+ {selectedVariant.size} / {selectedVariant.color}
+ </p>
+ </div>
+ ) : null}
+
+ {selectedVariant ? (
  <AddToCartForm product={product} sku={selectedVariant.sku} hideVariantSelect centered />
  ) : (
  <p className="text-sm text-muted-foreground">This item is currently unavailable.</p>

@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { unstable_noStore as noStore } from "next/cache";
 
 import { connectToDatabase } from "@/lib/db/mongoose";
+import { OrderModel } from "@/lib/db/models/order";
 import { ProductModel } from "@/lib/db/models/product";
 import { type CartItem, type Product } from "@/lib/products";
 
@@ -38,7 +39,106 @@ export type ResolvedOrderItem = {
   quantity: number;
 };
 
-function toUiProduct(doc: Awaited<ReturnType<typeof ProductModel.findOne>>) {
+type VariantSalesStats = {
+  soldQuantity: number;
+  orderCount: number;
+};
+
+type StorefrontVariant = {
+  size: string;
+  color?: { name?: string; code?: string } | null;
+  image?: string | null;
+  sku: string;
+  stock: number;
+  priceOverride?: number | null;
+};
+
+function normalizeSku(value: string) {
+  return value.trim().toUpperCase();
+}
+
+function getAllVariantSkus<T extends { variants?: Array<{ sku: string }> }>(docs: T[]) {
+  return docs.flatMap((doc) => doc.variants?.map((variant) => variant.sku) ?? []);
+}
+
+async function getSuccessfulVariantSalesBySku(skus: string[]) {
+  const normalizedSkus = Array.from(new Set(skus.map(normalizeSku).filter(Boolean)));
+
+  if (normalizedSkus.length === 0) {
+    return new Map<string, VariantSalesStats>();
+  }
+
+  const rows = await OrderModel.aggregate<{
+    _id: string;
+    soldQuantity: number;
+    orderCount: number;
+  }>([
+    { $match: { status: "Success", "items.variant.sku": { $in: normalizedSkus } } },
+    { $unwind: "$items" },
+    { $match: { "items.variant.sku": { $in: normalizedSkus } } },
+    {
+      $group: {
+        _id: "$items.variant.sku",
+        soldQuantity: { $sum: "$items.quantity" },
+        orderCount: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return new Map(
+    rows.map((row) => [
+      normalizeSku(row._id),
+      {
+        soldQuantity: row.soldQuantity,
+        orderCount: row.orderCount,
+      },
+    ]),
+  );
+}
+
+function mapVariantForStorefront(variant: StorefrontVariant, salesBySku: Map<string, VariantSalesStats>) {
+  const sales = salesBySku.get(normalizeSku(variant.sku));
+  const stockOnHand = variant.stock;
+  const soldQuantity = sales?.soldQuantity ?? 0;
+
+  return {
+    size: variant.size,
+    color: variant.color?.name ?? "Unknown",
+    colorCode: variant.color?.code ?? "#9CA3AF",
+    image: variant.image ?? undefined,
+    sku: variant.sku,
+    stock: Math.max(0, stockOnHand - soldQuantity),
+    stockOnHand,
+    soldQuantity,
+    orderCount: sales?.orderCount ?? 0,
+    priceOverride: variant.priceOverride ?? undefined,
+  };
+}
+
+function getProductInventoryStats<T extends { variants: StorefrontVariant[] }>(
+  doc: T,
+  salesBySku: Map<string, VariantSalesStats>,
+) {
+  return doc.variants.reduce(
+    (stats, variant) => {
+      const sales = salesBySku.get(normalizeSku(variant.sku));
+      const soldQuantity = sales?.soldQuantity ?? 0;
+
+      return {
+        stockOnHand: stats.stockOnHand + variant.stock,
+        availableStock: stats.availableStock + Math.max(0, variant.stock - soldQuantity),
+        soldQuantity: stats.soldQuantity + soldQuantity,
+        orderCount: stats.orderCount + (sales?.orderCount ?? 0),
+      };
+    },
+    { stockOnHand: 0, availableStock: 0, soldQuantity: 0, orderCount: 0 },
+  );
+}
+
+function toUiProduct(
+  doc: Awaited<ReturnType<typeof ProductModel.findOne>>,
+  salesBySku: Map<string, VariantSalesStats> = new Map(),
+) {
   if (!doc) {
     return null;
   }
@@ -51,15 +151,7 @@ function toUiProduct(doc: Awaited<ReturnType<typeof ProductModel.findOne>>) {
     basePrice: doc.basePrice,
     image: doc.images[0] ?? "",
     images: doc.images ?? [],
-    variants: doc.variants.map((variant) => ({
-      size: variant.size,
-      color: variant.color?.name ?? "Unknown",
-      colorCode: variant.color?.code ?? "#9CA3AF",
-      image: variant.image ?? undefined,
-      sku: variant.sku,
-      stock: variant.stock,
-      priceOverride: variant.priceOverride ?? undefined,
-    })),
+    variants: doc.variants.map((variant) => mapVariantForStorefront(variant, salesBySku)),
   } satisfies Product;
 }
 
@@ -90,6 +182,7 @@ export async function listProducts(filters: ProductFilters = {}) {
   }
 
   const docs = await ProductModel.find(query).lean();
+  const salesBySku = await getSuccessfulVariantSalesBySku(getAllVariantSkus(docs));
   const mapped = docs.map((doc) => ({
     slug: doc.slug,
     name: doc.name,
@@ -98,15 +191,7 @@ export async function listProducts(filters: ProductFilters = {}) {
     basePrice: doc.basePrice,
     image: doc.images[0] ?? "",
     images: doc.images ?? [],
-    variants: doc.variants.map((variant) => ({
-      size: variant.size,
-      color: variant.color?.name ?? "Unknown",
-      colorCode: variant.color?.code ?? "#9CA3AF",
-      image: variant.image ?? undefined,
-      sku: variant.sku,
-      stock: variant.stock,
-      priceOverride: variant.priceOverride ?? undefined,
-    })),
+    variants: doc.variants.map((variant) => mapVariantForStorefront(variant, salesBySku)),
   })) satisfies Product[];
 
   return sortProducts(mapped, filters.sort);
@@ -117,7 +202,9 @@ export async function getProductBySlug(slug: string) {
   await connectToDatabase();
 
   const doc = await ProductModel.findOne({ slug: slug.toLowerCase() });
-  return toUiProduct(doc);
+  const salesBySku = doc ? await getSuccessfulVariantSalesBySku(doc.variants.map((variant) => variant.sku)) : new Map();
+
+  return toUiProduct(doc, salesBySku);
 }
 
 export async function getProductById(id: string) {
@@ -231,6 +318,7 @@ export async function resolveOrderItemsFromCart(items: CartItem[]): Promise<Reso
 
   const skus = items.map((item) => item.sku);
   const docs = await ProductModel.find({ "variants.sku": { $in: skus } }).lean();
+  const salesBySku = await getSuccessfulVariantSalesBySku(skus);
 
   const variantMap = new Map<
     string,
@@ -256,7 +344,7 @@ export async function resolveOrderItemsFromCart(items: CartItem[]): Promise<Reso
           code: variant.color?.code ?? "#374151",
         },
         sku: variant.sku,
-        stock: variant.stock,
+        stock: Math.max(0, variant.stock - (salesBySku.get(normalizeSku(variant.sku))?.soldQuantity ?? 0)),
         unitPrice: variant.priceOverride ?? doc.basePrice,
       });
     });
@@ -292,16 +380,25 @@ export async function listProductsForAdmin() {
   await connectToDatabase();
 
   const docs = await ProductModel.find().sort({ createdAt: -1 }).lean();
+  const salesBySku = await getSuccessfulVariantSalesBySku(getAllVariantSkus(docs));
 
-  return docs.map((doc) => ({
-    id: String(doc._id),
-    name: doc.name,
-    category: doc.category,
-    slug: doc.slug,
-    isActive: doc.isActive,
-    variantsCount: doc.variants.length,
-    updatedAt: doc.updatedAt,
-  }));
+  return docs.map((doc) => {
+    const inventory = getProductInventoryStats(doc, salesBySku);
+
+    return {
+      id: String(doc._id),
+      name: doc.name,
+      category: doc.category,
+      slug: doc.slug,
+      isActive: doc.isActive,
+      variantsCount: doc.variants.length,
+      stockOnHand: inventory.stockOnHand,
+      availableStock: inventory.availableStock,
+      soldQuantity: inventory.soldQuantity,
+      orderCount: inventory.orderCount,
+      updatedAt: doc.updatedAt,
+    };
+  });
 }
 
 export async function listProductsForAdminPaged(filters: AdminProductListFilters = {}) {
@@ -336,20 +433,29 @@ export async function listProductsForAdminPaged(filters: AdminProductListFilters
       .lean(),
     ProductModel.countDocuments(query),
   ]);
+  const salesBySku = await getSuccessfulVariantSalesBySku(getAllVariantSkus(docs));
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const safePage = Math.min(page, totalPages);
 
   return {
-    products: docs.map((doc) => ({
-      id: String(doc._id),
-      name: doc.name,
-      category: doc.category,
-      slug: doc.slug,
-      isActive: doc.isActive,
-      variantsCount: doc.variants.length,
-      updatedAt: doc.updatedAt,
-    })),
+    products: docs.map((doc) => {
+      const inventory = getProductInventoryStats(doc, salesBySku);
+
+      return {
+        id: String(doc._id),
+        name: doc.name,
+        category: doc.category,
+        slug: doc.slug,
+        isActive: doc.isActive,
+        variantsCount: doc.variants.length,
+        stockOnHand: inventory.stockOnHand,
+        availableStock: inventory.availableStock,
+        soldQuantity: inventory.soldQuantity,
+        orderCount: inventory.orderCount,
+        updatedAt: doc.updatedAt,
+      };
+    }),
     pagination: {
       page: safePage,
       pageSize,

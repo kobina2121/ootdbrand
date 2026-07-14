@@ -30,7 +30,11 @@ export function AddToCartForm({
  hideVariantSelect = false,
  centered = false,
 }: AddToCartFormProps) {
- const [internalSku, setInternalSku] = useState(product.variants[0]?.sku ?? "");
+ const firstAvailableSku = useMemo(
+ () => product.variants.find((entry) => entry.stock > 0)?.sku ?? product.variants[0]?.sku ?? "",
+ [product.variants],
+ );
+ const [internalSku, setInternalSku] = useState(firstAvailableSku);
  const [quantity, setQuantity] = useState<number | "">(1);
  const previousQuantityRef = useRef(1);
  const quantityInputId = useId();
@@ -55,11 +59,30 @@ export function AddToCartForm({
  return null;
  }
 
+ const variantInStock = variant.stock > 0;
+ const stockLimit = Math.max(1, variant.stock);
+ const requestedQuantity = quantity === "" ? 1 : quantity;
+ const safeQuantity = Math.min(stockLimit, Math.max(1, requestedQuantity));
+ const normalizedQuantity = quantity === "" ? "" : safeQuantity;
+
+ const updateQuantity = (nextQuantity: number) => {
+ const clampedQuantity = Math.min(stockLimit, Math.max(1, nextQuantity));
+ previousQuantityRef.current = clampedQuantity;
+ setQuantity(clampedQuantity);
+ };
+
  const onAddToCart = async () => {
  if (isAdminUser) {
  toast.error("Admin accounts cannot place store orders.");
  return;
  }
+
+ if (!variantInStock) {
+ toast.error("This variant is out of stock.");
+ return;
+ }
+
+ const quantityToAdd = Math.min(stockLimit, Math.max(1, quantity === "" ? previousQuantityRef.current : quantity));
 
  try {
  await addItem({
@@ -70,11 +93,11 @@ export function AddToCartForm({
  size: variant.size,
  color: variant.color,
  unitPrice,
- quantity: quantity === "" ? previousQuantityRef.current : quantity,
+ quantity: quantityToAdd,
  });
 
  toast.success("Added to cart", {
- description: `${product.name} · ${variant.size} / ${variant.color}`,
+ description: `${quantityToAdd} × ${product.name} · ${variant.size} / ${variant.color}`,
  });
  } catch (error) {
  const message = error instanceof Error ? error.message : "Could not add item to cart.";
@@ -99,7 +122,7 @@ export function AddToCartForm({
  <SelectContent className=" ">
  {product.variants.map((entry) => (
  <SelectItem key={entry.sku} value={entry.sku}>
- {entry.size} · {entry.color} ({entry.stock} left)
+ {entry.size} · {entry.color}
  </SelectItem>
  ))}
  </SelectContent>
@@ -111,12 +134,25 @@ export function AddToCartForm({
  <label htmlFor={quantityInputId} className="mb-2 text-sm font-medium text-[#1f1b18] ">
  Quantity
  </label>
+ <div className={`flex items-center gap-2 ${centered ? "justify-center" : ""}`}>
+ <Button
+ type="button"
+ variant="outline"
+ size="icon"
+ className="h-11 w-11 rounded-full border-black/15 bg-white"
+ onClick={() => updateQuantity(safeQuantity - 1)}
+ disabled={!variantInStock || safeQuantity <= 1}
+ aria-label="Decrease quantity"
+ >
+ -
+ </Button>
  <Input
  id={quantityInputId}
  type="number"
  min={1}
- max={variant.stock}
- value={quantity}
+ max={stockLimit}
+ value={normalizedQuantity}
+ disabled={!variantInStock}
  onChange={(event) => {
  const nextValue = event.target.value;
  if (nextValue === "") {
@@ -124,9 +160,7 @@ export function AddToCartForm({
  return;
  }
 
- const normalizedQuantity = Math.min(variant.stock, Math.max(1, Number(nextValue) || 1));
- previousQuantityRef.current = normalizedQuantity;
- setQuantity(normalizedQuantity);
+ updateQuantity(Number(nextValue) || 1);
  }}
  onFocus={() => {
  if (quantity !== "") {
@@ -137,13 +171,26 @@ export function AddToCartForm({
  }}
  onBlur={() => {
  if (quantity === "") {
- setQuantity(Math.min(variant.stock, Math.max(1, previousQuantityRef.current)));
+ updateQuantity(previousQuantityRef.current);
  }
  }}
  className={`h-11 rounded-xl border-black/15 bg-white text-center ${
  centered ? "mx-auto w-28" : "w-28"
  }`}
  />
+ <Button
+ type="button"
+ variant="outline"
+ size="icon"
+ className="h-11 w-11 rounded-full border-black/15 bg-white"
+ onClick={() => updateQuantity(safeQuantity + 1)}
+ disabled={!variantInStock || safeQuantity >= variant.stock}
+ aria-label="Increase quantity"
+ >
+ +
+ </Button>
+ </div>
+ {!variantInStock ? <p className="mt-2 text-xs text-red-700">This option is out of stock.</p> : null}
  </div>
  </div>
 
@@ -151,11 +198,13 @@ export function AddToCartForm({
  size="lg"
  className={`h-11 rounded-full ${centered ? "mx-auto flex w-full max-w-[19rem]" : "w-full sm:w-auto"}`}
  onClick={onAddToCart}
- disabled={isAdminUser}
+ disabled={isAdminUser || !variantInStock}
  >
  {isAdminUser
  ? "Admin cannot add to cart"
- : `Add to Cart · ${new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(unitPrice)}`}
+ : !variantInStock
+ ? "Out of stock"
+ : `Add ${safeQuantity} to Cart · ${new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(unitPrice * safeQuantity)}`}
  </Button>
  </div>
  );
