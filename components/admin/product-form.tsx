@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { upload } from "@vercel/blob/client";
+import { uploadPresigned } from "@vercel/blob/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -257,7 +257,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  const nextImages = [...existingImages];
 
  for (const file of selectedFiles) {
- const blob = await upload(buildImageBlobPath("products", file.name), file, {
+ const blob = await uploadPresigned(buildImageBlobPath("products", file.name), file, {
  access: "public",
  handleUploadUrl: "/api/admin/uploads/product-image",
  });

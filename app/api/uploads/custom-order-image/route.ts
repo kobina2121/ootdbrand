@@ -1,4 +1,5 @@
-import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { issueSignedToken } from "@vercel/blob";
+import { handleUploadPresigned, type HandleUploadPresignedBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 
 import { failure } from "@/lib/api-response";
@@ -18,11 +19,11 @@ const ALLOWED_MIME_TYPES = [
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as HandleUploadBody;
-    const jsonResponse = await handleUpload({
+    const body = (await request.json()) as HandleUploadPresignedBody;
+    const jsonResponse = await handleUploadPresigned({
       body,
       request,
-      onBeforeGenerateToken: async (pathname) => {
+      getSignedToken: async (pathname) => {
         const rateLimit = checkRateLimit(request, {
           bucket: "uploads:custom-order-image",
           limit: 10,
@@ -37,9 +38,17 @@ export async function POST(request: Request) {
         }
 
         return {
-          allowedContentTypes: [...ALLOWED_MIME_TYPES],
-          maximumSizeInBytes: MAX_FILE_SIZE_BYTES,
-          addRandomSuffix: true,
+          token: await issueSignedToken({
+            pathname,
+            operations: ["put"],
+            allowedContentTypes: [...ALLOWED_MIME_TYPES],
+            maximumSizeInBytes: MAX_FILE_SIZE_BYTES,
+          }),
+          urlOptions: {
+            allowedContentTypes: [...ALLOWED_MIME_TYPES],
+            maximumSizeInBytes: MAX_FILE_SIZE_BYTES,
+            addRandomSuffix: true,
+          },
         };
       },
       onUploadCompleted: async () => {},

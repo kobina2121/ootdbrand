@@ -1,6 +1,6 @@
 "use client";
 
-import { upload } from "@vercel/blob/client";
+import { uploadPresigned } from "@vercel/blob/client";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -204,7 +204,7 @@ export default function CustomOrderPage() {
  const uploadedImages: string[] = [];
 
  for (const file of photoFiles) {
- const blob = await upload(buildImageBlobPath("custom-orders", file.name), file, {
+ const blob = await uploadPresigned(buildImageBlobPath("custom-orders", file.name), file, {
  access: "public",
  handleUploadUrl: "/api/uploads/custom-order-image",
  });
