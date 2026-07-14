@@ -88,6 +88,10 @@ const selectClassName =
 const textAreaClassName =
  "min-h-28 rounded-xl border-black/15 bg-white text-[15px] shadow-none focus-visible:ring-1 focus-visible:ring-black/25 ";
 const fieldHelperClassName = "min-h-5 text-xs text-muted-foreground";
+const maxProductImageSizeBytes = 10 * 1024 * 1024;
+const productImageMimeTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const productImageTypeMessage = "Use a JPEG, PNG, WebP, or AVIF image for product photos.";
+const productImageSizeMessage = "Product images must be 10MB or smaller.";
 
 function getInitialCustomColorOptions(initialValues?: ProductEditorValues) {
  const seededVariants = initialValues?.variants ?? [];
@@ -251,6 +255,22 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  return;
  }
 
+ const invalidTypeFile = selectedFiles.find((file) => !productImageMimeTypes.has(file.type));
+ if (invalidTypeFile) {
+ toast.error(
+ invalidTypeFile.type === "image/heic" || invalidTypeFile.type === "image/heif"
+ ? "iPhone HEIC photos need to be changed to JPEG before uploading as product photos."
+ : productImageTypeMessage,
+ );
+ return;
+ }
+
+ const oversizedFile = selectedFiles.find((file) => file.size > maxProductImageSizeBytes);
+ if (oversizedFile) {
+ toast.error(productImageSizeMessage);
+ return;
+ }
+
  setIsUploadingImage(true);
 
  try {
@@ -267,8 +287,8 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
 
  form.setValue("images", nextImages, { shouldValidate: true });
  toast.success(selectedFiles.length > 1 ? "Images uploaded" : "Image uploaded");
- } catch {
- toast.error("Image upload failed");
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : "Image upload failed");
  } finally {
  setIsUploadingImage(false);
  }

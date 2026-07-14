@@ -17,6 +17,15 @@ import { calculateCustomOrderTotal, resolveTransactionFeeGhs } from "@/lib/custo
 import { formatPriceNgn } from "@/lib/products";
 
 const typeOptions = ["Dress", "Top", "Skirt", "Set", "Jumpsuit"] as const;
+const maxReferenceImageSizeBytes = 8 * 1024 * 1024;
+const referenceImageMimeTypes = new Set([
+ "image/jpeg",
+ "image/png",
+ "image/webp",
+ "image/avif",
+ "image/heic",
+ "image/heif",
+]);
 const customOrderFieldLabels = {
  product: "Product",
  name: "Full name",
@@ -200,6 +209,18 @@ export default function CustomOrderPage() {
  return [];
  }
 
+ const invalidTypeFile = photoFiles.find((file) => !referenceImageMimeTypes.has(file.type));
+ if (invalidTypeFile) {
+ toast.error("Reference images must be JPEG, PNG, WebP, AVIF, HEIC, or HEIF.");
+ return [];
+ }
+
+ const oversizedFile = photoFiles.find((file) => file.size > maxReferenceImageSizeBytes);
+ if (oversizedFile) {
+ toast.error("Reference images must be 8MB or smaller.");
+ return [];
+ }
+
  try {
  const uploadedImages: string[] = [];
 
@@ -213,8 +234,8 @@ export default function CustomOrderPage() {
  }
 
  return uploadedImages;
- } catch {
- toast.error("Could not upload image. Continuing without image.");
+ } catch (error) {
+ toast.error(error instanceof Error ? error.message : "Could not upload image. Continuing without image.");
  return [];
  }
  };
