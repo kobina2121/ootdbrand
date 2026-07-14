@@ -1,5 +1,6 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -11,6 +12,7 @@ import { useCart } from "@/components/store/cart-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { buildImageBlobPath } from "@/lib/blob-upload";
 import { calculateCustomOrderTotal, resolveTransactionFeeGhs } from "@/lib/custom-order-pricing";
 import { formatPriceNgn } from "@/lib/products";
 
@@ -202,26 +204,12 @@ export default function CustomOrderPage() {
  const uploadedImages: string[] = [];
 
  for (const file of photoFiles) {
- const formData = new FormData();
- formData.append("file", file);
-
- const response = await fetch("/api/uploads/custom-order-image", {
- method: "POST",
- body: formData,
+ const blob = await upload(buildImageBlobPath("custom-orders", file.name), file, {
+ access: "public",
+ handleUploadUrl: "/api/uploads/custom-order-image",
  });
 
- const json = (await response.json()) as {
- ok: boolean;
- message: string;
- data: { imagePath?: string };
- };
-
- if (!response.ok || !json.ok || !json.data.imagePath) {
- toast.error(json.message || "Could not upload image. Continuing without image.");
- return uploadedImages;
- }
-
- uploadedImages.push(json.data.imagePath);
+ uploadedImages.push(blob.url);
  }
 
  return uploadedImages;

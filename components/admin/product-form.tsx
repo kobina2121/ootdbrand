@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { upload } from "@vercel/blob/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 
+import { buildImageBlobPath } from "@/lib/blob-upload";
 import { buildVariantRows, type ProductVariantDraft } from "@/lib/product-variant-builder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -255,26 +257,12 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  const nextImages = [...existingImages];
 
  for (const file of selectedFiles) {
- const formData = new FormData();
- formData.append("file", file);
-
- const response = await fetch("/api/admin/uploads/product-image", {
- method: "POST",
- body: formData,
+ const blob = await upload(buildImageBlobPath("products", file.name), file, {
+ access: "public",
+ handleUploadUrl: "/api/admin/uploads/product-image",
  });
 
- const json = (await response.json()) as {
- ok: boolean;
- message: string;
- data?: { imagePath?: string };
- };
-
- if (!response.ok || !json.ok || !json.data?.imagePath) {
- toast.error(json.message || "Image upload failed");
- return;
- }
-
- nextImages.push(json.data.imagePath);
+ nextImages.push(blob.url);
  }
 
  form.setValue("images", nextImages, { shouldValidate: true });

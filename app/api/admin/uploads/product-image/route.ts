@@ -1,79 +1,60 @@
-import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
-
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 
-import { failure, success } from "@/lib/api-response";
+import { failure } from "@/lib/api-response";
 import { requireAdminUser } from "@/lib/auth/guards";
 import { checkRateLimit } from "@/lib/security/guards";
 
 export const runtime = "nodejs";
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
-const ALLOWED_MIME_TYPES = new Set([
+const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/avif",
-]);
-
-const extensionByMimeType: Record<string, string> = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/avif": ".avif",
-};
+] as const;
 
 export async function POST(request: Request) {
-  const rateLimit = checkRateLimit(request, {
-    bucket: "admin:uploads:product-image",
-    limit: 20,
-    windowMs: 10 * 60 * 1000,
-  });
-  if (!rateLimit.ok) {
-    return NextResponse.json(failure("Too many product image upload attempts. Please retry shortly."), {
-      status: 429,
-      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-    });
-  }
-
-  const admin = await requireAdminUser();
-
-  if (!admin) {
-    return NextResponse.json(failure("Unauthorized"), { status: 403 });
-  }
-
   try {
-    const formData = await request.formData();
-    const fileEntry = formData.get("file");
+    const body = (await request.json()) as HandleUploadBody;
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (pathname) => {
+        const rateLimit = checkRateLimit(request, {
+          bucket: "admin:uploads:product-image",
+          limit: 20,
+          windowMs: 10 * 60 * 1000,
+        });
+        if (!rateLimit.ok) {
+          throw new Error("Too many product image upload attempts. Please retry shortly.");
+        }
 
-    if (!(fileEntry instanceof File)) {
-      return NextResponse.json(failure("No file uploaded"), { status: 400 });
-    }
+        const admin = await requireAdminUser();
 
-    if (!ALLOWED_MIME_TYPES.has(fileEntry.type)) {
-      return NextResponse.json(failure("Unsupported image type"), { status: 400 });
-    }
+        if (!admin) {
+          throw new Error("Unauthorized");
+        }
 
-    if (fileEntry.size > MAX_FILE_SIZE_BYTES) {
-      return NextResponse.json(failure("Image is too large (max 5MB)"), { status: 400 });
-    }
+        if (!pathname.startsWith("products/")) {
+          throw new Error("Invalid upload path");
+        }
 
-    const extension = extensionByMimeType[fileEntry.type] ?? (path.extname(fileEntry.name) || ".jpg");
-    const fileName = `product-${randomUUID()}${extension}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
-    const filePath = path.join(uploadDir, fileName);
+        return {
+          allowedContentTypes: [...ALLOWED_MIME_TYPES],
+          maximumSizeInBytes: MAX_FILE_SIZE_BYTES,
+          addRandomSuffix: true,
+        };
+      },
+      onUploadCompleted: async () => {},
+    });
 
-    await mkdir(uploadDir, { recursive: true });
+    return NextResponse.json(jsonResponse);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not upload image";
+    const status = message === "Unauthorized" ? 403 : 400;
 
-    const buffer = Buffer.from(await fileEntry.arrayBuffer());
-    await writeFile(filePath, buffer);
-
-    const imagePath = `/uploads/products/${fileName}`;
-
-    return NextResponse.json(success("Image uploaded", { imagePath }), { status: 201 });
-  } catch {
-    return NextResponse.json(failure("Could not upload image"), { status: 500 });
+    return NextResponse.json(failure(message), { status });
   }
 }
