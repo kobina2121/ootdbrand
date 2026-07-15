@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
   const rateLimit = checkRateLimit(request, {
     bucket: "admin:products:create",
-    limit: 30,
+    limit: 150,
     windowMs: 10 * 60 * 1000,
   });
   if (!rateLimit.ok) {

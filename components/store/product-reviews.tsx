@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { encodeProductSlugForPath } from "@/lib/product-slug";
 
 type ProductReviewView = {
  id: string;
@@ -53,7 +54,8 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
 
  setIsSubmitting(true);
  try {
- const response = await fetch(`/api/products/${productSlug}/reviews`, {
+ const encodedProductSlug = encodeProductSlugForPath(productSlug);
+ const response = await fetch(`/api/products/${encodedProductSlug}/reviews`, {
  method: "POST",
  headers: { "Content-Type": "application/json" },
  body: JSON.stringify({
@@ -135,7 +137,7 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
  <p className="text-sm text-muted-foreground">
  {reviewEligibility === "login_required" ? (
  <>
- <Link href={`/login?next=/products/${encodeURIComponent(productSlug)}`} className="underline underline-offset-4">
+ <Link href={`/login?next=/products/${encodeProductSlugForPath(productSlug)}`} className="underline underline-offset-4">
  Login
  </Link>{" "}
  to leave a review.

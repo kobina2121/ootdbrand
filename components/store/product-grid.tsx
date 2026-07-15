@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { encodeProductSlugForPath } from "@/lib/product-slug";
 import { formatPriceNgn } from "@/lib/products";
 
 type Product = {
@@ -110,7 +111,7 @@ function ProductCard({ product }: { product: Product }) {
  </CardContent>
 
  <CardFooter className="mt-auto p-4 pt-0 sm:p-5 sm:pt-0">
- <Link href={`/products/${product.slug}`} className="w-full">
+ <Link href={`/products/${encodeProductSlugForPath(product.slug)}`} className="w-full">
  <Button className="w-full rounded-full">View Product</Button>
  </Link>
  </CardFooter>

@@ -4,6 +4,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { OrderModel } from "@/lib/db/models/order";
 import { ProductModel } from "@/lib/db/models/product";
+import { getProductSlugLookupCandidates, normalizeProductSlug } from "@/lib/product-slug";
 import { type CartItem, type Product } from "@/lib/products";
 
 export type ProductFilters = {
@@ -201,7 +202,7 @@ export async function getProductBySlug(slug: string) {
   noStore();
   await connectToDatabase();
 
-  const doc = await ProductModel.findOne({ slug: slug.toLowerCase() });
+  const doc = await ProductModel.findOne({ slug: { $in: getProductSlugLookupCandidates(slug) } });
   const salesBySku = doc ? await getSuccessfulVariantSalesBySku(doc.variants.map((variant) => variant.sku)) : new Map();
 
   return toUiProduct(doc, salesBySku);
@@ -255,7 +256,7 @@ export async function createProduct(payload: {
   isActive: boolean;
 }) {
   await connectToDatabase();
-  const created = await ProductModel.create({ ...payload, slug: payload.slug.toLowerCase() });
+  const created = await ProductModel.create({ ...payload, slug: normalizeProductSlug(payload.slug) });
 
   return {
     id: String(created._id),
@@ -289,7 +290,7 @@ export async function updateProductById(
   }
 
   await connectToDatabase();
-  const update = payload.slug ? { ...payload, slug: payload.slug.toLowerCase() } : payload;
+  const update = payload.slug ? { ...payload, slug: normalizeProductSlug(payload.slug) } : payload;
   const updated = await ProductModel.findByIdAndUpdate(id, update, { returnDocument: "after" }).lean();
 
   if (!updated) {

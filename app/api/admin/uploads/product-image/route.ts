@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       getSignedToken: async (pathname) => {
         const rateLimit = checkRateLimit(request, {
           bucket: "admin:uploads:product-image",
-          limit: 20,
+          limit: 250,
           windowMs: 10 * 60 * 1000,
         });
         if (!rateLimit.ok) {

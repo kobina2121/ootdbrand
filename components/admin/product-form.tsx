@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 import { buildImageBlobPath } from "@/lib/blob-upload";
 import { catalogColorOptions, type ColorOption } from "@/lib/color-options";
+import { normalizeProductSlug } from "@/lib/product-slug";
 import { buildVariantRows, type ProductVariantDraft } from "@/lib/product-variant-builder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -252,18 +253,35 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
 
  try {
  const nextImages = [...existingImages];
+ const failedUploads: string[] = [];
 
  for (const file of selectedFiles) {
+ try {
  const blob = await uploadPresigned(buildImageBlobPath("products", file.name), file, {
  access: "public",
  handleUploadUrl: "/api/admin/uploads/product-image",
  });
 
  nextImages.push(blob.url);
+ } catch (error) {
+ const message = error instanceof Error ? error.message : "Upload failed";
+ failedUploads.push(`${file.name}: ${message}`);
+ }
  }
 
  form.setValue("images", nextImages, { shouldValidate: true });
- toast.success(selectedFiles.length > 1 ? "Images uploaded" : "Image uploaded");
+ if (failedUploads.length === selectedFiles.length) {
+ toast.error(failedUploads[0] || "Image upload failed");
+ return;
+ }
+
+ toast.success(
+ failedUploads.length > 0
+ ? `Uploaded ${selectedFiles.length - failedUploads.length} image(s). ${failedUploads.length} failed.`
+ : selectedFiles.length > 1
+ ? "Images uploaded"
+ : "Image uploaded",
+ );
  } catch (error) {
  toast.error(error instanceof Error ? error.message : "Image upload failed");
  } finally {
@@ -401,7 +419,15 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  <FormItem className="space-y-2 sm:min-h-[118px]">
  <FormLabel>Slug</FormLabel>
  <FormControl>
- <Input placeholder="cloud-tee" className={fieldClassName} {...field} />
+ <Input
+ placeholder="cloud-tee"
+ className={fieldClassName}
+ {...field}
+ onChange={(event) => {
+ const nextValue = event.target.value;
+ field.onChange(nextValue ? normalizeProductSlug(nextValue) : "");
+ }}
+ />
  </FormControl>
  <p className={fieldHelperClassName}>Use lowercase and hyphens only (example: cloud-tee).</p>
  <FormMessage />

@@ -90,7 +90,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const rateLimit = checkRateLimit(request, {
     bucket: "admin:products:update",
-    limit: 45,
+    limit: 150,
     windowMs: 10 * 60 * 1000,
   });
   if (!rateLimit.ok) {

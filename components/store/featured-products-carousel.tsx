@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { encodeProductSlugForPath } from "@/lib/product-slug";
 import { cn } from "@/lib/utils";
 
 type FeaturedProductSlide = {
@@ -149,7 +150,7 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  <p className="pt-2 text-center text-2xl font-semibold text-[#111827] ">{product.price}</p>
  <div className="pt-1 text-center">
  <Link
- href={`/products/${product.slug}`}
+ href={`/products/${encodeProductSlugForPath(product.slug)}`}
  className={cn(
  buttonVariants({ variant: "outline", size: "sm" }),
  "min-h-11 rounded-full border-black/20 px-5 text-[#1f2937] hover:border-black hover:bg-black hover:text-white ",
