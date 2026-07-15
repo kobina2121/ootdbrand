@@ -104,7 +104,7 @@ export default async function HomePage() {
  <div className="pointer-events-none absolute -left-20 top-20 hidden h-52 w-52 rounded-full bg-[#c8d4bc]/40 blur-3xl md:block animate-drift-x" />
  <div className="pointer-events-none absolute -right-16 top-[28rem] hidden h-64 w-64 rounded-full bg-[#d8c8ba]/35 blur-3xl md:block animate-drift-x-reverse" />
 
- <section className="animate-fade-up relative h-[66svh] min-h-[460px] overflow-hidden rounded-3xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] lg:h-[88svh] lg:min-h-[780px]">
+	 <section className="animate-fade-up relative h-[58svh] min-h-[360px] overflow-hidden rounded-2xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] sm:min-h-[540px] sm:rounded-3xl lg:h-[88svh] lg:min-h-[760px]">
  {heroImages.map((image, index) => (
  <Image
  key={image}
@@ -120,22 +120,22 @@ export default async function HomePage() {
  <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/70 lg:from-black/25 lg:via-black/5 lg:to-black/60" />
  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.18),transparent_38%)]" />
 
- <div className="animate-fade-up-delay-1 absolute bottom-24 left-1/2 z-10 w-[calc(100%-2rem)] max-w-4xl -translate-x-1/2 px-5 py-5 text-center text-white sm:bottom-28 sm:w-full lg:bottom-20">
- <p className="mb-2 text-xs tracking-[0.35em] text-white/85 sm:text-sm">NEW COLLECTION</p>
- <h1 className="font-heading text-[clamp(2.2rem,8vw,5.7rem)] font-semibold leading-[0.95] drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
- Wear Your Story
- </h1>
+	 <div className="animate-fade-up-delay-1 absolute bottom-20 left-1/2 z-10 w-[calc(100%-1.5rem)] max-w-4xl -translate-x-1/2 px-3 py-3 text-center text-white sm:bottom-28 sm:w-full sm:px-5 sm:py-5 lg:bottom-20">
+	 <p className="mb-2 text-xs tracking-[0.35em] text-white/85 sm:text-sm">NEW COLLECTION</p>
+	 <h1 className="font-heading text-5xl font-semibold leading-[0.95] drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] sm:text-7xl lg:text-8xl">
+	 Wear Your Story
+	 </h1>
  <p className="mx-auto mt-2 max-w-2xl text-sm text-white/90 sm:text-base">
  Every stitch speaks confidence, elegance, and the woman you are becoming.
  </p>
  </div>
 
- <div className="animate-fade-up-delay-2 absolute bottom-8 left-1/2 z-10 flex w-[calc(100%-2.5rem)] max-w-max -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-10 sm:w-auto sm:gap-3 animate-soft-float">
+	 <div className="animate-fade-up-delay-2 absolute bottom-7 left-1/2 z-10 flex w-[calc(100%-1.5rem)] max-w-max -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-10 sm:w-auto sm:gap-3 animate-soft-float">
  <Link
  href="/products"
  className={cn(
  buttonVariants({}),
- "animate-pulse-glow rounded-full bg-white px-7 text-[#3b2526] shadow-lg shadow-black/20 hover:!bg-white hover:text-[#3b2526] focus:!bg-white active:!bg-white sm:px-10",
+	 "animate-pulse-glow rounded-full bg-white px-5 text-[#3b2526] shadow-lg shadow-black/20 hover:!bg-white hover:text-[#3b2526] focus:!bg-white active:!bg-white sm:px-10",
  )}
  >
  SHOP NOW!
@@ -144,7 +144,7 @@ export default async function HomePage() {
  href="/products?sort=latest"
  className={cn(
  buttonVariants({ variant: "outline" }),
- "rounded-full border-white/70 bg-white/10 px-6 text-white backdrop-blur hover:bg-white/20",
+	 "rounded-full border-white/70 bg-white/10 px-5 text-white backdrop-blur hover:bg-white/20 sm:px-6",
  )}
  >
  New In <ArrowRight className="size-4" />
@@ -179,7 +179,7 @@ export default async function HomePage() {
  <div className="pointer-events-none absolute right-0 top-0 h-28 w-28 rounded-full bg-[#d9ccc0]/45 blur-3xl " />
  <div className="max-w-md space-y-6">
  <p className="text-xs tracking-[0.3em] text-muted-foreground ">{editorialShowcase.label}</p>
- <h3 className="font-heading whitespace-pre-line text-5xl leading-[0.95] text-[#1d1b1a] sm:text-6xl">
+	 <h3 className="font-heading whitespace-pre-line text-4xl leading-[0.95] text-[#1d1b1a] sm:text-6xl">
  {editorialShowcase.title}
  </h3>
  <p className="text-base leading-relaxed text-[#6e6761] ">{editorialShowcase.description}</p>
@@ -193,7 +193,7 @@ export default async function HomePage() {
  </div>
  </div>
 
- <div className="relative min-h-[420px] border-t border-black/5 lg:border-l lg:border-t-0">
+	 <div className="relative min-h-[320px] border-t border-black/5 sm:min-h-[420px] lg:border-l lg:border-t-0">
  <video
  src={editorialShowcase.video}
  poster={editorialShowcase.image}

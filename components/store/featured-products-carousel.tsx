@@ -90,7 +90,7 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  >
  <div
  ref={containerRef}
- className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-1"
+	 className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-1"
  onTouchStart={() => setIsPaused(true)}
  onTouchEnd={() => setIsPaused(false)}
  >
@@ -100,31 +100,31 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  ref={(el) => {
  itemRefs.current[index] = el;
  }}
- className="min-w-[88%] snap-center sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] xl:min-w-[calc(25%-12px)]"
+	 className="min-w-[82%] snap-center sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] xl:min-w-[calc(25%-12px)]"
  >
  <Card className="group h-full overflow-hidden border-[#cfd3d8] bg-white shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-md ">
- <div className="relative aspect-[4/3] overflow-hidden bg-[#dedede] p-6 ">
+	 <div className="relative aspect-[4/3] overflow-hidden bg-[#dedede] p-3 sm:p-6">
  <Image
  src={product.image}
  alt={product.name}
  fill
- sizes="(max-width: 639px) 88vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
+	 sizes="(max-width: 639px) 88vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
  unoptimized
  className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
  />
  </div>
- <CardContent className="space-y-3 p-5 text-center">
+	 <CardContent className="space-y-2 p-3 text-center sm:space-y-3 sm:p-5">
  <Link
  href={`/products?category=${encodeURIComponent(product.category)}`}
- className="inline-flex text-[0.7rem] uppercase tracking-[0.2em] text-[#6b7280] underline-offset-4 transition hover:text-[#1f2937] hover:underline "
+	 className="inline-flex text-[0.7rem] uppercase tracking-[0.2em] text-[#6b7280] underline-offset-4 transition hover:text-[#1f2937] hover:underline "
  >
  {product.category}
  </Link>
- <h3 className="font-heading text-[1.7rem] leading-tight text-[#1f2937] ">{product.name}</h3>
- {product.description ? (
- <p className="min-h-[3rem] text-sm leading-relaxed text-[#6b7280] ">{product.description}</p>
- ) : null}
- <div className="space-y-2 text-sm text-[#5f6368] ">
+	 <h3 className="font-heading text-[1.35rem] leading-tight text-[#1f2937] sm:text-[1.7rem]">{product.name}</h3>
+	 {product.description ? (
+	 <p className="min-h-0 text-xs leading-relaxed text-[#6b7280] sm:min-h-[3rem] sm:text-sm">{product.description}</p>
+	 ) : null}
+	 <div className="space-y-2 text-sm text-[#5f6368] ">
  {product.sizes && product.sizes.length > 0 ? (
  <div className="space-y-1">
  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[#7a7f85] ">
@@ -146,14 +146,14 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  <p className="text-xs text-[#6b6b6b] ">Colors: {product.colors.join(", ")}</p>
  ) : null}
  </div>
- <p className="text-sm tracking-wide text-[#a47531]">{"★★★★★"} {product.rating ? `(${product.rating.toFixed(1)})` : "(5.0)"}</p>
- <p className="pt-2 text-center text-2xl font-semibold text-[#111827] ">{product.price}</p>
+	 <p className="text-sm tracking-wide text-[#a47531]">{"★★★★★"} {product.rating ? `(${product.rating.toFixed(1)})` : "(5.0)"}</p>
+	 <p className="pt-2 text-center text-2xl font-semibold text-[#111827] ">{product.price}</p>
  <div className="pt-1 text-center">
  <Link
  href={`/products/${encodeProductSlugForPath(product.slug)}`}
  className={cn(
- buttonVariants({ variant: "outline", size: "sm" }),
- "min-h-11 rounded-full border-black/20 px-5 text-[#1f2937] hover:border-black hover:bg-black hover:text-white ",
+	 buttonVariants({ variant: "outline", size: "sm" }),
+	 "min-h-11 rounded-full border-black/20 px-5 text-[#1f2937] hover:border-black hover:bg-black hover:text-white ",
  )}
  >
  View Product

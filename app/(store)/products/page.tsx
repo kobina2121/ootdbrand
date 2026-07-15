@@ -67,16 +67,16 @@ export default async function ProductListPage({ searchParams }: PageProps) {
 
  return (
  <div className="space-y-8">
- <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-5 shadow-sm sm:p-7">
- <div className="flex flex-wrap items-start justify-between gap-4">
- <div className="space-y-2">
- <p className="text-[0.8rem] tracking-[0.18em] text-[#5f5954]">THEOOTD SHOP</p>
- <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">All Products</h1>
+	 <section className="rounded-2xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-4 shadow-sm sm:rounded-3xl sm:p-7">
+	 <div className="flex flex-wrap items-start justify-between gap-4">
+	 <div className="space-y-2">
+	 <p className="text-[0.8rem] tracking-[0.18em] text-[#5f5954]">THEOOTD SHOP</p>
+	 <h1 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-6xl">All Products</h1>
  <p className="section-subtitle max-w-xl">
  Discover signature silhouettes crafted for confidence, comfort, and timeless elegance.
  </p>
  </div>
- <form action="/products" method="get" className="flex w-full max-w-md items-center gap-2">
+	 <form action="/products" method="get" className="flex w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center">
  <input type="hidden" name="category" value={category} />
  <input type="hidden" name="sort" value={sort} />
  <Input
@@ -93,7 +93,7 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  </div>
  </section>
 
- <section className="rounded-2xl border border-black/10 bg-white/80 p-4 shadow-sm ">
+	 <section className="rounded-2xl border border-black/10 bg-white/80 p-3 shadow-sm sm:p-4">
  <div className="mb-3 flex items-center justify-between gap-3">
  <p className="text-[0.8rem] tracking-[0.16em] text-[#5f5954] uppercase">
  {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"} available
@@ -142,7 +142,6 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  image: product.image,
  price: product.basePrice,
  sizes: [...new Set(product.variants.map((variant) => variant.size))],
- stockStatus: resolveStockStatus(product.variants.map((variant) => variant.stock)),
  rating: 5,
  reviewCount: 0,
  }))}
@@ -183,18 +182,4 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  ) : null}
  </div>
  );
-}
-
-function resolveStockStatus(stocks: number[]) {
- const totalStock = stocks.reduce((sum, stock) => sum + stock, 0);
-
- if (totalStock <= 0) {
- return "Out of Stock" as const;
- }
-
- if (totalStock <= 5) {
- return "Low Stock" as const;
- }
-
- return "In Stock" as const;
 }

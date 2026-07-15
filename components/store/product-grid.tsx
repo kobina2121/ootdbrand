@@ -17,14 +17,13 @@ type Product = {
  price: number;
  sizes: string[];
  description?: string;
- stockStatus?: "In Stock" | "Low Stock" | "Out of Stock";
  rating?: number;
  reviewCount?: number;
 };
 
 export function ProductGrid({ products }: { products: Product[] }) {
  return (
- <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+ <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-4 lg:gap-5">
  {products.map((product) => (
  <ProductCard key={product.slug} product={product} />
  ))}
@@ -33,29 +32,22 @@ export function ProductGrid({ products }: { products: Product[] }) {
 }
 
 function ProductCard({ product }: { product: Product }) {
- const stockTone =
- product.stockStatus === "Out of Stock"
- ? "border-rose-500/20 bg-rose-500/10 text-rose-700 "
- : product.stockStatus === "Low Stock"
- ? "border-amber-500/20 bg-amber-500/10 text-amber-700 "
- : "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 ";
-
  return (
- <Card className="group hover-lift flex h-full flex-col overflow-hidden rounded-3xl border-black/10 bg-white/95 shadow-[0_16px_40px_rgba(15,12,10,0.06)] ">
- <CardHeader className="space-y-4 p-4 sm:p-5">
- <div className="relative overflow-hidden rounded-2xl bg-[#f5f0ea] ">
+ <Card className="group hover-lift flex h-full flex-col overflow-hidden rounded-2xl border-black/10 bg-white/95 shadow-[0_16px_40px_rgba(15,12,10,0.06)] sm:rounded-3xl">
+ <CardHeader className="space-y-4 p-3 sm:p-5">
+ <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#f5f0ea] ">
  <Image
  src={product.image}
  alt={product.name}
  width={900}
  height={900}
  unoptimized
- className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-105 sm:h-72"
+ className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
  />
  </div>
  </CardHeader>
 
- <CardContent className="flex flex-1 flex-col items-center px-4 pb-4 text-center sm:px-5">
+ <CardContent className="flex flex-1 flex-col items-center px-3 pb-4 text-center sm:px-5">
  <div className="flex flex-wrap items-center justify-center gap-2">
  <Badge
  variant="secondary"
@@ -63,13 +55,10 @@ function ProductCard({ product }: { product: Product }) {
  >
  {product.category}
  </Badge>
- <Badge className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.16em] ${stockTone}`}>
- {product.stockStatus ?? "In Stock"}
- </Badge>
  </div>
 
  <div className="mt-4 space-y-2">
- <CardTitle className="text-2xl text-[#1f1b18] ">{product.name}</CardTitle>
+ <CardTitle className="text-[1.55rem] leading-none text-[#1f1b18] sm:text-2xl">{product.name}</CardTitle>
  {product.description ? (
  <p className="mx-auto max-w-[28ch] text-sm leading-6 text-[#6f675f] ">
  {product.description}
@@ -87,7 +76,7 @@ function ProductCard({ product }: { product: Product }) {
  </div>
 
  <div className="mt-5 space-y-3">
- <p className="text-3xl font-semibold tracking-tight text-[#1f1b18] ">
+ <p className="text-2xl font-semibold tracking-tight text-[#1f1b18] sm:text-3xl">
  {formatPriceNgn(product.price)}
  </p>
  <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">Available sizes</p>

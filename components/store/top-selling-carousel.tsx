@@ -82,7 +82,7 @@ export function TopSellingCarousel({ items }: { items: Slide[] }) {
               ref={(el) => {
                 itemRefs.current[index] = el;
               }}
-              className="group relative h-[520px] min-w-full snap-center overflow-hidden rounded-xl bg-[#efefef] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:min-w-[calc(50%-8px)] md:h-[620px] lg:min-w-[calc(33.333%-11px)]"
+              className="group relative h-[340px] min-w-full snap-center overflow-hidden rounded-xl bg-[#efefef] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:h-[520px] md:h-[620px] md:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)]"
             >
               <Image
                 src={item.image}

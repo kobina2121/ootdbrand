@@ -356,7 +356,7 @@ export default function CustomOrderPage() {
  return (
  <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
- <CardTitle className="font-heading text-5xl leading-none text-[#1f1b18] ">Custom Orders Disabled for Admin</CardTitle>
+	 <CardTitle className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">Custom Orders Disabled for Admin</CardTitle>
  </CardHeader>
  <CardContent className="space-y-3">
  <p className="text-sm text-muted-foreground">Admin accounts cannot place customer custom orders.</p>
@@ -369,9 +369,9 @@ export default function CustomOrderPage() {
  }
 
  return (
- <div className="mx-auto w-full max-w-4xl space-y-4">
- <Card className="border-black/10 bg-[#f4f3ef] shadow-sm ">
- <CardContent className="flex items-start gap-3 p-4 sm:p-5">
+	 <div className="mx-auto w-full max-w-4xl space-y-4">
+	 <Card className="border-black/10 bg-[#f4f3ef] shadow-sm ">
+	 <CardContent className="flex items-start gap-3 p-3 sm:p-5">
  <Clock3 className="mt-0.5 size-5 text-[#3f3a35] " />
  <div>
  <p className="text-sm font-medium text-[#1f1b18] ">Production timeline</p>
@@ -383,14 +383,14 @@ export default function CustomOrderPage() {
  <Card className="border-black/10 bg-white/90 shadow-sm ">
  <CardHeader>
  <p className="form-section-title">Custom Atelier</p>
- <CardTitle className="font-heading text-3xl text-[#1f1b18] ">Customize From Catalog</CardTitle>
+	 <CardTitle className="font-heading text-2xl text-[#1f1b18] sm:text-3xl">Customize From Catalog</CardTitle>
  <p className="text-sm text-[#6b655f] ">
  Choose a shop product first, then customize it. Product name, price, images, and specs auto-fill from catalog.
  </p>
  </CardHeader>
  <CardContent>
  <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
- <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-3 sm:p-5">
  <p className="form-section-title">Selected Product *</p>
  <div className="space-y-2">
  <label htmlFor="custom-order-category" className="text-sm font-medium text-[#1f1b18] ">
@@ -456,14 +456,14 @@ export default function CustomOrderPage() {
  </div>
 
  {selectedProduct ? (
- <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[140px_1fr]">
+	 <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[minmax(7.5rem,8.75rem)_1fr]">
  <Image
  src={selectedProduct.image}
  alt={selectedProduct.name}
  width={140}
  height={160}
  unoptimized
- className="h-40 w-full rounded-lg object-cover"
+	 className="aspect-[4/5] h-auto w-full rounded-lg object-cover"
  />
  <div className="space-y-1">
  <p className="text-base font-semibold text-[#1f1b18] ">{selectedProduct.name}</p>
@@ -489,7 +489,7 @@ export default function CustomOrderPage() {
  ) : null}
  </div>
 
- <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-3 sm:p-5">
  <p className="form-section-title">Customer Details</p>
  <div className="grid gap-4 sm:grid-cols-2">
  <div className="space-y-2">
@@ -560,7 +560,7 @@ export default function CustomOrderPage() {
  </div>
  </div>
 
- <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-3 sm:p-5">
  <p className="form-section-title">Customization</p>
  <div className="grid gap-4 sm:grid-cols-2">
  <div className="space-y-2">
@@ -785,7 +785,7 @@ export default function CustomOrderPage() {
  </div>
  </div>
 
- <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
+	 <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-3 sm:p-5">
  <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] ">
  <MapPin className="size-4" />
  Delivery Address *
@@ -947,7 +947,7 @@ export default function CustomOrderPage() {
  <p className="text-xs text-muted-foreground">
  Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).
  </p>
- <Button type="submit" className="rounded-full px-7" disabled={isSubmitting || !selectedProduct}>
+	 <Button type="submit" className="min-h-11 w-full rounded-full px-5 sm:w-auto sm:px-7" disabled={isSubmitting || !selectedProduct}>
  {isSubmitting
  ? "Preparing Payment..."
  : paymentMethod === "card"

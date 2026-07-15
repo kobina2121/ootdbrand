@@ -53,12 +53,12 @@ export function AppShell({ children, user }: AppShellProps) {
  return (
  <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)] text-foreground transition-colors ">
  <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur ">
- <div className="page-container flex items-center justify-between gap-3 py-3 sm:py-4">
-            <Link href="/" className="flex min-h-11 shrink-0 items-center pr-2 xl:pr-6" aria-label="theootd.brand home">
- <span className="block text-[1.7rem] leading-none font-semibold tracking-[-0.04em] text-[#2f1d15] sm:text-[2rem]">
-                theootd.brand
- </span>
- </Link>
+	 <div className="page-container flex items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-4">
+	            <Link href="/" className="flex min-h-11 shrink-0 items-center pr-2 xl:pr-6" aria-label="theootd.brand home">
+	 <span className="block text-[1.35rem] leading-none font-semibold tracking-[-0.04em] text-[#2f1d15] sm:text-[2rem]">
+	                theootd.brand
+	 </span>
+	 </Link>
 
  <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 lg:flex xl:gap-6 2xl:gap-8">
  {visibleNavLinks.map((link) => (
@@ -221,7 +221,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
  </header>
 
- <main className="page-container flex flex-1 flex-col py-6 pb-24 sm:py-8 md:pb-10">{children}</main>
+	 <main className="page-container flex flex-1 flex-col py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:py-8 md:pb-10">{children}</main>
 
  <footer className="border-t border-black/10 bg-white ">
  <div className="page-container py-12 sm:py-16">
@@ -287,7 +287,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
  </footer>
 
- <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-background/95 backdrop-blur md:hidden">
+	 <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
  <ul className="mx-auto grid w-full max-w-md grid-cols-4">
  {mobileTabs.map((tab) => {
  const Icon = tab.icon;

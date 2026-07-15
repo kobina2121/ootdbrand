@@ -109,7 +109,7 @@ export default function CartPage() {
  return (
  <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
- <CardTitle className="font-heading text-5xl leading-none ">Loading cart...</CardTitle>
+	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Loading cart...</CardTitle>
  </CardHeader>
  <CardContent>
  <p className="text-sm text-muted-foreground ">Preparing your cart details.</p>
@@ -122,7 +122,7 @@ export default function CartPage() {
  return (
  <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
- <CardTitle className="font-heading text-5xl leading-none ">Admin Shopping Disabled</CardTitle>
+	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Admin Shopping Disabled</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground ">Admin accounts cannot place store orders or manage cart items.</p>
@@ -138,7 +138,7 @@ export default function CartPage() {
  return (
  <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
- <CardTitle className="font-heading text-5xl leading-none ">Your cart is empty</CardTitle>
+	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Your cart is empty</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground ">Add products to your cart to continue checkout.</p>
@@ -208,12 +208,12 @@ export default function CartPage() {
 
  return (
  <div className="space-y-6">
- <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede6_100%)] p-5 shadow-sm sm:p-7">
- <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Shopping Cart</h1>
+	 <section className="rounded-2xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede6_100%)] p-4 shadow-sm sm:rounded-3xl sm:p-7">
+	 <h1 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-6xl">Shopping Cart</h1>
  <p className="section-subtitle mt-2 ">Review your picks and continue to secure checkout.</p>
  </section>
 
- <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+	 <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)] xl:gap-6">
  <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm ">
  <CardHeader className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
  <CardTitle className="">Cart Items</CardTitle>
@@ -223,7 +223,7 @@ export default function CartPage() {
  </CardHeader>
  <CardContent className="space-y-4">
  {items.map((item) => (
- <div key={item.sku} className="flex flex-col gap-3 rounded-xl border border-black/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+	 <div key={item.sku} className="flex flex-col gap-3 rounded-xl border border-black/10 p-3 sm:flex-row sm:items-center sm:justify-between">
  <div className="flex items-center gap-3">
  <Image src={item.image} alt={item.name} width={64} height={64} unoptimized className="h-16 w-16 rounded-md object-cover" />
  <div>
@@ -234,7 +234,7 @@ export default function CartPage() {
  <p className="text-sm font-medium text-[#4b433c] ">{formatPriceNgn(item.unitPrice)}</p>
  </div>
  </div>
- <div className="flex items-center gap-2">
+	 <div className="flex flex-wrap items-center gap-2">
  <Input
  value={quantityDrafts[item.sku] ?? item.quantity}
  type="number"
@@ -274,7 +274,7 @@ export default function CartPage() {
  </CardContent>
  </Card>
 
- <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm xl:sticky xl:top-24">
+	 <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm lg:sticky lg:top-24">
  <CardHeader>
  <CardTitle className="">Summary</CardTitle>
  </CardHeader>

@@ -79,7 +79,7 @@ export default function CheckoutPage() {
  return (
  <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
- <CardTitle className="font-heading text-5xl leading-none ">Loading checkout</CardTitle>
+	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Loading checkout</CardTitle>
  </CardHeader>
  <CardContent>
  <p className="text-sm text-muted-foreground">Preparing your cart...</p>
@@ -92,7 +92,7 @@ export default function CheckoutPage() {
  return (
  <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
- <CardTitle className="font-heading text-5xl leading-none ">Checkout Disabled for Admin</CardTitle>
+	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Checkout Disabled for Admin</CardTitle>
  </CardHeader>
  <CardContent className="space-y-3">
  <p className="text-sm text-muted-foreground">Admin accounts cannot complete customer checkout.</p>
@@ -108,7 +108,7 @@ export default function CheckoutPage() {
  return (
  <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
- <CardTitle className="font-heading text-5xl leading-none ">No items to checkout</CardTitle>
+	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">No items to checkout</CardTitle>
  </CardHeader>
  <CardContent>
  <p className="text-sm text-muted-foreground">Your cart is empty. Add products before checkout.</p>
@@ -206,12 +206,12 @@ export default function CheckoutPage() {
 
  return (
  <div className="space-y-6">
- <section className="rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-5 shadow-sm sm:p-7">
- <h1 className="font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">Checkout</h1>
+	 <section className="rounded-2xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-4 shadow-sm sm:rounded-3xl sm:p-7">
+	 <h1 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-6xl">Checkout</h1>
  <p className="section-subtitle mt-2">Complete your details and continue to secure payment.</p>
  </section>
 
- <form className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]" onSubmit={onSubmit}>
+	 <form className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)] xl:gap-6" onSubmit={onSubmit}>
  <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm ">
  <CardHeader className="border-b border-black/10 pb-4 ">
  <div className="inline-flex items-center gap-2 text-[#1f1b18] ">
@@ -402,7 +402,7 @@ export default function CheckoutPage() {
  </CardContent>
  </Card>
 
- <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm xl:sticky xl:top-24">
+	 <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm lg:sticky lg:top-24">
  <CardHeader>
  <div className="inline-flex items-center gap-2 ">
  <CreditCard className="size-4" />

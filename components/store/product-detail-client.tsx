@@ -85,21 +85,21 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  };
 
  return (
- <div className="grid gap-8 rounded-3xl border border-black/10 bg-white/85 p-4 shadow-sm lg:grid-cols-[1.15fr_0.85fr] lg:p-6">
- <div className="space-y-4">
- <div className="relative overflow-hidden rounded-[1.75rem] border border-black/5 bg-[#f7f1eb] shadow-[0_18px_44px_rgba(20,17,15,0.08)] ">
- <Image
- src={selectedImage}
- alt={product.name}
- width={1200}
- height={1440}
- unoptimized
- className="h-[520px] w-full object-cover object-center lg:h-[620px]"
- />
- </div>
+	 <div className="grid gap-5 rounded-2xl border border-black/10 bg-white/85 p-3 shadow-sm sm:gap-8 sm:rounded-3xl sm:p-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:p-6">
+	 <div className="space-y-4">
+	 <div className="relative overflow-hidden rounded-2xl border border-black/5 bg-[#f7f1eb] shadow-[0_18px_44px_rgba(20,17,15,0.08)] sm:rounded-[1.75rem]">
+	 <Image
+	 src={selectedImage}
+	 alt={product.name}
+	 width={1200}
+	 height={1440}
+	 unoptimized
+	 className="h-[min(62svh,460px)] min-h-[280px] w-full object-cover object-center sm:h-[min(72svh,520px)] sm:min-h-[340px] lg:h-[620px]"
+	 />
+	 </div>
 
  {galleryImages.length > 1 ? (
- <div className="flex flex-wrap justify-center gap-3">
+	 <div className="flex flex-nowrap justify-start gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:gap-3">
  {galleryImages.map((image, index) => {
  const isActive = image === selectedImage;
 
@@ -108,7 +108,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  key={`${image}-${index}`}
  type="button"
  onClick={() => selectImage(image)}
- className={`group relative w-[7.25rem] overflow-hidden rounded-2xl border bg-[#f7f1eb] transition-all sm:w-[7.75rem] ${
+	 className={`group relative w-[5.75rem] shrink-0 overflow-hidden rounded-xl border bg-[#f7f1eb] transition-all sm:w-[7.75rem] sm:rounded-2xl ${
  isActive
  ? "border-black shadow-[0_10px_25px_rgba(20,17,15,0.14)] "
  : "border-black/10 hover:border-black/30 "
@@ -122,7 +122,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  width={220}
  height={260}
  unoptimized
- className="h-24 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+	 className="h-20 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-24"
  />
  </button>
  );
@@ -131,8 +131,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  ) : null}
  </div>
 
- <section className="mx-auto flex w-full max-w-[34rem] flex-col items-center space-y-5 text-center">
- <h1 className="max-w-[14ch] font-heading text-5xl leading-none text-[#1f1b18] sm:max-w-[13ch]">
+	 <section className="mx-auto flex w-full max-w-[34rem] flex-col items-center space-y-4 text-center sm:space-y-5">
+	 <h1 className="max-w-[14ch] font-heading text-4xl leading-none text-[#1f1b18] sm:max-w-[13ch] sm:text-5xl">
  {product.name}
  </h1>
  <p className="max-w-[28rem] text-sm text-[#6c655f] sm:text-base">{product.description}</p>

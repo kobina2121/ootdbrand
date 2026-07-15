@@ -62,11 +62,11 @@ export default function AboutPage() {
  <div className="space-y-10 sm:space-y-12">
  <section className="overflow-hidden rounded-3xl border border-black/10 bg-[#f4f3ef] shadow-sm">
  <div className="grid lg:grid-cols-[1fr_0.82fr]">
- <div className="flex min-h-[420px] items-center p-7 sm:p-10 lg:p-14">
+	 <div className="flex min-h-[320px] items-center p-7 sm:min-h-[420px] sm:p-10 lg:p-14">
  <div className="max-w-3xl space-y-6">
  <p className="text-xs uppercase tracking-[0.28em] text-[#6f6860]">About the brand</p>
  <div className="space-y-4">
- <h1 className="font-heading text-[clamp(3.2rem,10vw,7rem)] font-semibold leading-[0.9] text-[#1f1b18]">
+	 <h1 className="font-heading text-5xl font-semibold leading-[0.9] text-[#1f1b18] sm:text-7xl lg:text-[7rem]">
  theootd.brand
  </h1>
  <p className="max-w-2xl text-base leading-relaxed text-[#625b54] sm:text-lg">
@@ -91,7 +91,7 @@ export default function AboutPage() {
  </div>
  </div>
  </div>
- <div className="relative min-h-[420px] overflow-hidden border-t border-black/10 lg:border-l lg:border-t-0">
+	 <div className="relative min-h-[320px] overflow-hidden border-t border-black/10 sm:min-h-[420px] lg:border-l lg:border-t-0">
  <Image
  src={ownerProfile.image}
  alt={`${ownerProfile.name}, ${ownerProfile.title} of theootd.brand`}
@@ -202,7 +202,7 @@ export default function AboutPage() {
  </CardContent>
  </Card>
 
- <section className="relative flex min-h-[520px] overflow-hidden rounded-3xl border border-black/10 text-white shadow-sm">
+	 <section className="relative flex min-h-[360px] overflow-hidden rounded-3xl border border-black/10 text-white shadow-sm sm:min-h-[520px]">
  <Image
  src="/images/about/presence-cta.jpg"
  alt="Woman in a yellow dress from theootd.brand"
