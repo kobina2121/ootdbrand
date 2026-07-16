@@ -4,6 +4,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { OrderModel } from "@/lib/db/models/order";
 import { ProductModel } from "@/lib/db/models/product";
+import { ProductReviewModel } from "@/lib/db/models/product-review";
 import { getProductSlugLookupCandidates, normalizeProductSlug } from "@/lib/product-slug";
 import { type CartItem, type Product } from "@/lib/products";
 
@@ -45,6 +46,11 @@ type VariantSalesStats = {
   orderCount: number;
 };
 
+type ProductReviewStats = {
+  rating: number;
+  reviewCount: number;
+};
+
 type StorefrontVariant = {
   size: string;
   color?: { name?: string; code?: string } | null;
@@ -56,6 +62,10 @@ type StorefrontVariant = {
 
 function normalizeSku(value: string) {
   return value.trim().toUpperCase();
+}
+
+function normalizeReviewSlug(value: string) {
+  return value.trim().toLowerCase();
 }
 
 function getAllVariantSkus<T extends { variants?: Array<{ sku: string }> }>(docs: T[]) {
@@ -92,6 +102,39 @@ async function getSuccessfulVariantSalesBySku(skus: string[]) {
       {
         soldQuantity: row.soldQuantity,
         orderCount: row.orderCount,
+      },
+    ]),
+  );
+}
+
+async function getApprovedReviewStatsBySlug(slugs: string[]) {
+  const normalizedSlugs = Array.from(new Set(slugs.map(normalizeReviewSlug).filter(Boolean)));
+
+  if (normalizedSlugs.length === 0) {
+    return new Map<string, ProductReviewStats>();
+  }
+
+  const rows = await ProductReviewModel.aggregate<{
+    _id: string;
+    rating: number;
+    reviewCount: number;
+  }>([
+    { $match: { isApproved: true, productSlug: { $in: normalizedSlugs } } },
+    {
+      $group: {
+        _id: "$productSlug",
+        rating: { $avg: "$rating" },
+        reviewCount: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return new Map(
+    rows.map((row) => [
+      normalizeReviewSlug(row._id),
+      {
+        rating: row.rating,
+        reviewCount: row.reviewCount,
       },
     ]),
   );
@@ -139,10 +182,13 @@ function getProductInventoryStats<T extends { variants: StorefrontVariant[] }>(
 function toUiProduct(
   doc: Awaited<ReturnType<typeof ProductModel.findOne>>,
   salesBySku: Map<string, VariantSalesStats> = new Map(),
+  reviewStatsBySlug: Map<string, ProductReviewStats> = new Map(),
 ) {
   if (!doc) {
     return null;
   }
+
+  const reviewStats = reviewStatsBySlug.get(normalizeReviewSlug(doc.slug));
 
   return {
     slug: doc.slug,
@@ -153,6 +199,8 @@ function toUiProduct(
     image: doc.images[0] ?? "",
     images: doc.images ?? [],
     variants: doc.variants.map((variant) => mapVariantForStorefront(variant, salesBySku)),
+    rating: reviewStats?.rating ?? 0,
+    reviewCount: reviewStats?.reviewCount ?? 0,
   } satisfies Product;
 }
 
@@ -183,7 +231,10 @@ export async function listProducts(filters: ProductFilters = {}) {
   }
 
   const docs = await ProductModel.find(query).lean();
-  const salesBySku = await getSuccessfulVariantSalesBySku(getAllVariantSkus(docs));
+  const [salesBySku, reviewStatsBySlug] = await Promise.all([
+    getSuccessfulVariantSalesBySku(getAllVariantSkus(docs)),
+    getApprovedReviewStatsBySlug(docs.map((doc) => doc.slug)),
+  ]);
   const mapped = docs.map((doc) => ({
     slug: doc.slug,
     name: doc.name,
@@ -193,6 +244,8 @@ export async function listProducts(filters: ProductFilters = {}) {
     image: doc.images[0] ?? "",
     images: doc.images ?? [],
     variants: doc.variants.map((variant) => mapVariantForStorefront(variant, salesBySku)),
+    rating: reviewStatsBySlug.get(normalizeReviewSlug(doc.slug))?.rating ?? 0,
+    reviewCount: reviewStatsBySlug.get(normalizeReviewSlug(doc.slug))?.reviewCount ?? 0,
   })) satisfies Product[];
 
   return sortProducts(mapped, filters.sort);
@@ -203,9 +256,14 @@ export async function getProductBySlug(slug: string) {
   await connectToDatabase();
 
   const doc = await ProductModel.findOne({ slug: { $in: getProductSlugLookupCandidates(slug) } });
-  const salesBySku = doc ? await getSuccessfulVariantSalesBySku(doc.variants.map((variant) => variant.sku)) : new Map();
+  const [salesBySku, reviewStatsBySlug] = doc
+    ? await Promise.all([
+        getSuccessfulVariantSalesBySku(doc.variants.map((variant) => variant.sku)),
+        getApprovedReviewStatsBySlug([doc.slug]),
+      ])
+    : [new Map<string, VariantSalesStats>(), new Map<string, ProductReviewStats>()];
 
-  return toUiProduct(doc, salesBySku);
+  return toUiProduct(doc, salesBySku, reviewStatsBySlug);
 }
 
 export async function getProductById(id: string) {

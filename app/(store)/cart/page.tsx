@@ -17,8 +17,10 @@ type SuggestedProduct = {
  name: string;
  category: string;
  image: string;
- price: number;
- sizes: string[];
+  price: number;
+  sizes: string[];
+  rating?: number;
+  reviewCount?: number;
 };
 
 export default function CartPage() {

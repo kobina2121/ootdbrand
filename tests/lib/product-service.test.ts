@@ -4,6 +4,7 @@ const mockConnectToDatabase = vi.fn();
 const mockProductLean = vi.fn();
 const mockProductFind = vi.fn(() => ({ lean: mockProductLean }));
 const mockOrderAggregate = vi.fn();
+const mockProductReviewAggregate = vi.fn();
 const mockNoStore = vi.fn();
 
 vi.mock("next/cache", () => ({
@@ -26,6 +27,12 @@ vi.mock("@/lib/db/models/order", () => ({
   },
 }));
 
+vi.mock("@/lib/db/models/product-review", () => ({
+  ProductReviewModel: {
+    aggregate: mockProductReviewAggregate,
+  },
+}));
+
 const productDoc = {
   _id: "product-1",
   name: "Test Dress",
@@ -41,11 +48,20 @@ const productDoc = {
   ],
 };
 
+const storefrontProductDoc = {
+  ...productDoc,
+  slug: "test-dress",
+  category: "MAXI",
+  description: "A beautiful test dress.",
+  images: ["/images/test-dress.jpg"],
+};
+
 describe("resolveOrderItemsFromCart", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockProductLean.mockResolvedValue([productDoc]);
     mockOrderAggregate.mockResolvedValue([]);
+    mockProductReviewAggregate.mockResolvedValue([]);
   });
 
   it("allows checkout when requested quantity fits stock after successful orders", async () => {
@@ -138,5 +154,39 @@ describe("resolveOrderItemsFromCart", () => {
         },
       ]),
     ).rejects.toThrow("Insufficient stock for TEST-DRESS-WINE-L");
+  });
+});
+
+describe("listProducts", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockProductLean.mockResolvedValue([storefrontProductDoc]);
+    mockOrderAggregate.mockResolvedValue([]);
+    mockProductReviewAggregate.mockResolvedValue([{ _id: "test-dress", rating: 4.5, reviewCount: 2 }]);
+  });
+
+  it("includes approved review summary data for storefront cards", async () => {
+    const { listProducts } = await import("@/lib/services/product-service");
+
+    await expect(listProducts({ activeOnly: true })).resolves.toMatchObject([
+      {
+        slug: "test-dress",
+        rating: 4.5,
+        reviewCount: 2,
+      },
+    ]);
+
+    expect(mockProductReviewAggregate).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        { $match: { isApproved: true, productSlug: { $in: ["test-dress"] } } },
+        expect.objectContaining({
+          $group: expect.objectContaining({
+            _id: "$productSlug",
+            rating: { $avg: "$rating" },
+            reviewCount: { $sum: 1 },
+          }),
+        }),
+      ]),
+    );
   });
 });

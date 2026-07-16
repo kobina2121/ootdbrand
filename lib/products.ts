@@ -20,6 +20,8 @@ export type Product = {
   image: string;
   images?: string[];
   variants: ProductVariant[];
+  rating?: number;
+  reviewCount?: number;
 };
 
 export const products: Product[] = [

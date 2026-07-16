@@ -18,6 +18,7 @@ type FeaturedProductSlide = {
  sizes?: string[];
  colors?: string[];
  rating?: number;
+ reviewCount?: number;
  price: string;
  image: string;
 };
@@ -94,9 +95,13 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  onTouchStart={() => setIsPaused(true)}
  onTouchEnd={() => setIsPaused(false)}
  >
- {items.map((product, index) => (
- <div
- key={product.slug}
+	 {items.map((product, index) => {
+	 const reviewCount = product.reviewCount ?? 0;
+	 const rating = product.rating ?? 0;
+
+	 return (
+	 <div
+	 key={product.slug}
  ref={(el) => {
  itemRefs.current[index] = el;
  }}
@@ -146,8 +151,15 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  <p className="text-xs text-[#6b6b6b] ">Colors: {product.colors.join(", ")}</p>
  ) : null}
  </div>
-	 <p className="text-sm tracking-wide text-[#a47531]">{"★★★★★"} {product.rating ? `(${product.rating.toFixed(1)})` : "(5.0)"}</p>
-	 <p className="pt-2 text-center text-2xl font-semibold text-[#111827] ">{product.price}</p>
+		 <div className="space-y-1">
+		 <p className="text-sm tracking-wide text-[#a47531]">
+		 {reviewCount > 0 ? `★★★★★ (${rating.toFixed(1)})` : "No ratings yet"}
+		 </p>
+		 <p className="text-[0.72rem] uppercase tracking-[0.16em] text-[#6b6b6b]">
+		 {reviewCount} review{reviewCount === 1 ? "" : "s"}
+		 </p>
+		 </div>
+		 <p className="pt-2 text-center text-2xl font-semibold text-[#111827] ">{product.price}</p>
  <div className="pt-1 text-center">
  <Link
  href={`/products/${encodeProductSlugForPath(product.slug)}`}
@@ -160,9 +172,10 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  </Link>
  </div>
  </CardContent>
- </Card>
- </div>
- ))}
+	 </Card>
+	 </div>
+	 );
+	 })}
  </div>
  </div>
 

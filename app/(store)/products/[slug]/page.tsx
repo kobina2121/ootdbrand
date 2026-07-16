@@ -50,11 +50,12 @@ export default async function ProductDetailPage({
  slug: entry.slug,
  name: entry.name,
  category: entry.category,
- image: entry.image,
- price: entry.basePrice,
- sizes: [...new Set(entry.variants.map((variant) => variant.size))],
- rating: 5,
- }));
+	 image: entry.image,
+	 price: entry.basePrice,
+	 sizes: [...new Set(entry.variants.map((variant) => variant.size))],
+	 rating: entry.rating,
+	 reviewCount: entry.reviewCount,
+	 }));
 
  return (
  <div className="space-y-6">

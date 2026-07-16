@@ -94,9 +94,11 @@ export default async function HomePage() {
  {
  description: product.description,
  sizes: Array.from(new Set(product.variants.map((variant) => variant.size))),
- colors: Array.from(new Set(product.variants.map((variant) => variant.color))),
- },
- ]),
+	 colors: Array.from(new Set(product.variants.map((variant) => variant.color))),
+	 rating: product.rating,
+	 reviewCount: product.reviewCount,
+	 },
+	 ]),
  );
 
  return (
@@ -236,8 +238,9 @@ export default async function HomePage() {
  description: productDetailsBySlug[product.slug]?.description ?? "",
  sizes: productDetailsBySlug[product.slug]?.sizes ?? [],
  colors: productDetailsBySlug[product.slug]?.colors ?? [],
- rating: 5,
- price: formatPriceNgn(product.basePrice),
+	 rating: productDetailsBySlug[product.slug]?.rating,
+	 reviewCount: productDetailsBySlug[product.slug]?.reviewCount,
+	 price: formatPriceNgn(product.basePrice),
  image: product.image || featuredImageBySlug[product.slug] || "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80",
  }))}
  />

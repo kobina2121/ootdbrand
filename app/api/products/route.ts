@@ -31,6 +31,8 @@ export async function GET(request: Request) {
         image: product.image,
         price: product.basePrice,
         sizes: [...new Set(product.variants.map((variant) => variant.size))],
+        rating: product.rating,
+        reviewCount: product.reviewCount,
       }));
 
     return NextResponse.json(success("Products fetched", { products: filtered }));
@@ -38,4 +40,3 @@ export async function GET(request: Request) {
     return NextResponse.json(failure("Could not fetch products"), { status: 500 });
   }
 }
-

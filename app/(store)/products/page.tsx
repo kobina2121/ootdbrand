@@ -139,12 +139,12 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  name: product.name,
  category: product.category,
  description: product.description,
- image: product.image,
- price: product.basePrice,
- sizes: [...new Set(product.variants.map((variant) => variant.size))],
- rating: 5,
- reviewCount: 0,
- }))}
+	 image: product.image,
+	 price: product.basePrice,
+	 sizes: [...new Set(product.variants.map((variant) => variant.size))],
+	 rating: product.rating,
+	 reviewCount: product.reviewCount,
+	 }))}
  />
  ) : (
  <div className="rounded-2xl border border-dashed border-black/25 bg-white/70 p-10 text-center ">

@@ -32,6 +32,9 @@ export function ProductGrid({ products }: { products: Product[] }) {
 }
 
 function ProductCard({ product }: { product: Product }) {
+ const reviewCount = product.reviewCount ?? 0;
+ const rating = product.rating ?? 0;
+
  return (
  <Card className="group hover-lift flex h-full flex-col overflow-hidden rounded-2xl border-black/10 bg-white/95 shadow-[0_16px_40px_rgba(15,12,10,0.06)] sm:rounded-3xl">
  <CardHeader className="space-y-4 p-3 sm:p-5">
@@ -68,10 +71,16 @@ function ProductCard({ product }: { product: Product }) {
 
  <div className="mt-4 flex flex-col items-center gap-1">
  <p className="text-sm tracking-wide text-[#a47531] ">
- {"★★★★★"} <span className="font-medium">({(product.rating ?? 5).toFixed(1)})</span>
+ {reviewCount > 0 ? (
+ <>
+ {"★★★★★"} <span className="font-medium">({rating.toFixed(1)})</span>
+ </>
+ ) : (
+ <span className="text-[#7c736b]">No ratings yet</span>
+ )}
  </p>
  <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">
- {product.reviewCount ?? 0} reviews
+ {reviewCount} review{reviewCount === 1 ? "" : "s"}
  </p>
  </div>
 
