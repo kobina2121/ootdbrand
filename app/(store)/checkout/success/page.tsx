@@ -4,16 +4,20 @@ import { ClearCartOnSuccess } from "@/components/store/clear-cart-on-success";
 import { PaymentStatusVerifier } from "@/components/store/payment-status-verifier";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
-import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
-import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
+import {
+  isCustomOrderReferenceOwnedByUser,
+  reconcileCustomOrderAfterVerification,
+} from "@/lib/services/custom-order-service";
+import { isOrderReferenceOwnedByUser, reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { recordPaymentEvent } from "@/lib/services/payment-event-service";
 
 type SuccessPageProps = {
  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-type SuccessViewState = "missing-reference" | "pending" | "success" | "failed" | "error";
+type SuccessViewState = "auth-required" | "missing-reference" | "not-found" | "pending" | "success" | "failed" | "error";
 
 export default async function OrderSuccessPage({ searchParams }: SuccessPageProps) {
  const params = await searchParams;
@@ -24,6 +28,21 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
  if (!reference) {
  state = "missing-reference";
  } else {
+ const session = await requireAuthenticatedUser();
+
+ if (!session) {
+ state = "auth-required";
+ } else if (session.user.role !== "admin") {
+ const ownsStoreOrder = await isOrderReferenceOwnedByUser(reference, session.user.id);
+ const ownsCustomOrder = ownsStoreOrder ? false : await isCustomOrderReferenceOwnedByUser(reference, session.user.id);
+
+ if (!ownsStoreOrder && !ownsCustomOrder) {
+ state = "not-found";
+ }
+ }
+ }
+
+ if (state === "pending") {
  try {
  const verification = await verifyPaystackTransaction(reference);
 
@@ -103,6 +122,38 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">We could not verify this payment because no reference was provided.</p>
+ <Link href="/orders">
+ <Button className="rounded-full">View Orders</Button>
+ </Link>
+ </CardContent>
+ </Card>
+ );
+ }
+
+ if (state === "auth-required") {
+ return (
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <CardHeader>
+ <CardTitle className="font-heading text-5xl leading-none ">Sign In Required</CardTitle>
+ </CardHeader>
+ <CardContent className="space-y-4">
+ <p className="text-sm text-muted-foreground">Sign in to verify this payment and view your order.</p>
+ <Link href="/login?next=/checkout/success">
+ <Button className="rounded-full">Sign in</Button>
+ </Link>
+ </CardContent>
+ </Card>
+ );
+ }
+
+ if (state === "not-found") {
+ return (
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <CardHeader>
+ <CardTitle className="font-heading text-5xl leading-none ">Order Not Found</CardTitle>
+ </CardHeader>
+ <CardContent className="space-y-4">
+ <p className="text-sm text-muted-foreground">This payment reference is not connected to your account.</p>
  <Link href="/orders">
  <Button className="rounded-full">View Orders</Button>
  </Link>

@@ -104,6 +104,24 @@ export default function CheckoutPage() {
  );
  }
 
+ if (userRole === null) {
+ return (
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <CardHeader>
+	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Sign in to Checkout</CardTitle>
+ </CardHeader>
+ <CardContent className="space-y-3">
+ <p className="text-sm text-muted-foreground">
+ Sign in before checkout so your cart and order stay connected to your account only.
+ </p>
+ <Button className="rounded-full" onClick={() => window.location.assign("/login?next=/checkout")}>
+ Sign in
+ </Button>
+ </CardContent>
+ </Card>
+ );
+ }
+
  if (items.length === 0) {
  return (
  <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">

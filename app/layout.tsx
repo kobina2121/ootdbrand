@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { socialLinks } from "@/lib/social-links";
+import {
+  canonicalSiteUrl,
+  searchLogoPath,
+  searchLogoUrl,
+  siteDescription,
+  siteName,
+  siteTitle,
+  siteUrl,
+} from "@/lib/site-metadata";
 import "./globals.css";
-
-const siteName = "theootd.brand";
-const siteDescription = "Premium womenswear and custom pieces from theootd.brand.";
-const siteUrl = new URL(process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000");
-const canonicalSiteUrl = new URL("/", siteUrl).toString();
-const searchLogoUrl = new URL("/images/logo/theootd-search-logo.png", siteUrl).toString();
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -23,19 +27,54 @@ export const metadata: Metadata = {
   metadataBase: siteUrl,
   applicationName: siteName,
   title: {
-    default: siteName,
+    default: siteTitle,
     template: `%s | ${siteName}`,
   },
   description: siteDescription,
+  keywords: [
+    "theootd.brand",
+    "theootdbrand",
+    "premium womenswear",
+    "custom womenswear",
+    "made in Ghana fashion",
+    "women clothing boutique",
+  ],
+  creator: siteName,
+  publisher: siteName,
+  alternates: {
+    canonical: "/",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: searchLogoPath, sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
-    title: siteName,
+    title: siteTitle,
     description: siteDescription,
     siteName,
     type: "website",
     url: canonicalSiteUrl,
+    locale: "en_US",
     images: [
       {
-        url: "/images/logo/theootd-search-logo.png",
+        url: searchLogoPath,
         width: 512,
         height: 512,
         alt: `${siteName} logo`,
@@ -43,27 +82,56 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary",
-    title: siteName,
+    card: "summary_large_image",
+    title: siteTitle,
     description: siteDescription,
-    images: ["/images/logo/theootd-search-logo.png"],
+    images: [searchLogoPath],
   },
 };
+
+const sameAs = [socialLinks.instagram, socialLinks.tiktok];
 
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@id": `${canonicalSiteUrl}#website`,
       "@type": "WebSite",
       name: siteName,
       alternateName: "THEOOTD",
       url: canonicalSiteUrl,
+      publisher: {
+        "@id": `${canonicalSiteUrl}#organization`,
+      },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${new URL("/products", siteUrl).toString()}?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
     },
     {
+      "@id": `${canonicalSiteUrl}#organization`,
       "@type": "Organization",
       name: siteName,
+      alternateName: ["THEOOTD", "theootdbrand"],
+      description: siteDescription,
       url: canonicalSiteUrl,
-      logo: searchLogoUrl,
+      logo: {
+        "@type": "ImageObject",
+        url: searchLogoUrl,
+        width: 512,
+        height: 512,
+      },
+      image: searchLogoUrl,
+      sameAs,
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          telephone: "+233536477207",
+          contactType: "customer service",
+          availableLanguage: ["English"],
+        },
+      ],
     },
   ],
 };

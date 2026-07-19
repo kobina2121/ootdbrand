@@ -8,6 +8,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const session = await getServerSession(authOptions);
   const user = session?.user
     ? {
+        id: session.user.id,
         name: session.user.name,
         email: session.user.email,
         role: session.user.role,
@@ -15,7 +16,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
     : null;
 
   return (
-    <CartProvider userRole={user?.role ?? null}>
+    <CartProvider key={user?.id ?? "guest"} userId={user?.id ?? null} userRole={user?.role ?? null}>
       <AppShell user={user}>{children}</AppShell>
     </CartProvider>
   );

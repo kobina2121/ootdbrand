@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -8,6 +9,18 @@ import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { formatPriceNgn } from "@/lib/products";
 import { getOrdersByUserId } from "@/lib/services/order-service";
 import { getCustomOrdersByUserId } from "@/lib/services/custom-order-service";
+
+export const metadata: Metadata = {
+ title: "My Orders",
+ robots: {
+ index: false,
+ follow: false,
+ googleBot: {
+ index: false,
+ follow: false,
+ },
+ },
+};
 
 function paymentStatusBadgeClass(status: string) {
  if (status === "Success") {

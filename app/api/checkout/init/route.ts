@@ -52,20 +52,22 @@ export async function POST(request: Request) {
 
     const { paymentMethod, ...orderPayload } = parsed.data;
     const session = await requireAuthenticatedUser();
+    if (!session) {
+      return NextResponse.json(failure("Please sign in before checkout."), { status: 401 });
+    }
+
     if (session?.user?.role === "admin") {
       return NextResponse.json(failure("Admin accounts cannot place store orders."), { status: 403 });
     }
 
     const order = await createPendingOrder(
       orderPayload,
-      session?.user
-        ? {
-            id: session.user.id,
-            name: session.user.name ?? "Guest",
-            email: session.user.email ?? orderPayload.email,
-            role: session.user.role,
-          }
-        : null,
+      {
+        id: session.user.id,
+        name: session.user.name ?? "Guest",
+        email: session.user.email ?? orderPayload.email,
+        role: session.user.role,
+      },
     );
     createdReference = order.paymentReference;
 

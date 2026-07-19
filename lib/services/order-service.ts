@@ -134,6 +134,22 @@ export async function getOrderByReference(reference: string) {
   };
 }
 
+export async function isOrderReferenceOwnedByUser(reference: string, userId: string) {
+  if (!Types.ObjectId.isValid(userId)) {
+    return false;
+  }
+
+  await connectToDatabase();
+  const order = await OrderModel.findOne({
+    paymentReference: reference,
+    userId: new Types.ObjectId(userId),
+  })
+    .select({ _id: 1 })
+    .lean();
+
+  return Boolean(order?._id);
+}
+
 export async function reconcileOrderAfterVerification(reference: string, verification: VerificationPayload): Promise<ReconcileResult | null> {
   await connectToDatabase();
 

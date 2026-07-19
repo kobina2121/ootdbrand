@@ -1,10 +1,35 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Heart, Ruler, Sparkles, Target } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
+import { absoluteUrl, searchLogoPath, siteName } from "@/lib/site-metadata";
 import { cn } from "@/lib/utils";
+
+export const metadata: Metadata = {
+ title: "About",
+ description:
+ "Learn about theootd.brand, a womenswear brand creating polished ready-to-wear pieces and custom looks with thoughtful fit.",
+ alternates: {
+ canonical: "/about",
+ },
+ openGraph: {
+ title: `About | ${siteName}`,
+ description:
+ "Meet the point of view behind theootd.brand: refined silhouettes, clean finishing, and pieces that feel personal.",
+ url: absoluteUrl("/about"),
+ images: [
+ {
+ url: searchLogoPath,
+ width: 512,
+ height: 512,
+ alt: `${siteName} logo`,
+ },
+ ],
+ },
+};
 
 const milestones = [
  {

@@ -2,9 +2,13 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
-import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
-import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
+import {
+  isCustomOrderReferenceOwnedByUser,
+  reconcileCustomOrderAfterVerification,
+} from "@/lib/services/custom-order-service";
+import { isOrderReferenceOwnedByUser, reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { recordPaymentEvent } from "@/lib/services/payment-event-service";
 
 type FailedPageProps = {
@@ -16,6 +20,45 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  const reference = typeof params.reference === "string" ? params.reference : "";
 
  if (reference) {
+ const session = await requireAuthenticatedUser();
+
+ if (!session) {
+ return (
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <CardHeader>
+ <CardTitle className="font-heading text-5xl leading-none ">Sign In Required</CardTitle>
+ </CardHeader>
+ <CardContent className="space-y-4">
+ <p className="text-sm text-muted-foreground">Sign in to verify this payment and view your order.</p>
+ <Link href="/login?next=/checkout/failed">
+ <Button className="rounded-full">Sign in</Button>
+ </Link>
+ </CardContent>
+ </Card>
+ );
+ }
+
+ if (session.user.role !== "admin") {
+ const ownsStoreOrder = await isOrderReferenceOwnedByUser(reference, session.user.id);
+ const ownsCustomOrder = ownsStoreOrder ? false : await isCustomOrderReferenceOwnedByUser(reference, session.user.id);
+
+ if (!ownsStoreOrder && !ownsCustomOrder) {
+ return (
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <CardHeader>
+ <CardTitle className="font-heading text-5xl leading-none ">Order Not Found</CardTitle>
+ </CardHeader>
+ <CardContent className="space-y-4">
+ <p className="text-sm text-muted-foreground">This payment reference is not connected to your account.</p>
+ <Link href="/orders">
+ <Button className="rounded-full">View Orders</Button>
+ </Link>
+ </CardContent>
+ </Card>
+ );
+ }
+ }
+
  try {
  const verification = await verifyPaystackTransaction(reference);
 

@@ -52,11 +52,20 @@ const validPayload = {
     country: "Ghana",
   },
 };
+const customerSession = {
+  user: {
+    id: "64f1f0000000000000000002",
+    name: "Custom Buyer",
+    email: "custom@example.com",
+    role: "customer" as const,
+  },
+  expires: new Date(Date.now() + 60_000).toISOString(),
+};
 
 describe("POST /api/custom-order/init", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuthenticatedUser.mockResolvedValue(null);
+    mockRequireAuthenticatedUser.mockResolvedValue(customerSession);
     mockFailPendingCustomOrderByReference.mockResolvedValue(null);
   });
 
@@ -98,7 +107,15 @@ describe("POST /api/custom-order/init", () => {
       currency: "GHS",
       authorizationUrl: "https://paystack.example/authorize/custom",
     });
-    expect(mockCreatePendingCustomOrder).toHaveBeenCalledWith(validPayload, null);
+    expect(mockCreatePendingCustomOrder).toHaveBeenCalledWith(
+      validPayload,
+      {
+        id: "64f1f0000000000000000002",
+        name: "Custom Buyer",
+        email: "custom@example.com",
+        role: "customer",
+      },
+    );
   });
 
   it("returns 400 for invalid payload", async () => {
@@ -116,6 +133,27 @@ describe("POST /api/custom-order/init", () => {
       ok: false,
       message: "Invalid custom order payload",
     });
+  });
+
+  it("returns 401 when a guest tries to place a custom order", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue(null);
+
+    const request = new Request("http://localhost:3000/api/custom-order/init", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(validPayload),
+    });
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "Please sign in before placing a custom order.",
+    });
+    expect(mockCreatePendingCustomOrder).not.toHaveBeenCalled();
+    expect(mockInitializePaystackTransaction).not.toHaveBeenCalled();
   });
 
   it("returns 403 when an admin account tries to place a custom order", async () => {

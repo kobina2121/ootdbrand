@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
+import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
 import { checkRateLimit } from "@/lib/security/guards";
-import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
-import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
+import {
+  isCustomOrderReferenceOwnedByUser,
+  reconcileCustomOrderAfterVerification,
+} from "@/lib/services/custom-order-service";
+import { isOrderReferenceOwnedByUser, reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { recordPaymentEvent } from "@/lib/services/payment-event-service";
 
 const verifyPayloadSchema = z.object({
@@ -31,6 +35,21 @@ export async function POST(request: Request) {
 
     if (!parsed.success) {
       return NextResponse.json(failure("Invalid verification payload"), { status: 400 });
+    }
+
+    const session = await requireAuthenticatedUser();
+    if (!session) {
+      return NextResponse.json(failure("Please sign in before verifying payment."), { status: 401 });
+    }
+
+    if (session.user.role !== "admin") {
+      const ownsStoreOrder = await isOrderReferenceOwnedByUser(parsed.data.reference, session.user.id);
+      const ownsCustomOrder =
+        ownsStoreOrder ? false : await isCustomOrderReferenceOwnedByUser(parsed.data.reference, session.user.id);
+
+      if (!ownsStoreOrder && !ownsCustomOrder) {
+        return NextResponse.json(failure("Order not found for this payment reference"), { status: 404 });
+      }
     }
 
     const verification = await verifyPaystackTransaction(parsed.data.reference);

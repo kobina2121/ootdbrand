@@ -55,20 +55,22 @@ export async function POST(request: Request) {
 
     const { paymentMethod, ...customOrderPayload } = parsed.data;
     const session = await requireAuthenticatedUser();
+    if (!session) {
+      return NextResponse.json(failure("Please sign in before placing a custom order."), { status: 401 });
+    }
+
     if (session?.user?.role === "admin") {
       return NextResponse.json(failure("Admin accounts cannot place custom orders."), { status: 403 });
     }
 
     const customOrder = await createPendingCustomOrder(
       customOrderPayload,
-      session?.user
-        ? {
-            id: session.user.id,
-            name: session.user.name ?? "Customer",
-            email: session.user.email ?? customOrderPayload.email,
-            role: session.user.role,
-          }
-        : null,
+      {
+        id: session.user.id,
+        name: session.user.name ?? "Customer",
+        email: session.user.email ?? customOrderPayload.email,
+        role: session.user.role,
+      },
     );
     createdReference = customOrder.paymentReference;
 

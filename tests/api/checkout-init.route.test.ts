@@ -43,15 +43,24 @@ const validCheckoutPayload = {
     },
   ],
 };
+const customerSession = {
+  user: {
+    id: "64f1f0000000000000000001",
+    name: "Test Buyer",
+    email: "buyer@example.com",
+    role: "customer" as const,
+  },
+  expires: new Date(Date.now() + 60_000).toISOString(),
+};
 
 describe("POST /api/checkout/init", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRequireAuthenticatedUser.mockResolvedValue(customerSession);
     mockFailPendingOrderByReference.mockResolvedValue(null);
   });
 
   it("initializes checkout and returns Paystack authorization url", async () => {
-    mockRequireAuthenticatedUser.mockResolvedValue(null);
     mockCreatePendingOrder.mockResolvedValue({
       id: "order_123",
       paymentReference: "PSK-ABC12345",
@@ -92,7 +101,15 @@ describe("POST /api/checkout/init", () => {
       currency: "GHS",
       authorizationUrl: "https://paystack.example/authorize/abc",
     });
-    expect(mockCreatePendingOrder).toHaveBeenCalledWith(validCheckoutPayload, null);
+    expect(mockCreatePendingOrder).toHaveBeenCalledWith(
+      validCheckoutPayload,
+      {
+        id: "64f1f0000000000000000001",
+        name: "Test Buyer",
+        email: "buyer@example.com",
+        role: "customer",
+      },
+    );
     expect(mockInitializePaystackTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
         email: "buyer@example.com",
@@ -116,6 +133,27 @@ describe("POST /api/checkout/init", () => {
     expect(body).toMatchObject({
       ok: false,
       message: "Invalid checkout payload",
+    });
+    expect(mockCreatePendingOrder).not.toHaveBeenCalled();
+    expect(mockInitializePaystackTransaction).not.toHaveBeenCalled();
+  });
+
+  it("returns 401 when a guest tries to checkout", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue(null);
+
+    const request = new Request("http://localhost:3000/api/checkout/init", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(validCheckoutPayload),
+    });
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "Please sign in before checkout.",
     });
     expect(mockCreatePendingOrder).not.toHaveBeenCalled();
     expect(mockInitializePaystackTransaction).not.toHaveBeenCalled();
@@ -151,7 +189,6 @@ describe("POST /api/checkout/init", () => {
   });
 
   it("returns 400 when the coupon code is invalid", async () => {
-    mockRequireAuthenticatedUser.mockResolvedValue(null);
     mockCreatePendingOrder.mockRejectedValue(new Error("Coupon code is invalid or inactive."));
 
     const request = new Request("http://localhost:3000/api/checkout/init", {
@@ -172,7 +209,6 @@ describe("POST /api/checkout/init", () => {
   });
 
   it("returns 504 when Paystack initialization times out", async () => {
-    mockRequireAuthenticatedUser.mockResolvedValue(null);
     mockCreatePendingOrder.mockResolvedValue({
       id: "order_456",
       paymentReference: "PSK-TIMEOUT1",
@@ -205,7 +241,6 @@ describe("POST /api/checkout/init", () => {
   });
 
   it("marks pending order failed when Paystack initialization returns status=false", async () => {
-    mockRequireAuthenticatedUser.mockResolvedValue(null);
     mockCreatePendingOrder.mockResolvedValue({
       id: "order_987",
       paymentReference: "PSK-FAILED00",

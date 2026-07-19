@@ -94,6 +94,37 @@ describe("resolveOrderItemsFromCart", () => {
         },
       },
     ]);
+    expect(mockOrderAggregate).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        { $match: { status: "Success", "items.variant.sku": { $in: ["TEST-DRESS-WINE-M"] } } },
+      ]),
+    );
+  });
+
+  it("does not reduce checkout stock for pending unpaid orders", async () => {
+    mockOrderAggregate.mockResolvedValue([]);
+    const { resolveOrderItemsFromCart } = await import("@/lib/services/product-service");
+
+    await expect(
+      resolveOrderItemsFromCart([
+        {
+          slug: "test-dress",
+          name: "Test Dress",
+          image: "/images/test.jpg",
+          size: "M",
+          color: "Wine",
+          sku: "TEST-DRESS-WINE-M",
+          quantity: 8,
+          unitPrice: 350,
+        },
+      ]),
+    ).resolves.toHaveLength(1);
+
+    expect(mockOrderAggregate).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        { $match: { status: "Success", "items.variant.sku": { $in: ["TEST-DRESS-WINE-M"] } } },
+      ]),
+    );
   });
 
   it("rejects checkout when successful orders have consumed available stock", async () => {
@@ -186,6 +217,30 @@ describe("listProducts", () => {
             reviewCount: { $sum: 1 },
           }),
         }),
+      ]),
+    );
+  });
+
+  it("shows available stock without subtracting pending unpaid orders", async () => {
+    const { listProducts } = await import("@/lib/services/product-service");
+
+    await expect(listProducts({ activeOnly: true })).resolves.toMatchObject([
+      {
+        slug: "test-dress",
+        variants: [
+          {
+            sku: "TEST-DRESS-WINE-M",
+            stock: 8,
+            stockOnHand: 8,
+            soldQuantity: 0,
+          },
+        ],
+      },
+    ]);
+
+    expect(mockOrderAggregate).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        { $match: { status: "Success", "items.variant.sku": { $in: ["TEST-DRESS-WINE-M"] } } },
       ]),
     );
   });

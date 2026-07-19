@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ProductGrid } from "@/components/store/product-grid";
@@ -5,6 +6,30 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { listProducts } from "@/lib/services/product-service";
+import { absoluteUrl, searchLogoPath, siteName } from "@/lib/site-metadata";
+
+export const metadata: Metadata = {
+ title: "Shop Premium Womenswear",
+ description:
+ "Shop ready-to-wear dresses, tops, sets, and custom-inspired womenswear from theootd.brand.",
+ alternates: {
+ canonical: "/products",
+ },
+ openGraph: {
+ title: `Shop Premium Womenswear | ${siteName}`,
+ description:
+ "Discover ready-to-wear dresses, tops, sets, and custom-inspired womenswear from theootd.brand.",
+ url: absoluteUrl("/products"),
+ images: [
+ {
+ url: searchLogoPath,
+ width: 512,
+ height: 512,
+ alt: `${siteName} logo`,
+ },
+ ],
+ },
+};
 
 type PageProps = {
  searchParams: Promise<Record<string, string | string[] | undefined>>;

@@ -245,6 +245,22 @@ export async function failPendingCustomOrderByReference(reference: string, reaso
   };
 }
 
+export async function isCustomOrderReferenceOwnedByUser(reference: string, userId: string) {
+  if (!Types.ObjectId.isValid(userId)) {
+    return false;
+  }
+
+  await connectToDatabase();
+  const customOrder = await CustomOrderModel.findOne({
+    paymentReference: reference,
+    userId: new Types.ObjectId(userId),
+  })
+    .select({ _id: 1 })
+    .lean();
+
+  return Boolean(customOrder?._id);
+}
+
 export async function listCustomOrders(filters: { status?: "Pending" | "Success" | "Failed"; limit?: number } = {}) {
   try {
     await connectToDatabase();

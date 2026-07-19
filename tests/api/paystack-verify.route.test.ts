@@ -1,19 +1,29 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
-import { reconcileCustomOrderAfterVerification } from "@/lib/services/custom-order-service";
-import { reconcileOrderAfterVerification } from "@/lib/services/order-service";
+import {
+  isCustomOrderReferenceOwnedByUser,
+  reconcileCustomOrderAfterVerification,
+} from "@/lib/services/custom-order-service";
+import { isOrderReferenceOwnedByUser, reconcileOrderAfterVerification } from "@/lib/services/order-service";
 import { recordPaymentEvent } from "@/lib/services/payment-event-service";
+
+vi.mock("@/lib/auth/guards", () => ({
+  requireAuthenticatedUser: vi.fn(),
+}));
 
 vi.mock("@/lib/paystack/client", () => ({
   verifyPaystackTransaction: vi.fn(),
 }));
 
 vi.mock("@/lib/services/order-service", () => ({
+  isOrderReferenceOwnedByUser: vi.fn(),
   reconcileOrderAfterVerification: vi.fn(),
 }));
 
 vi.mock("@/lib/services/custom-order-service", () => ({
+  isCustomOrderReferenceOwnedByUser: vi.fn(),
   reconcileCustomOrderAfterVerification: vi.fn(),
 }));
 
@@ -23,10 +33,22 @@ vi.mock("@/lib/services/payment-event-service", () => ({
 
 import { POST } from "@/app/api/paystack/verify/route";
 
+const mockRequireAuthenticatedUser = vi.mocked(requireAuthenticatedUser);
 const mockVerifyPaystackTransaction = vi.mocked(verifyPaystackTransaction);
+const mockIsOrderReferenceOwnedByUser = vi.mocked(isOrderReferenceOwnedByUser);
 const mockReconcileOrderAfterVerification = vi.mocked(reconcileOrderAfterVerification);
+const mockIsCustomOrderReferenceOwnedByUser = vi.mocked(isCustomOrderReferenceOwnedByUser);
 const mockReconcileCustomOrderAfterVerification = vi.mocked(reconcileCustomOrderAfterVerification);
 const mockRecordPaymentEvent = vi.mocked(recordPaymentEvent);
+const customerSession = {
+  user: {
+    id: "64f1f0000000000000000003",
+    name: "Order Owner",
+    email: "owner@example.com",
+    role: "customer" as const,
+  },
+  expires: new Date(Date.now() + 60_000).toISOString(),
+};
 
 function buildRequest(reference: string) {
   return new Request("http://localhost:3000/api/paystack/verify", {
@@ -39,6 +61,9 @@ function buildRequest(reference: string) {
 describe("POST /api/paystack/verify", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRequireAuthenticatedUser.mockResolvedValue(customerSession);
+    mockIsOrderReferenceOwnedByUser.mockResolvedValue(true);
+    mockIsCustomOrderReferenceOwnedByUser.mockResolvedValue(false);
     mockReconcileCustomOrderAfterVerification.mockResolvedValue(null);
   });
 
@@ -79,6 +104,8 @@ describe("POST /api/paystack/verify", () => {
   });
 
   it("falls back to custom order reconciliation when store order is not found", async () => {
+    mockIsOrderReferenceOwnedByUser.mockResolvedValue(false);
+    mockIsCustomOrderReferenceOwnedByUser.mockResolvedValue(true);
     mockVerifyPaystackTransaction.mockResolvedValue({
       status: true,
       message: "Verification successful",
@@ -115,6 +142,15 @@ describe("POST /api/paystack/verify", () => {
   });
 
   it("returns 404 when no store or custom order is found for reference", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue({
+      user: {
+        id: "admin_1",
+        name: "Admin",
+        email: "admin@theootd.brand",
+        role: "admin",
+      },
+      expires: new Date(Date.now() + 60_000).toISOString(),
+    });
     mockVerifyPaystackTransaction.mockResolvedValue({
       status: true,
       message: "Verification successful",
@@ -138,5 +174,34 @@ describe("POST /api/paystack/verify", () => {
       message: "Order not found for this payment reference",
     });
     expect(mockRecordPaymentEvent).toHaveBeenCalled();
+  });
+
+  it("returns 401 when a guest tries to verify a payment", async () => {
+    mockRequireAuthenticatedUser.mockResolvedValue(null);
+
+    const response = await POST(buildRequest("PSK-STORE-001"));
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "Please sign in before verifying payment.",
+    });
+    expect(mockVerifyPaystackTransaction).not.toHaveBeenCalled();
+  });
+
+  it("returns 404 when a customer tries to verify another user's reference", async () => {
+    mockIsOrderReferenceOwnedByUser.mockResolvedValue(false);
+    mockIsCustomOrderReferenceOwnedByUser.mockResolvedValue(false);
+
+    const response = await POST(buildRequest("PSK-OTHER-001"));
+    const body = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(body).toMatchObject({
+      ok: false,
+      message: "Order not found for this payment reference",
+    });
+    expect(mockVerifyPaystackTransaction).not.toHaveBeenCalled();
   });
 });

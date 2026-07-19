@@ -46,7 +46,8 @@ type CartContextValue = {
   syncCart: () => Promise<void>;
 };
 
-const CART_STORAGE_KEY = "threadline.cart.v1";
+const LEGACY_CART_STORAGE_KEY = "threadline.cart.v1";
+const CART_STORAGE_KEY_PREFIX = "threadline.cart.v2";
 
 const CartContext = createContext<CartContextValue | null>(null);
 
@@ -59,7 +60,11 @@ function createEmptyDiscount(requestedCode?: string | null): CartDiscountState {
   };
 }
 
-function readStoredCartState(): Pick<CartState, "items" | "discountCode"> {
+export function getCartStorageKey(userId?: string | null) {
+  return `${CART_STORAGE_KEY_PREFIX}.${userId ? `user.${userId}` : "guest"}`;
+}
+
+function readStoredCartState(storageKey: string): Pick<CartState, "items" | "discountCode"> {
   if (typeof window === "undefined") {
     return {
       items: [],
@@ -67,7 +72,7 @@ function readStoredCartState(): Pick<CartState, "items" | "discountCode"> {
     };
   }
 
-  const stored = localStorage.getItem(CART_STORAGE_KEY);
+  const stored = localStorage.getItem(storageKey) ?? (!storageKey.endsWith(".guest") ? null : localStorage.getItem(LEGACY_CART_STORAGE_KEY));
   if (!stored) {
     return {
       items: [],
@@ -90,7 +95,7 @@ function readStoredCartState(): Pick<CartState, "items" | "discountCode"> {
       discountCode: typeof parsed.discountCode === "string" ? parsed.discountCode : "",
     };
   } catch {
-    localStorage.removeItem(CART_STORAGE_KEY);
+    localStorage.removeItem(storageKey);
     return {
       items: [],
       discountCode: "",
@@ -98,8 +103,8 @@ function readStoredCartState(): Pick<CartState, "items" | "discountCode"> {
   }
 }
 
-function createInitialCartState(): CartState {
-  const stored = readStoredCartState();
+function createInitialCartState(storageKey: string): CartState {
+  const stored = readStoredCartState(storageKey);
 
   return {
     items: stored.items,
@@ -151,27 +156,80 @@ async function syncCartPayload(items: CartItem[], discountCode?: string) {
   }
 }
 
+function getUnavailableVariantSku(message: string) {
+  const match = message.match(/^Variant not found:\s*(.+)$/i);
+  return match?.[1]?.trim() || null;
+}
+
+async function syncCartPayloadWithRecovery(items: CartItem[], discountCode?: string) {
+  const result = await syncCartPayload(items, discountCode);
+
+  if (result.ok) {
+    return {
+      ...result,
+      items,
+      removedSku: null,
+    };
+  }
+
+  const unavailableSku = getUnavailableVariantSku(result.message);
+  if (!unavailableSku) {
+    return {
+      ...result,
+      items,
+      removedSku: null,
+    };
+  }
+
+  const prunedItems = items.filter((item) => item.sku !== unavailableSku);
+  if (prunedItems.length === items.length) {
+    return {
+      ...result,
+      items,
+      removedSku: null,
+    };
+  }
+
+  const retryResult = await syncCartPayload(prunedItems, discountCode);
+  if (!retryResult.ok) {
+    return {
+      ...retryResult,
+      items: prunedItems,
+      removedSku: unavailableSku,
+    };
+  }
+
+  return {
+    ...retryResult,
+    items: prunedItems,
+    removedSku: unavailableSku,
+  };
+}
+
 export function CartProvider({
   children,
+  userId = null,
   userRole = null,
 }: {
   children: React.ReactNode;
+  userId?: string | null;
   userRole?: "customer" | "admin" | null;
 }) {
-  const [cartState, setCartState] = useState<CartState>(createInitialCartState);
+  const storageKey = useMemo(() => getCartStorageKey(userId), [userId]);
+  const [cartState, setCartState] = useState<CartState>(() => createInitialCartState(storageKey));
 
   useEffect(() => {
     localStorage.setItem(
-      CART_STORAGE_KEY,
+      storageKey,
       JSON.stringify({
         items: cartState.items,
         discountCode: cartState.discountCode || undefined,
       }),
     );
-  }, [cartState.discountCode, cartState.items]);
+  }, [cartState.discountCode, cartState.items, storageKey]);
 
   const syncCart = useCallback(async () => {
-    const result = await syncCartPayload(cartState.items, cartState.discountCode || undefined);
+    const result = await syncCartPayloadWithRecovery(cartState.items, cartState.discountCode || undefined);
 
     if (!result.ok) {
       throw new Error(result.message);
@@ -179,6 +237,7 @@ export function CartProvider({
 
     setCartState((prev) => ({
       ...prev,
+      items: result.items,
       discountCode: result.discount.requestedCode ?? "",
       pricing: {
         totals: result.totals,
@@ -220,7 +279,7 @@ export function CartProvider({
       };
     });
 
-    const result = await syncCartPayload(nextItems, nextDiscountCode || undefined);
+    const result = await syncCartPayloadWithRecovery(nextItems, nextDiscountCode || undefined);
 
     if (!result.ok) {
       if (previousState) {
@@ -229,8 +288,20 @@ export function CartProvider({
       throw new Error(result.message);
     }
 
+    if (result.removedSku === payload.sku) {
+      setCartState({
+        items: result.items,
+        discountCode: result.discount.requestedCode ?? "",
+        pricing: {
+          totals: result.totals,
+          discount: result.discount,
+        },
+      });
+      throw new Error("This product option is no longer available.");
+    }
+
     setCartState({
-      items: nextItems,
+      items: result.items,
       discountCode: result.discount.requestedCode ?? "",
       pricing: {
         totals: result.totals,
@@ -255,7 +326,7 @@ export function CartProvider({
       };
     });
 
-    const result = await syncCartPayload(nextItems, nextDiscountCode || undefined);
+    const result = await syncCartPayloadWithRecovery(nextItems, nextDiscountCode || undefined);
 
     if (!result.ok) {
       if (previousState) {
@@ -265,7 +336,7 @@ export function CartProvider({
     }
 
     setCartState({
-      items: nextItems,
+      items: result.items,
       discountCode: result.discount.requestedCode ?? "",
       pricing: {
         totals: result.totals,
@@ -289,7 +360,7 @@ export function CartProvider({
       };
     });
 
-    const result = await syncCartPayload(nextItems, nextDiscountCode || undefined);
+    const result = await syncCartPayloadWithRecovery(nextItems, nextDiscountCode || undefined);
 
     if (!result.ok) {
       if (previousState) {
@@ -299,7 +370,7 @@ export function CartProvider({
     }
 
     setCartState({
-      items: nextItems,
+      items: result.items,
       discountCode: result.discount.requestedCode ?? "",
       pricing: {
         totals: result.totals,
@@ -345,18 +416,18 @@ export function CartProvider({
       });
 
       const items = previousState.items;
-      const result = await syncCartPayload(items, nextDiscountCode || undefined);
+    const result = await syncCartPayloadWithRecovery(items, nextDiscountCode || undefined);
 
-      if (!result.ok) {
-        setCartState(previousState);
+    if (!result.ok) {
+      setCartState(previousState);
         throw new Error(result.message);
       }
 
-      setCartState({
-        items,
-        discountCode: result.discount.requestedCode ?? "",
-        pricing: {
-          totals: result.totals,
+    setCartState({
+      items: result.items,
+      discountCode: result.discount.requestedCode ?? "",
+      pricing: {
+        totals: result.totals,
           discount: result.discount,
         },
       });
@@ -373,7 +444,7 @@ export function CartProvider({
     });
 
     const items = previousState.items;
-    const result = await syncCartPayload(items);
+    const result = await syncCartPayloadWithRecovery(items);
 
     if (!result.ok) {
       setCartState(previousState);
@@ -381,7 +452,7 @@ export function CartProvider({
     }
 
     setCartState({
-      items,
+      items: result.items,
       discountCode: "",
       pricing: {
         totals: result.totals,

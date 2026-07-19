@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -8,15 +9,67 @@ import { ProductReviews } from "@/components/store/product-reviews";
 import { getCurrentSession } from "@/lib/auth/guards";
 import { hasSuccessfulPurchaseForProduct } from "@/lib/services/order-service";
 import { listReviewsByProductSlug } from "@/lib/services/review-service";
+import { encodeProductSlugForPath } from "@/lib/product-slug";
 import { buttonVariants } from "@/components/ui/button";
 import { getProductBySlug, listProducts } from "@/lib/services/product-service";
+import { absoluteUrl, searchLogoPath, siteName } from "@/lib/site-metadata";
 import { cn } from "@/lib/utils";
+
+type ProductDetailPageProps = {
+ params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
+ const { slug } = await params;
+ const product = await getProductBySlug(slug);
+
+ if (!product) {
+ return {
+ title: "Product Not Found",
+ robots: {
+ index: false,
+ follow: false,
+ },
+ };
+ }
+
+ const productPath = `/products/${encodeProductSlugForPath(product.slug)}`;
+ const title = product.name;
+ const description =
+ product.description ||
+ `Shop ${product.name}, a premium ${product.category.toLowerCase()} from ${siteName}.`;
+ const image = product.image || searchLogoPath;
+
+ return {
+ title,
+ description,
+ alternates: {
+ canonical: productPath,
+ },
+ openGraph: {
+ title: `${product.name} | ${siteName}`,
+ description,
+ type: "website",
+ url: absoluteUrl(productPath),
+ images: [
+ {
+ url: image,
+ alt: product.name,
+ },
+ ],
+ },
+ twitter: {
+ card: "summary_large_image",
+ title,
+ description,
+ images: [image],
+ },
+ };
+}
 
 export default async function ProductDetailPage({
  params,
-}: {
- params: Promise<{ slug: string }>;
-}) {
+}: ProductDetailPageProps) {
  const { slug } = await params;
  const [product, allProducts, session, productReviews] = await Promise.all([
  getProductBySlug(slug),
