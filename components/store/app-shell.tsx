@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -280,9 +281,22 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
  </div>
 
- <div className="mt-10 flex flex-col gap-2 border-t border-black/10 pt-6 text-sm text-[#5f5954] sm:flex-row sm:items-center sm:justify-between">
+ <div className="mt-10 grid gap-2 border-t border-black/10 pt-6 text-center text-sm text-[#5f5954] sm:grid-cols-3 sm:items-center sm:text-left">
               <p>© <span suppressHydrationWarning>{new Date().getFullYear()}</span> theootd.brand. All rights reserved.</p>
- <p>Designed in Ghana. Built for comfort.</p>
+ <div className="space-y-1 sm:text-center">
+ <p>Made by Kobina.</p>
+ <p>
+ Product of Loo<span className="text-[#ff4028]">prompt.</span>
+ </p>
+ <Image
+ src="/images/logo/looprompt-icon.png"
+ alt="Looprompt"
+ width={24}
+ height={24}
+ className="mx-auto"
+ />
+ </div>
+ <p className="sm:text-right">Designed in Ghana. Built for comfort.</p>
  </div>
  </div>
  </footer>
