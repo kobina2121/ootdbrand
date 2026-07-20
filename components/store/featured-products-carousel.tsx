@@ -126,9 +126,6 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  {product.category}
  </Link>
 	 <h3 className="font-heading text-[1.35rem] leading-tight text-[#1f2937] sm:text-[1.7rem]">{product.name}</h3>
-	 {product.description ? (
-	 <p className="min-h-0 text-xs leading-relaxed text-[#6b7280] sm:min-h-[3rem] sm:text-sm">{product.description}</p>
-	 ) : null}
 	 <div className="space-y-2 text-sm text-[#5f6368] ">
  {product.sizes && product.sizes.length > 0 ? (
  <div className="space-y-1">
