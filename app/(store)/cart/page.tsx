@@ -23,6 +23,16 @@ type SuggestedProduct = {
     name: string;
     code?: string;
   }>;
+  variants?: Array<{
+    name?: string;
+    size: string;
+    color: string;
+    colorCode?: string;
+    image?: string;
+    sku: string;
+    stock: number;
+    priceOverride?: number;
+  }>;
   rating?: number;
   reviewCount?: number;
 };

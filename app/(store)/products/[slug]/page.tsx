@@ -114,6 +114,16 @@ export default async function ProductDetailPage({
 	 ]),
 	 ).values(),
 	 ),
+	 variants: entry.variants.map((variant) => ({
+	 name: variant.name,
+	 size: variant.size,
+	 color: variant.color,
+	 colorCode: variant.colorCode,
+	 image: variant.image,
+	 sku: variant.sku,
+	 stock: variant.stock,
+	 priceOverride: variant.priceOverride,
+	 })),
 	 rating: entry.rating,
 	 reviewCount: entry.reviewCount,
 	 }));

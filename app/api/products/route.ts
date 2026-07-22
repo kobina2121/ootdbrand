@@ -39,6 +39,16 @@ export async function GET(request: Request) {
             ]),
           ).values(),
         ),
+        variants: product.variants.map((variant) => ({
+          name: variant.name,
+          size: variant.size,
+          color: variant.color,
+          colorCode: variant.colorCode,
+          image: variant.image,
+          sku: variant.sku,
+          stock: variant.stock,
+          priceOverride: variant.priceOverride,
+        })),
         rating: product.rating,
         reviewCount: product.reviewCount,
       }));
