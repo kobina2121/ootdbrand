@@ -16,6 +16,10 @@ type Product = {
  image: string;
  price: number;
  sizes: string[];
+ colors?: Array<{
+ name: string;
+ code?: string;
+ }>;
  description?: string;
  rating?: number;
  reviewCount?: number;
@@ -83,6 +87,26 @@ function ProductCard({ product }: { product: Product }) {
  <p className="text-2xl font-semibold tracking-tight text-[#1f1b18] sm:text-3xl">
  {formatPriceNgn(product.price)}
  </p>
+ {product.colors && product.colors.length > 0 ? (
+ <div className="space-y-2">
+ <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">Available colors</p>
+ <div className="flex flex-wrap items-center justify-center gap-2">
+ {product.colors.map((color) => (
+ <span
+ key={`${product.slug}-${color.name}-${color.code ?? "color"}`}
+ title={color.name}
+ aria-label={color.name}
+ className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/20 bg-white p-1"
+ >
+ <span
+ className="block h-full w-full rounded-full border border-black/10"
+ style={{ backgroundColor: color.code ?? "#D1D5DB" }}
+ />
+ </span>
+ ))}
+ </div>
+ </div>
+ ) : null}
  <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">Available sizes</p>
  {product.sizes.length > 0 ? (
  <div className="flex flex-wrap items-center justify-center gap-2">

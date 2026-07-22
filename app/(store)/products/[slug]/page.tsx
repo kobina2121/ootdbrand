@@ -106,6 +106,14 @@ export default async function ProductDetailPage({
 	 image: entry.image,
 	 price: entry.basePrice,
 	 sizes: [...new Set(entry.variants.map((variant) => variant.size))],
+	 colors: Array.from(
+	 new Map(
+	 entry.variants.map((variant) => [
+	 variant.color,
+	 { name: variant.color, code: variant.colorCode },
+	 ]),
+	 ).values(),
+	 ),
 	 rating: entry.rating,
 	 reviewCount: entry.reviewCount,
 	 }));

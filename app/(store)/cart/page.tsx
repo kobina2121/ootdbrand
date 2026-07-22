@@ -19,6 +19,10 @@ type SuggestedProduct = {
  image: string;
   price: number;
   sizes: string[];
+  colors?: Array<{
+    name: string;
+    code?: string;
+  }>;
   rating?: number;
   reviewCount?: number;
 };
