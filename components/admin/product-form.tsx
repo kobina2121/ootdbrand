@@ -27,6 +27,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
+const nonnegativeIntegerField = (message: string) =>
+ z.preprocess(
+ (value) => {
+ if (value === "") {
+ return undefined;
+ }
+
+ if (typeof value === "string") {
+ return Number(value);
+ }
+
+ return value;
+ },
+ z.number().int().nonnegative(message),
+ );
+
 const variantSchema = z.object({
  size: z.string().min(1, "Select a size"),
  colorName: z.string().min(1, "Color name is required"),
@@ -38,7 +54,7 @@ const variantSchema = z.object({
  .refine((value) => value === "" || value.startsWith("/") || /^https?:\/\//.test(value), "Image path is invalid")
  .optional(),
  sku: z.string().min(2, "SKU is required"),
- stock: z.number().int().nonnegative("Stock cannot be negative"),
+ stock: nonnegativeIntegerField("Stock cannot be negative"),
 });
 
 const productEditorSchema = z.object({
@@ -47,7 +63,7 @@ const productEditorSchema = z.object({
  description: z.string().min(10, "Description must be at least 10 characters"),
  category: z.string().min(2, "Category is required"),
  tags: z.string().optional(),
- basePrice: z.number().int().nonnegative("Fixed price must be positive"),
+ basePrice: nonnegativeIntegerField("Fixed price must be positive"),
  images: z
  .array(
  z
@@ -61,12 +77,13 @@ const productEditorSchema = z.object({
  variants: z.array(variantSchema).min(1, "Add at least one variant"),
 });
 
-type ProductEditorValues = z.infer<typeof productEditorSchema>;
+type ProductEditorInputValues = z.input<typeof productEditorSchema>;
+type ProductEditorValues = z.output<typeof productEditorSchema>;
 
 type ProductFormProps = {
  mode: "create" | "edit";
  productId?: string;
- initialValues?: ProductEditorValues;
+ initialValues?: ProductEditorInputValues;
 };
 
 const productCategories = ["TOPS", "MAXI", "MIDI", "MINI"] as const;
@@ -86,7 +103,44 @@ const productImageMimeTypes = new Set(["image/jpeg", "image/png", "image/webp", 
 const productImageTypeMessage = "Use a JPEG, PNG, WebP, or AVIF image for product photos.";
 const productImageSizeMessage = "Product images must be 10MB or smaller.";
 
-function getInitialProductColorOptions(initialValues?: ProductEditorValues) {
+function AdminNumericInput({
+ value,
+ onChange,
+ onBlur,
+ placeholder,
+}: {
+ value: unknown;
+ onChange: (value: number | "") => void;
+ onBlur: () => void;
+ placeholder: string;
+}) {
+ const [draftValue, setDraftValue] = useState(value === undefined ? "" : String(value));
+
+ return (
+ <Input
+ type="text"
+ inputMode="numeric"
+ pattern="[0-9]*"
+ placeholder={placeholder}
+ className={numericFieldClassName}
+ value={draftValue}
+ onChange={(event) => {
+ const nextValue = event.target.value;
+
+ if (!/^\d*$/.test(nextValue)) {
+ return;
+ }
+
+ setDraftValue(nextValue);
+ onChange(nextValue === "" ? "" : Number(nextValue));
+ }}
+ onFocus={(event) => event.currentTarget.select()}
+ onBlur={onBlur}
+ />
+ );
+}
+
+function getInitialProductColorOptions(initialValues?: ProductEditorInputValues) {
  const seededVariants = initialValues?.variants ?? [];
 
  return seededVariants
@@ -103,7 +157,7 @@ function getInitialProductColorOptions(initialValues?: ProductEditorValues) {
  );
 }
 
-const defaultValues: DefaultValues<ProductEditorValues> = {
+const defaultValues: DefaultValues<ProductEditorInputValues> = {
  name: "",
  slug: "",
  description: "",
@@ -127,13 +181,12 @@ const defaultValues: DefaultValues<ProductEditorValues> = {
 export function ProductForm({ mode, productId, initialValues }: ProductFormProps) {
  const router = useRouter();
  const [isUploadingImage, setIsUploadingImage] = useState(false);
- const [numberInputDrafts, setNumberInputDrafts] = useState<Record<string, string>>({});
  const [bulkSelectedSizes, setBulkSelectedSizes] = useState<string[]>([]);
  const [bulkSelectedColorCodes, setBulkSelectedColorCodes] = useState<string[]>([]);
  const [colorSearch, setColorSearch] = useState("");
  const [initialProductColorOptions] = useState<ColorOption[]>(() => getInitialProductColorOptions(initialValues));
 
- const form = useForm<ProductEditorValues>({
+ const form = useForm<ProductEditorInputValues, unknown, ProductEditorValues>({
  resolver: zodResolver(productEditorSchema),
  defaultValues: initialValues ?? defaultValues,
  });
@@ -360,34 +413,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  }
  };
 
- const handleNumberFieldInput = (fieldName: string, value: string, onChange: (value: number | undefined) => void) => {
- setNumberInputDrafts((previous) => ({ ...previous, [fieldName]: value }));
-
- if (value === "") {
- onChange(undefined);
- return;
- }
-
- const numericValue = Number(value);
- onChange(Number.isFinite(numericValue) ? numericValue : undefined);
- };
-
- const startNumberFieldInput = (fieldName: string, value: number | undefined) => {
- setNumberInputDrafts((previous) => ({
- ...previous,
- [fieldName]: value === undefined ? "" : String(value),
- }));
- };
-
- const finishNumberField = (fieldName: string, onBlur: () => void) => {
- setNumberInputDrafts((previous) => {
- const nextDrafts = { ...previous };
- delete nextDrafts[fieldName];
- return nextDrafts;
- });
- onBlur();
- };
-
  return (
  <Card className="border-black/10 bg-white/90 shadow-sm ">
  <CardHeader className="border-b border-black/10 ">
@@ -443,14 +468,11 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  <FormItem className="space-y-2 sm:min-h-[118px]">
  <FormLabel>Fixed price</FormLabel>
  <FormControl>
- <Input
- type="number"
+ <AdminNumericInput
+ value={field.value}
+ onChange={field.onChange}
+ onBlur={field.onBlur}
  placeholder="42000"
- className={numericFieldClassName}
- value={numberInputDrafts.basePrice ?? field.value ?? ""}
- onChange={(event) => handleNumberFieldInput("basePrice", event.target.value, field.onChange)}
- onFocus={() => startNumberFieldInput("basePrice", field.value)}
- onBlur={() => finishNumberField("basePrice", field.onBlur)}
  />
  </FormControl>
  <p className={fieldHelperClassName}>One price applies to every size and color variant.</p>
@@ -873,14 +895,11 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  <FormItem>
  <FormLabel>Stock</FormLabel>
  <FormControl>
- <Input
- type="number"
+ <AdminNumericInput
+ value={variantField.value}
+ onChange={variantField.onChange}
+ onBlur={variantField.onBlur}
  placeholder="10"
- className={numericFieldClassName}
- value={numberInputDrafts[`variants.${index}.stock`] ?? variantField.value ?? ""}
- onChange={(event) => handleNumberFieldInput(`variants.${index}.stock`, event.target.value, variantField.onChange)}
- onFocus={() => startNumberFieldInput(`variants.${index}.stock`, variantField.value)}
- onBlur={() => finishNumberField(`variants.${index}.stock`, variantField.onBlur)}
  />
  </FormControl>
  <FormMessage />
