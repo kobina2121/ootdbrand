@@ -2,6 +2,7 @@ import { model, models, Schema, type InferSchemaType, type Model } from "mongoos
 
 const productVariantSchema = new Schema(
   {
+    name: { type: String, trim: true },
     size: { type: String, required: true, trim: true },
     color: {
       name: { type: String, required: true, trim: true },

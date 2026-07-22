@@ -4,6 +4,7 @@ export type VariantColorOption = {
 };
 
 export type ProductVariantDraft = {
+  name?: string;
   size: string;
   colorName: string;
   colorCode: string;

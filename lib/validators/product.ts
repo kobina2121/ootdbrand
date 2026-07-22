@@ -17,6 +17,7 @@ export const imagePathSchema = z
   }, "Image must be an uploaded path or a valid URL");
 
 export const productVariantSchema = z.object({
+  name: z.string().trim().optional(),
   size: z.string().min(1),
   color: z.object({
     name: z.string().min(1),

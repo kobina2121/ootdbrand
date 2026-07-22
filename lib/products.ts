@@ -1,4 +1,5 @@
 export type ProductVariant = {
+  name?: string;
   size: string;
   color: string;
   colorCode?: string;

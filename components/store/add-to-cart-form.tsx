@@ -61,6 +61,7 @@ export function AddToCartForm({
 
  const variantInStock = variant.stock > 0;
  const stockLimit = Math.max(1, variant.stock);
+ const selectedProductName = variant.name?.trim() || product.name;
  const requestedQuantity = quantity === "" ? 1 : quantity;
  const safeQuantity = Math.min(stockLimit, Math.max(1, requestedQuantity));
  const normalizedQuantity = quantity === "" ? "" : safeQuantity;
@@ -87,7 +88,7 @@ export function AddToCartForm({
  try {
  await addItem({
  slug: product.slug,
- name: product.name,
+ name: selectedProductName,
  image: variant.image ?? product.image,
  sku: variant.sku,
  size: variant.size,
@@ -97,7 +98,7 @@ export function AddToCartForm({
  });
 
  toast.success("Added to cart", {
- description: `${quantityToAdd} × ${product.name} · ${variant.size} / ${variant.color}`,
+ description: `${quantityToAdd} × ${selectedProductName} · ${variant.size} / ${variant.color}`,
  });
  } catch (error) {
  const message = error instanceof Error ? error.message : "Could not add item to cart.";
@@ -122,6 +123,7 @@ export function AddToCartForm({
  <SelectContent className=" ">
  {product.variants.map((entry) => (
  <SelectItem key={entry.sku} value={entry.sku}>
+ {entry.name?.trim() ? `${entry.name} · ` : ""}
  {entry.size} · {entry.color}
  </SelectItem>
  ))}

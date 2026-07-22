@@ -44,6 +44,7 @@ const nonnegativeIntegerField = (message: string) =>
  );
 
 const variantSchema = z.object({
+ name: z.string().trim().optional(),
  size: z.string().min(1, "Select a size"),
  colorName: z.string().min(1, "Color name is required"),
  colorCode: z
@@ -168,6 +169,7 @@ const defaultValues: DefaultValues<ProductEditorInputValues> = {
  status: "active",
  variants: [
  {
+ name: "",
  size: "M",
  colorName: "Black",
  colorCode: "#111827",
@@ -344,6 +346,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
 
  const onSubmit = async (values: ProductEditorValues) => {
  const flattenedVariants = values.variants.map((variant) => ({
+ name: variant.name?.trim() || undefined,
  size: variant.size.trim().toUpperCase(),
  color: {
  name: variant.colorName.trim(),
@@ -666,6 +669,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  size="sm"
  onClick={() =>
  append({
+ name: "",
  size: "M",
  colorName: "",
  colorCode: "#111827",
@@ -791,6 +795,22 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  </Button>
  ) : null}
  </div>
+ <FormField
+ control={form.control}
+ name={`variants.${index}.name`}
+ render={({ field: variantField }) => (
+ <FormItem>
+ <FormLabel>Variant Name</FormLabel>
+ <FormControl>
+ <Input placeholder="Black Halter Knot Midi Dress" className={fieldClassName} {...variantField} />
+ </FormControl>
+ <p className="text-xs text-muted-foreground">
+ Shown after this variant is selected. Leave blank to use the product name.
+ </p>
+ <FormMessage />
+ </FormItem>
+ )}
+ />
  <FormField
  control={form.control}
  name={`variants.${index}.size`}

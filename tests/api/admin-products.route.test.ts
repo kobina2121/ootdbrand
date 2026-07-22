@@ -34,6 +34,7 @@ const validPayload = {
   images: ["/uploads/products/pic.jpg"],
   variants: [
     {
+      name: "Wine Test Dress",
       size: "M",
       color: { name: "Wine", code: "#7A1730" },
       sku: "TEST-DRESS-WINE-M",

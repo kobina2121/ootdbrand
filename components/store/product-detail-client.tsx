@@ -57,6 +57,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
  const selectedVariantInStock = Boolean(selectedVariant && selectedVariant.stock > 0);
  const showSelectedStatus = hasSelectedVariant && selectedVariant;
+ const selectedProductName = selectedVariant?.name?.trim() || product.name;
  const galleryImages = useMemo(() => {
  const ordered = [
  selectedVariant?.image,
@@ -90,7 +91,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 	 <div className="relative overflow-hidden rounded-2xl border border-black/5 bg-[#f7f1eb] shadow-[0_18px_44px_rgba(20,17,15,0.08)] sm:rounded-[1.75rem]">
 	 <Image
 	 src={selectedImage}
-	 alt={product.name}
+	 alt={selectedProductName}
 	 width={1200}
 	 height={1440}
 	 unoptimized
@@ -118,7 +119,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  >
  <Image
  src={image}
- alt={`${product.name} preview ${index + 1}`}
+ alt={`${selectedProductName} preview ${index + 1}`}
  width={220}
  height={260}
  unoptimized
@@ -133,7 +134,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
 	 <section className="mx-auto flex w-full max-w-[34rem] flex-col items-center space-y-4 text-center sm:space-y-5">
 	 <h1 className="max-w-[14ch] font-heading text-4xl leading-none text-[#1f1b18] sm:max-w-[13ch] sm:text-5xl">
- {product.name}
+ {selectedProductName}
  </h1>
  <p className="max-w-[28rem] text-sm text-[#6c655f] sm:text-base">{product.description}</p>
 

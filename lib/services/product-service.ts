@@ -52,6 +52,7 @@ type ProductReviewStats = {
 };
 
 type StorefrontVariant = {
+  name?: string | null;
   size: string;
   color?: { name?: string; code?: string } | null;
   image?: string | null;
@@ -146,6 +147,7 @@ function mapVariantForStorefront(variant: StorefrontVariant, salesBySku: Map<str
   const soldQuantity = sales?.soldQuantity ?? 0;
 
   return {
+    name: variant.name?.trim() || undefined,
     size: variant.size,
     color: variant.color?.name ?? "Unknown",
     colorCode: variant.color?.code ?? "#9CA3AF",
@@ -304,6 +306,7 @@ export async function createProduct(payload: {
   basePrice: number;
   images: string[];
   variants: Array<{
+    name?: string;
     size: string;
     color: { name: string; code: string };
     image?: string;
@@ -333,6 +336,7 @@ export async function updateProductById(
     basePrice: number;
     images: string[];
     variants: Array<{
+      name?: string;
       size: string;
       color: { name: string; code: string };
       image?: string;
@@ -396,7 +400,7 @@ export async function resolveOrderItemsFromCart(items: CartItem[]): Promise<Reso
     doc.variants.forEach((variant) => {
       variantMap.set(variant.sku, {
         productId: String(doc._id),
-        productNameSnapshot: doc.name,
+        productNameSnapshot: variant.name?.trim() || doc.name,
         size: variant.size,
         color: {
           name: variant.color?.name ?? "Unknown",
