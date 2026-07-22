@@ -167,17 +167,7 @@ const defaultValues: DefaultValues<ProductEditorInputValues> = {
  basePrice: undefined,
  images: [],
  status: "active",
- variants: [
- {
- name: "",
- size: "M",
- colorName: "Black",
- colorCode: "#111827",
- image: "",
- sku: "",
- stock: undefined,
- },
- ],
+ variants: [],
 };
 
 export function ProductForm({ mode, productId, initialValues }: ProductFormProps) {
