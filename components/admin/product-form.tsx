@@ -372,9 +372,11 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  onChange(Number.isFinite(numericValue) ? numericValue : undefined);
  };
 
- const clearNumberField = (fieldName: string, onChange: (value: number | undefined) => void) => {
- setNumberInputDrafts((previous) => ({ ...previous, [fieldName]: "" }));
- onChange(undefined);
+ const startNumberFieldInput = (fieldName: string, value: number | undefined) => {
+ setNumberInputDrafts((previous) => ({
+ ...previous,
+ [fieldName]: value === undefined ? "" : String(value),
+ }));
  };
 
  const finishNumberField = (fieldName: string, onBlur: () => void) => {
@@ -447,7 +449,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  className={numericFieldClassName}
  value={numberInputDrafts.basePrice ?? field.value ?? ""}
  onChange={(event) => handleNumberFieldInput("basePrice", event.target.value, field.onChange)}
- onFocus={() => clearNumberField("basePrice", field.onChange)}
+ onFocus={() => startNumberFieldInput("basePrice", field.value)}
  onBlur={() => finishNumberField("basePrice", field.onBlur)}
  />
  </FormControl>
@@ -877,7 +879,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  className={numericFieldClassName}
  value={numberInputDrafts[`variants.${index}.stock`] ?? variantField.value ?? ""}
  onChange={(event) => handleNumberFieldInput(`variants.${index}.stock`, event.target.value, variantField.onChange)}
- onFocus={() => clearNumberField(`variants.${index}.stock`, variantField.onChange)}
+ onFocus={() => startNumberFieldInput(`variants.${index}.stock`, variantField.value)}
  onBlur={() => finishNumberField(`variants.${index}.stock`, variantField.onBlur)}
  />
  </FormControl>
