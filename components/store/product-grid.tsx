@@ -62,11 +62,6 @@ function ProductCard({ product }: { product: Product }) {
 
  <div className="mt-4 space-y-2">
  <CardTitle className="text-[1.55rem] leading-none text-[#1f1b18] sm:text-2xl">{product.name}</CardTitle>
- {product.description ? (
- <p className="mx-auto max-w-[28ch] text-sm leading-6 text-[#6f675f] ">
- {product.description}
- </p>
- ) : null}
  </div>
 
  <div className="mt-4 flex flex-col items-center gap-1">
