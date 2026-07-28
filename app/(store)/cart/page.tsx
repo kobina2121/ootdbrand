@@ -18,11 +18,6 @@ type SuggestedProduct = {
  category: string;
  image: string;
   price: number;
-  sizes: string[];
-  colors?: Array<{
-    name: string;
-    code?: string;
-  }>;
   variants?: Array<{
     name?: string;
     size: string;

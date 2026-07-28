@@ -1,8 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
+import { HeroImageRotator } from "@/components/store/hero-image-rotator";
+import { LazyShowcaseVideo } from "@/components/store/lazy-showcase-video";
 import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
 import { buttonVariants } from "@/components/ui/button";
 import { formatPriceNgn } from "@/lib/products";
@@ -88,54 +89,13 @@ export default async function HomePage() {
  const catalogProducts = await listProducts({ activeOnly: true, sort: "latest" });
  const featuredCatalogProducts = catalogProducts.slice(0, 6);
 
- const productDetailsBySlug = Object.fromEntries(
- catalogProducts.map((product) => [
- product.slug,
- {
- description: product.description,
- sizes: Array.from(new Set(product.variants.map((variant) => variant.size))),
-	 colors: Array.from(
-	 new Map(
-	 product.variants.map((variant) => [
-	 variant.color,
-	 { name: variant.color, code: variant.colorCode },
-	 ]),
-	 ).values(),
-	 ),
-	 variants: product.variants.map((variant) => ({
-	 name: variant.name,
-	 size: variant.size,
-	 color: variant.color,
-	 colorCode: variant.colorCode,
-	 image: variant.image,
-	 sku: variant.sku,
-	 stock: variant.stock,
-	 priceOverride: variant.priceOverride,
-	 })),
-	 rating: product.rating,
-	 reviewCount: product.reviewCount,
-	 },
-	 ]),
- );
-
  return (
  <div className="relative max-w-full overflow-x-clip space-y-10 sm:space-y-12">
  <div className="pointer-events-none absolute -left-20 top-20 hidden h-52 w-52 rounded-full bg-[#c8d4bc]/40 blur-3xl md:block animate-drift-x" />
  <div className="pointer-events-none absolute -right-16 top-[28rem] hidden h-64 w-64 rounded-full bg-[#d8c8ba]/35 blur-3xl md:block animate-drift-x-reverse" />
 
 	 <section className="animate-fade-up relative h-[58svh] min-h-[360px] overflow-hidden rounded-2xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] sm:min-h-[540px] sm:rounded-3xl lg:h-[88svh] lg:min-h-[760px]">
- {heroImages.map((image, index) => (
- <Image
- key={image}
- src={image}
-     alt={`theootd.brand hero ${index + 1}`}
- fill
- sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), 1440px"
- className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"
- style={{ animationDelay: `${index}s` }}
- priority={index === 0}
- />
- ))}
+ <HeroImageRotator images={heroImages} />
  <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/70 lg:from-black/25 lg:via-black/5 lg:to-black/60" />
  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.18),transparent_38%)]" />
 
@@ -213,17 +173,11 @@ export default async function HomePage() {
  </div>
 
 	 <div className="relative min-h-[320px] border-t border-black/5 sm:min-h-[420px] lg:border-l lg:border-t-0">
- <video
+ <LazyShowcaseVideo
  src={editorialShowcase.video}
  poster={editorialShowcase.image}
- autoPlay
- muted
- loop
- playsInline
- className="h-full w-full object-cover object-center animate-hero-zoom"
- >
- Your browser does not support the video preview.
- </video>
+ className="h-full w-full bg-cover bg-center object-cover object-center animate-hero-zoom"
+ />
  </div>
  </div>
  </section>
@@ -252,12 +206,18 @@ export default async function HomePage() {
  slug: product.slug,
  name: product.name,
  category: product.category,
- description: productDetailsBySlug[product.slug]?.description ?? "",
- sizes: productDetailsBySlug[product.slug]?.sizes ?? [],
-colors: productDetailsBySlug[product.slug]?.colors ?? [],
- variants: productDetailsBySlug[product.slug]?.variants ?? [],
-	 rating: productDetailsBySlug[product.slug]?.rating,
-	 reviewCount: productDetailsBySlug[product.slug]?.reviewCount,
+ variants: product.variants.map((variant) => ({
+ name: variant.name,
+ size: variant.size,
+ color: variant.color,
+ colorCode: variant.colorCode,
+ image: variant.image,
+ sku: variant.sku,
+ stock: variant.stock,
+ priceOverride: variant.priceOverride,
+ })),
+	 rating: product.rating,
+	 reviewCount: product.reviewCount,
 	 price: formatPriceNgn(product.basePrice),
  priceValue: product.basePrice,
  image: product.image || featuredImageBySlug[product.slug] || "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80",

@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckCircle2, LoaderCircle } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -36,9 +37,10 @@ export function AddToCartForm({
  );
  const [internalSku, setInternalSku] = useState(firstAvailableSku);
  const [quantity, setQuantity] = useState<number | "">(1);
+ const [isAdding, setIsAdding] = useState(false);
  const previousQuantityRef = useRef(1);
  const quantityInputId = useId();
- const { addItem, userRole } = useCart();
+ const { addItem, items, userRole } = useCart();
  const isAdminUser = userRole === "admin";
  const activeSku = sku ?? internalSku;
  const setSku = (nextSku: string) => {
@@ -65,6 +67,8 @@ export function AddToCartForm({
  const requestedQuantity = quantity === "" ? 1 : quantity;
  const safeQuantity = Math.min(stockLimit, Math.max(1, requestedQuantity));
  const normalizedQuantity = quantity === "" ? "" : safeQuantity;
+ const cartItem = items.find((item) => item.sku === variant.sku);
+ const isVariantInCart = Boolean(cartItem);
 
  const updateQuantity = (nextQuantity: number) => {
  const clampedQuantity = Math.min(stockLimit, Math.max(1, nextQuantity));
@@ -73,6 +77,10 @@ export function AddToCartForm({
  };
 
  const onAddToCart = async () => {
+ if (isAdding) {
+ return;
+ }
+
  if (isAdminUser) {
  toast.error("Admin accounts cannot place store orders.");
  return;
@@ -83,9 +91,17 @@ export function AddToCartForm({
  return;
  }
 
+ if (isVariantInCart) {
+ toast.success("Already in cart", {
+ description: `${cartItem?.quantity ?? 1} × ${selectedProductName} · ${variant.size} / ${variant.color}`,
+ });
+ return;
+ }
+
  const quantityToAdd = Math.min(stockLimit, Math.max(1, quantity === "" ? previousQuantityRef.current : quantity));
 
  try {
+ setIsAdding(true);
  await addItem({
  slug: product.slug,
  name: selectedProductName,
@@ -103,6 +119,8 @@ export function AddToCartForm({
  } catch (error) {
  const message = error instanceof Error ? error.message : "Could not add item to cart.";
  toast.error(message);
+ } finally {
+ setIsAdding(false);
  }
  };
 
@@ -200,9 +218,19 @@ export function AddToCartForm({
  size="lg"
  className={`h-11 rounded-full ${centered ? "mx-auto flex w-full max-w-[19rem]" : "w-full sm:w-auto"}`}
  onClick={onAddToCart}
- disabled={isAdminUser || !variantInStock}
+ disabled={isAdding || isVariantInCart || isAdminUser || !variantInStock}
  >
- {isAdminUser
+ {isAdding ? (
+ <span className="inline-flex items-center gap-2">
+ <LoaderCircle className="size-4 animate-spin" />
+ Adding...
+ </span>
+ ) : isVariantInCart ? (
+ <span className="inline-flex items-center gap-2">
+ <CheckCircle2 className="size-4" />
+ In cart · {cartItem?.quantity ?? 1}
+ </span>
+ ) : isAdminUser
  ? "Admin cannot add to cart"
  : !variantInStock
  ? "Out of stock"

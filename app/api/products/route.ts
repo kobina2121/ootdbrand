@@ -30,15 +30,6 @@ export async function GET(request: Request) {
         category: product.category,
         image: product.image,
         price: product.basePrice,
-        sizes: [...new Set(product.variants.map((variant) => variant.size))],
-        colors: Array.from(
-          new Map(
-            product.variants.map((variant) => [
-              variant.color,
-              { name: variant.color, code: variant.colorCode },
-            ]),
-          ).values(),
-        ),
         variants: product.variants.map((variant) => ({
           name: variant.name,
           size: variant.size,

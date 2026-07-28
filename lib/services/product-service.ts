@@ -232,7 +232,7 @@ export async function listProducts(filters: ProductFilters = {}) {
     query.category = new RegExp(`^${filters.category}$`, "i");
   }
 
-  const docs = await ProductModel.find(query).lean();
+  const docs = await ProductModel.find(query, "slug name category description basePrice images variants").lean();
   const [salesBySku, reviewStatsBySlug] = await Promise.all([
     getSuccessfulVariantSalesBySku(getAllVariantSkus(docs)),
     getApprovedReviewStatsBySlug(docs.map((doc) => doc.slug)),

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, LoaderCircle, ShoppingCart } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -32,7 +32,6 @@ type FeaturedProductSlide = {
  slug: string;
  name: string;
  category: string;
- description?: string;
  sizes?: string[];
  colors?: FeaturedProductColor[];
  variants?: FeaturedProductVariant[];
@@ -185,9 +184,10 @@ function FeaturedProductCard({
 }) {
  const reviewCount = product.reviewCount ?? 0;
  const rating = product.rating ?? 0;
- const { addItem, userRole } = useCart();
+ const { addItem, items, userRole } = useCart();
  const [selectedColor, setSelectedColor] = useState("");
  const [selectedSize, setSelectedSize] = useState("");
+ const [isAdding, setIsAdding] = useState(false);
  const variants = useMemo(() => product.variants ?? [], [product.variants]);
  const colorOptions = useMemo(() => {
  if (product.colors && product.colors.length > 0) {
@@ -205,7 +205,8 @@ function FeaturedProductCard({
  }, [product.colors, variants]);
  const availableSizes = useMemo(() => {
  if (!selectedColor || variants.length === 0) {
- return (product.sizes ?? []).map((size) => ({ size, inStock: true }));
+ const sizes = product.sizes ?? Array.from(new Set(variants.map((variant) => variant.size)));
+ return sizes.map((size) => ({ size, inStock: true }));
  }
 
  return variants
@@ -224,9 +225,22 @@ function FeaturedProductCard({
  const previewImage = previewVariant?.image ?? product.image;
  const selectedVariantInStock = Boolean(selectedVariant && selectedVariant.stock > 0);
  const showQuickAdd = Boolean(selectedColor && selectedSize && selectedVariant);
+ const cartItem = selectedVariant ? items.find((item) => item.sku === selectedVariant.sku) : undefined;
+ const isSelectedVariantInCart = Boolean(cartItem);
 
  const handleQuickAdd = async () => {
+ if (isAdding) {
+ return;
+ }
+
  if (!selectedVariant) {
+ return;
+ }
+
+ if (isSelectedVariantInCart) {
+ toast.success("Already in cart", {
+ description: `${cartItem?.quantity ?? 1} × ${selectedVariant.name?.trim() || product.name} · ${selectedVariant.size} / ${selectedVariant.color}`,
+ });
  return;
  }
 
@@ -243,6 +257,7 @@ function FeaturedProductCard({
  const selectedProductName = selectedVariant.name?.trim() || product.name;
 
  try {
+ setIsAdding(true);
  await addItem({
  slug: product.slug,
  name: selectedProductName,
@@ -260,6 +275,8 @@ function FeaturedProductCard({
  } catch (error) {
  const message = error instanceof Error ? error.message : "Could not add item to cart.";
  toast.error(message);
+ } finally {
+ setIsAdding(false);
  }
  };
 
@@ -272,7 +289,6 @@ function FeaturedProductCard({
  alt={selectedColor ? `${product.name} in ${selectedColor}` : product.name}
  fill
  sizes="(max-width: 639px) 88vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
- unoptimized
  className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
  />
  </div>
@@ -378,19 +394,30 @@ function FeaturedProductCard({
  <Button
  type="button"
  size="icon"
- variant={selectedVariantInStock && userRole !== "admin" ? "default" : "outline"}
+ variant={isSelectedVariantInCart || (selectedVariantInStock && userRole !== "admin") ? "default" : "outline"}
  className="h-11 w-11 rounded-full"
  onClick={handleQuickAdd}
- disabled={!selectedVariantInStock || userRole === "admin"}
+ disabled={isAdding || isSelectedVariantInCart || !selectedVariantInStock || userRole === "admin"}
  aria-label={
- selectedVariantInStock ? `Add ${product.name} ${selectedSize} ${selectedColor} to cart` : "Selected option is out of stock"
+ isAdding
+ ? `Adding ${product.name} to cart`
+ : isSelectedVariantInCart
+ ? `${product.name} ${selectedSize} ${selectedColor} is in cart`
+ : selectedVariantInStock
+ ? `Add ${product.name} ${selectedSize} ${selectedColor} to cart`
+ : "Selected option is out of stock"
  }
- title={selectedVariantInStock ? "Add to cart" : "Out of stock"}
+ title={isAdding ? "Adding..." : isSelectedVariantInCart ? "In cart" : selectedVariantInStock ? "Add to cart" : "Out of stock"}
  >
- <ShoppingCart className="size-4" />
+ {isAdding ? <LoaderCircle className="size-4 animate-spin" /> : isSelectedVariantInCart ? <CheckCircle2 className="size-4" /> : <ShoppingCart className="size-4" />}
  </Button>
  ) : null}
  </div>
+ {isSelectedVariantInCart ? (
+ <p className="text-center text-[0.68rem] font-medium uppercase tracking-[0.14em] text-emerald-700">
+ In cart · {cartItem?.quantity ?? 1}
+ </p>
+ ) : null}
  </CardContent>
  </Card>
  </div>

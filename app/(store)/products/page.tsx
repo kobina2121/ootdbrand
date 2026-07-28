@@ -44,17 +44,24 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
  const pageSize = 9;
 
- const [allProducts, categoryFilteredProducts] = await Promise.all([
- listProducts({ activeOnly: true, sort: "latest" }),
- listProducts({ activeOnly: true, category, sort: sort as "latest" | "price-asc" | "price-desc" }),
- ]);
+ const allProducts = await listProducts({ activeOnly: true, sort: "latest" });
 
  const categories = ["all", ...new Set(allProducts.map((product) => product.category))];
+ const categoryFilteredProducts =
+ category.toLowerCase() === "all"
+ ? allProducts
+ : allProducts.filter((product) => product.category.toLowerCase() === category.toLowerCase());
+ const sortedProducts =
+ sort === "price-asc"
+ ? [...categoryFilteredProducts].sort((a, b) => a.basePrice - b.basePrice)
+ : sort === "price-desc"
+ ? [...categoryFilteredProducts].sort((a, b) => b.basePrice - a.basePrice)
+ : categoryFilteredProducts;
  const normalizedQuery = q.toLowerCase();
  const filteredProducts =
  normalizedQuery.length === 0
- ? categoryFilteredProducts
- : categoryFilteredProducts.filter((product) =>
+ ? sortedProducts
+ : sortedProducts.filter((product) =>
  [product.name, product.category, product.description].some((value) =>
  value.toLowerCase().includes(normalizedQuery),
  ),
@@ -163,18 +170,8 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  slug: product.slug,
  name: product.name,
  category: product.category,
- description: product.description,
 	 image: product.image,
 	 price: product.basePrice,
-	 sizes: [...new Set(product.variants.map((variant) => variant.size))],
-	 colors: Array.from(
-	 new Map(
-	 product.variants.map((variant) => [
-	 variant.color,
-	 { name: variant.color, code: variant.colorCode },
-	 ]),
-	 ).values(),
-	 ),
 	 variants: product.variants.map((variant) => ({
 	 name: variant.name,
 	 size: variant.size,

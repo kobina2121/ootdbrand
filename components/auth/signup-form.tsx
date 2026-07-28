@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
-import { getProviders, signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ export function SignupForm() {
  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
  const [googleStatusChecked, setGoogleStatusChecked] = useState(false);
  const [isGoogleAvailable, setIsGoogleAvailable] = useState(false);
- const showGoogleOption = isGoogleAvailable;
+ const showGoogleOption = isGoogleAvailable || !googleStatusChecked;
 
  useEffect(() => {
  let isMounted = true;
@@ -46,12 +46,7 @@ export function SignupForm() {
  return;
  }
 
- const providers = await getProviders();
- if (!isMounted) {
- return;
- }
-
- setIsGoogleAvailable(Boolean(providers?.google));
+ setIsGoogleAvailable(true);
  } catch {
  if (!isMounted) {
  return;
@@ -137,7 +132,7 @@ export function SignupForm() {
  variant="outline"
  className="mb-4 h-11 w-full rounded-full border-black/20 "
  onClick={onGoogleSignup}
- disabled={isGoogleSubmitting || isSubmitting}
+ disabled={!isGoogleAvailable || isGoogleSubmitting || isSubmitting}
  >
  <svg aria-hidden="true" viewBox="0 0 48 48" className="mr-2 size-4">
  <path
@@ -157,7 +152,7 @@ export function SignupForm() {
  d="M43.61 20.08H42V20H24v8h11.3c-.79 2.37-2.31 4.39-4.29 5.53l6.2 5.24C36.77 39.19 44 34 44 24c0-1.34-.14-2.65-.39-3.92z"
  />
  </svg>
- {isGoogleSubmitting ? "Redirecting..." : "Continue with Google"}
+ {!googleStatusChecked ? "Checking Google..." : isGoogleSubmitting ? "Redirecting..." : "Continue with Google"}
  </Button>
  ) : googleStatusChecked ? (
  <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 ">

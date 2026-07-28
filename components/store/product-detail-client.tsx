@@ -94,7 +94,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 	 alt={selectedProductName}
 	 width={1200}
 	 height={1440}
-	 unoptimized
+	 sizes="(max-width: 1023px) calc(100vw - 2rem), 58vw"
 	 className="h-[min(62svh,460px)] min-h-[280px] w-full object-cover object-center sm:h-[min(72svh,520px)] sm:min-h-[340px] lg:h-[620px]"
 	 />
 	 </div>
@@ -122,7 +122,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  alt={`${selectedProductName} preview ${index + 1}`}
  width={220}
  height={260}
- unoptimized
+ sizes="8rem"
 	 className="h-20 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-24"
  />
  </button>

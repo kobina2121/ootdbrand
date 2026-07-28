@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { calculateCartTotals, type CartItem, type CartTotals } from "@/lib/products";
 
@@ -217,6 +218,7 @@ export function CartProvider({
 }) {
   const storageKey = useMemo(() => getCartStorageKey(userId), [userId]);
   const [cartState, setCartState] = useState<CartState>(() => createInitialCartState(storageKey));
+  const pendingAddSkusRef = useRef(new Set<string>());
 
   useEffect(() => {
     localStorage.setItem(
@@ -247,6 +249,11 @@ export function CartProvider({
   }, [cartState.discountCode, cartState.items]);
 
   const addItem = useCallback(async (payload: AddPayload) => {
+    if (pendingAddSkusRef.current.has(payload.sku)) {
+      throw new Error("This item is already being added.");
+    }
+
+    pendingAddSkusRef.current.add(payload.sku);
     let previousState: CartState | null = null;
     let nextItems: CartItem[] = [];
     let nextDiscountCode = "";
@@ -279,35 +286,43 @@ export function CartProvider({
       };
     });
 
-    const result = await syncCartPayloadWithRecovery(nextItems, nextDiscountCode || undefined);
+    void (async () => {
+      try {
+        const result = await syncCartPayloadWithRecovery(nextItems, nextDiscountCode || undefined);
 
-    if (!result.ok) {
-      if (previousState) {
-        setCartState(previousState);
+        if (!result.ok) {
+          if (previousState) {
+            setCartState(previousState);
+          }
+          toast.error(result.message);
+          return;
+        }
+
+        if (result.removedSku === payload.sku) {
+          setCartState({
+            items: result.items,
+            discountCode: result.discount.requestedCode ?? "",
+            pricing: {
+              totals: result.totals,
+              discount: result.discount,
+            },
+          });
+          toast.error("This product option is no longer available.");
+          return;
+        }
+
+        setCartState({
+          items: result.items,
+          discountCode: result.discount.requestedCode ?? "",
+          pricing: {
+            totals: result.totals,
+            discount: result.discount,
+          },
+        });
+      } finally {
+        pendingAddSkusRef.current.delete(payload.sku);
       }
-      throw new Error(result.message);
-    }
-
-    if (result.removedSku === payload.sku) {
-      setCartState({
-        items: result.items,
-        discountCode: result.discount.requestedCode ?? "",
-        pricing: {
-          totals: result.totals,
-          discount: result.discount,
-        },
-      });
-      throw new Error("This product option is no longer available.");
-    }
-
-    setCartState({
-      items: result.items,
-      discountCode: result.discount.requestedCode ?? "",
-      pricing: {
-        totals: result.totals,
-        discount: result.discount,
-      },
-    });
+    })();
   }, []);
 
   const updateQuantity = useCallback(async (sku: string, quantity: number) => {
