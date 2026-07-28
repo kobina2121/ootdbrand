@@ -28,6 +28,21 @@ const mobileTabs = [
  { href: "/profile", icon: UserRound, label: "Profile" },
 ];
 
+function CartCountBadge({ count }: { count: number }) {
+ if (count <= 0) {
+ return null;
+ }
+
+ return (
+ <span
+ suppressHydrationWarning
+ className="absolute -right-1 -top-1 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground shadow-sm"
+ >
+ {count > 99 ? "99+" : count}
+ </span>
+ );
+}
+
 type AppShellProps = {
  children: React.ReactNode;
  user: {
@@ -97,16 +112,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <Link href="/cart">
  <Button size="icon" variant="ghost" className="relative">
  <ShoppingBag className="h-4 w-4" />
- {!isAdminUser ? (
- <span
- suppressHydrationWarning
- className={`absolute -right-1 -top-1 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground ${
- itemCount > 0 ? "opacity-100" : "opacity-0"
- }`}
- >
- {itemCount > 0 ? itemCount : ""}
- </span>
- ) : null}
+ {!isAdminUser ? <CartCountBadge count={itemCount} /> : null}
  <span className="sr-only">Cart</span>
  </Button>
  </Link>
@@ -147,16 +153,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <Link href="/cart">
  <Button size="icon" variant="ghost" className="relative">
  <ShoppingBag className="h-4 w-4" />
- {!isAdminUser ? (
- <span
- suppressHydrationWarning
- className={`absolute -right-1 -top-1 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground ${
- itemCount > 0 ? "opacity-100" : "opacity-0"
- }`}
- >
- {itemCount > 0 ? itemCount : ""}
- </span>
- ) : null}
+ {!isAdminUser ? <CartCountBadge count={itemCount} /> : null}
  <span className="sr-only">Cart</span>
  </Button>
  </Link>
@@ -310,10 +307,12 @@ export function AppShell({ children, user }: AppShellProps) {
  <li key={tab.href}>
  <Link
  href={tab.href}
+ aria-label={tab.href === "/cart" && !isAdminUser && itemCount > 0 ? `Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}` : tab.label}
  className={`flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[11px] ${active ? "text-foreground" : "text-muted-foreground"}`}
  >
- <span className={`rounded-full p-1 ${active ? "bg-black/10 " : ""}`}>
+ <span className={`relative rounded-full p-1 ${active ? "bg-black/10 " : ""}`}>
  <Icon className="size-4" />
+ {tab.href === "/cart" && !isAdminUser ? <CartCountBadge count={itemCount} /> : null}
  </span>
  {tab.label}
  </Link>
