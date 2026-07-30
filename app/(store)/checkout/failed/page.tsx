@@ -22,7 +22,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  const params = await searchParams;
  const reference = typeof params.reference === "string" ? params.reference : "";
  let state: FailedViewState = "failed";
- let successfulOrderType: "store" | "custom" | null = null;
+ let checkoutOrderType: "store" | "custom" | null = null;
 
  if (reference) {
  const session = await requireAuthenticatedUser();
@@ -46,6 +46,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  if (session.user.role !== "admin") {
  const ownsStoreOrder = await isOrderReferenceOwnedByUser(reference, session.user.id);
  const ownsCustomOrder = ownsStoreOrder ? false : await isCustomOrderReferenceOwnedByUser(reference, session.user.id);
+ checkoutOrderType = ownsStoreOrder ? "store" : ownsCustomOrder ? "custom" : null;
 
  if (!ownsStoreOrder && !ownsCustomOrder) {
  return (
@@ -87,7 +88,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
 
  const reconcile = orderReconcile ?? customOrderReconcile;
  state = reconcile?.status === "Success" ? "success" : reconcile?.status === "Failed" ? "failed" : "pending";
- successfulOrderType = state === "success" ? (orderReconcile ? "store" : "custom") : null;
+ checkoutOrderType = reconcile ? (orderReconcile ? "store" : "custom") : null;
  } else {
  state = "pending";
  }
@@ -110,7 +111,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  <CardTitle className="font-heading text-5xl leading-none ">Payment Successful</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
- <ClearCartOnSuccess shouldClear={Boolean(successfulOrderType)} />
+ <ClearCartOnSuccess shouldClear={checkoutOrderType === "store"} />
  <p className="text-sm text-muted-foreground">Your payment has been confirmed and your order is being prepared.</p>
  <Link href="/orders">
  <Button className="rounded-full">View Orders</Button>
@@ -123,6 +124,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  if (state === "pending") {
  return (
  <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <ClearCartOnSuccess shouldClear={checkoutOrderType === "store"} />
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Payment Pending</CardTitle>
  </CardHeader>
