@@ -7,6 +7,7 @@ import { OrderModel, type OrderStatus } from "@/lib/db/models/order";
 import { resolveDiscount } from "@/lib/discounts";
 import { ProductModel } from "@/lib/db/models/product";
 import { calculateShipping, calculateTransactionFee } from "@/lib/products";
+import { notifyAdminNewOrder } from "@/lib/services/admin-alert-service";
 import { resolveOrderItemsFromCart } from "@/lib/services/product-service";
 import type { AppUser } from "@/lib/services/user-service";
 
@@ -40,7 +41,13 @@ export type ReconcileResult = {
   orderId: string;
   status: OrderStatus;
   changed: boolean;
-  reason: "already-success" | "verified-success" | "verification-failed" | "amount-mismatch" | "currency-mismatch";
+  reason:
+    | "already-success"
+    | "verified-success"
+    | "gateway-incomplete"
+    | "verification-failed"
+    | "amount-mismatch"
+    | "currency-mismatch";
 };
 
 function toValidDate(value?: string | null) {
@@ -50,6 +57,11 @@ function toValidDate(value?: string | null) {
 
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+function shouldKeepGatewayStatusPending(status: string) {
+  const normalizedStatus = status.trim().toLowerCase();
+  return normalizedStatus !== "success" && normalizedStatus !== "failed" && normalizedStatus !== "reversed";
 }
 
 export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUser | null) {
@@ -173,6 +185,27 @@ export async function reconcileOrderAfterVerification(reference: string, verific
   const sameAmount = expectedAmountSubunit === Math.round(verification.amountSubunit);
   const isGatewaySuccess = verification.status.toLowerCase() === "success";
 
+  if (!isGatewaySuccess && shouldKeepGatewayStatusPending(verification.status)) {
+    const pending = await OrderModel.findOneAndUpdate(
+      { paymentReference: reference, status: { $ne: "Success" } },
+      {
+        $set: {
+          status: "Pending",
+          paymentGatewayStatus: verification.status,
+          paymentGatewayResponse: verification.gatewayResponse ?? "payment-incomplete",
+        },
+      },
+      { returnDocument: "after" },
+    ).lean();
+
+    return {
+      orderId: String(order._id),
+      status: pending?.status ?? order.status,
+      changed: Boolean(pending),
+      reason: "gateway-incomplete",
+    };
+  }
+
   if (isGatewaySuccess && sameCurrency && sameAmount) {
     const paidAt = toValidDate(verification.paidAt);
     const update = await OrderModel.findOneAndUpdate(
@@ -187,6 +220,18 @@ export async function reconcileOrderAfterVerification(reference: string, verific
       },
       { returnDocument: "after" },
     ).lean();
+
+    if (update) {
+      await notifyAdminNewOrder({
+        orderType: "store-order",
+        reference: update.paymentReference,
+        customerName: update.shippingAddress.fullName,
+        customerEmail: update.shippingAddress.email,
+        customerPhone: update.shippingAddress.phone,
+        amount: update.amountTotal,
+        createdAt: update.createdAt ?? new Date(),
+      }).catch(() => null);
+    }
 
     return {
       orderId: String(order._id),
@@ -324,6 +369,92 @@ export async function listOrders(filters: { status?: OrderStatus; limit?: number
   } catch {
     return [];
   }
+}
+
+export async function getOrderDetailsByReference(reference: string, userId?: string) {
+  const query: { paymentReference: string; userId?: Types.ObjectId } = {
+    paymentReference: reference,
+  };
+
+  if (userId) {
+    if (!Types.ObjectId.isValid(userId)) {
+      return null;
+    }
+
+    query.userId = new Types.ObjectId(userId);
+  }
+
+  await connectToDatabase();
+  const doc = await OrderModel.findOne(query).lean();
+
+  if (!doc) {
+    return null;
+  }
+
+  const productIds = Array.from(
+    new Set(
+      doc.items
+        .map((item) => String(item.productId))
+        .filter((productId) => Types.ObjectId.isValid(productId)),
+    ),
+  ).map((id) => new Types.ObjectId(id));
+
+  const products = productIds.length
+    ? await ProductModel.find({ _id: { $in: productIds } })
+        .select({ _id: 1, images: 1 })
+        .lean()
+    : [];
+
+  const productImageMap = new Map<string, string>(
+    products.map((product) => [String(product._id), product.images?.[0] || ""]),
+  );
+
+  return {
+    id: String(doc._id),
+    paymentReference: doc.paymentReference,
+    customerName: doc.shippingAddress.fullName,
+    customerEmail: doc.shippingAddress.email,
+    customerPhone: doc.shippingAddress.phone,
+    deliveryAddress: doc.shippingAddress.addressLine,
+    shippingAddress: {
+      fullName: doc.shippingAddress.fullName,
+      email: doc.shippingAddress.email,
+      phone: doc.shippingAddress.phone,
+      addressLine: doc.shippingAddress.addressLine,
+    },
+    items: doc.items.map((item) => ({
+      productId: String(item.productId),
+      productName: item.productNameSnapshot,
+      image: productImageMap.get(String(item.productId)) ?? "",
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      lineTotal: item.unitPrice * item.quantity,
+      variant: {
+        size: item.variant?.size ?? "",
+        colorName: item.variant?.color?.name ?? "",
+        colorCode: item.variant?.color?.code ?? "#9CA3AF",
+        sku: item.variant?.sku ?? "",
+      },
+    })),
+    amountSubtotal: doc.amountSubtotal,
+    discountCode: doc.discountCode ?? "",
+    discountAmount: doc.discountAmount ?? 0,
+    shippingFee: doc.shippingFee,
+    transactionFee: doc.transactionFee ?? 0,
+    amountTotal: doc.amountTotal,
+    currency: doc.currency,
+    status: doc.status,
+    deliveryStatus: doc.deliveryStatus ?? "Pending",
+    trackingNumber: doc.trackingNumber ?? "",
+    trackingUrl: doc.trackingUrl ?? "",
+    adminUpdate: doc.adminUpdate ?? "",
+    paymentProvider: doc.paymentProvider,
+    paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
+    paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
+    paidAt: doc.paidAt ?? null,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  };
 }
 
 export async function getOrdersByUserId(userId: string) {

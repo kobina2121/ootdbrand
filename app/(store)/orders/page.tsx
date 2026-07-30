@@ -34,6 +34,17 @@ function paymentStatusBadgeClass(status: string) {
  return "";
 }
 
+function shouldVerifyPaymentStatus(order: { status: string; paymentGatewayStatus: string; paymentGatewayResponse: string }) {
+ const gatewayStatus = order.paymentGatewayStatus.toLowerCase();
+ const gatewayResponse = order.paymentGatewayResponse.toLowerCase();
+
+ return (
+ order.status === "Pending" ||
+ (order.status === "Failed" &&
+ (gatewayStatus === "abandoned" || gatewayResponse.includes("not completed") || gatewayResponse.includes("incomplete")))
+ );
+}
+
 export default async function AccountOrdersPage() {
  const session = await requireAuthenticatedUser();
 
@@ -59,13 +70,13 @@ export default async function AccountOrdersPage() {
  getCustomOrdersByUserId(session.user.id),
  ]);
  const pendingPaymentReferences = [
- ...orders.filter((order) => order.status === "Pending").map((order) => order.paymentReference),
- ...customOrders.filter((order) => order.status === "Pending").map((order) => order.paymentReference),
+ ...orders.filter(shouldVerifyPaymentStatus).map((order) => order.paymentReference),
+ ...customOrders.filter(shouldVerifyPaymentStatus).map((order) => order.paymentReference),
  ];
 
  return (
  <div className="space-y-6">
- <PaymentStatusVerifier references={pendingPaymentReferences} />
+ <PaymentStatusVerifier references={pendingPaymentReferences} clearCartOnSuccess />
  <section className="surface-strong p-5 sm:p-7">
  <p className="heading-kicker">ACCOUNT</p>
  <h1 className="mt-2 font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">My Orders</h1>
@@ -88,11 +99,15 @@ export default async function AccountOrdersPage() {
  </p>
  ) : (
  orders.map((order) => (
- <article key={order.id} className="space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-5">
+ <article key={order.id} className="group relative space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md sm:p-5">
+ <Link href={`/orders/${encodeURIComponent(order.paymentReference)}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={`View order ${order.paymentReference}`} />
+ <div className="relative z-10 space-y-4 pointer-events-none">
  <header className="flex flex-wrap items-start justify-between gap-3">
  <div>
  <p className="text-xs tracking-[0.15em] text-muted-foreground ">Order Ref</p>
- <p className="font-medium text-[#1f1b18] ">{order.paymentReference}</p>
+ <Link href={`/orders/${encodeURIComponent(order.paymentReference)}`} className="pointer-events-auto font-medium text-[#1f1b18] hover:underline">
+ {order.paymentReference}
+ </Link>
  <p className="text-xs text-muted-foreground ">{new Date(order.createdAt).toLocaleString()}</p>
  </div>
  <div className="flex flex-wrap gap-2">
@@ -139,7 +154,7 @@ export default async function AccountOrdersPage() {
  </div>
 
  {order.trackingUrl ? (
- <Link href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-sm text-[#1f1b18] underline ">
+ <Link href={order.trackingUrl} target="_blank" rel="noreferrer" className="pointer-events-auto text-sm text-[#1f1b18] underline ">
  Track shipment
  </Link>
  ) : null}
@@ -147,6 +162,7 @@ export default async function AccountOrdersPage() {
  <p className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm ">
  <span className="text-muted-foreground ">Admin update:</span> {order.adminUpdate || "No update yet."}
  </p>
+ </div>
  </article>
  ))
  )}
@@ -174,11 +190,15 @@ export default async function AccountOrdersPage() {
  : [];
 
  return (
- <article key={order.id} className="space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-5">
+ <article key={order.id} className="group relative space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md sm:p-5">
+ <Link href={`/orders/${encodeURIComponent(order.paymentReference)}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={`View custom order ${order.paymentReference}`} />
+ <div className="relative z-10 space-y-4 pointer-events-none">
  <header className="flex flex-wrap items-start justify-between gap-3">
  <div>
  <p className="text-xs tracking-[0.15em] text-muted-foreground ">Custom Ref</p>
- <p className="font-medium text-[#1f1b18] ">{order.paymentReference}</p>
+ <Link href={`/orders/${encodeURIComponent(order.paymentReference)}`} className="pointer-events-auto font-medium text-[#1f1b18] hover:underline">
+ {order.paymentReference}
+ </Link>
  <p className="text-xs text-muted-foreground ">{new Date(order.createdAt).toLocaleString()}</p>
  </div>
  <div className="flex flex-wrap gap-2">
@@ -245,7 +265,7 @@ export default async function AccountOrdersPage() {
  </p>
  ) : null}
  {order.trackingUrl ? (
- <Link href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-sm text-[#1f1b18] underline ">
+ <Link href={order.trackingUrl} target="_blank" rel="noreferrer" className="pointer-events-auto text-sm text-[#1f1b18] underline ">
  Track shipment
  </Link>
  ) : null}
@@ -253,6 +273,7 @@ export default async function AccountOrdersPage() {
  <p className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm ">
  <span className="text-muted-foreground ">Admin update:</span> {order.adminUpdate || "No update yet."}
  </p>
+ </div>
  </article>
  );
  })

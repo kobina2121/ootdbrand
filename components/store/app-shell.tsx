@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Home, Menu, Search, ShoppingBag, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -56,10 +56,16 @@ export function AppShell({ children, user }: AppShellProps) {
  const pathname = usePathname();
  const searchParams = useSearchParams();
  const { itemCount } = useCart();
+ const isHydrated = useSyncExternalStore(
+ () => () => {},
+ () => true,
+ () => false,
+ );
  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
  const nextPath = searchParams.get("next") ?? "";
  const isAdminLoginView = pathname === "/login" && nextPath.startsWith("/admin");
  const isAdminUser = user?.role === "admin";
+ const visibleItemCount = isHydrated ? itemCount : 0;
  const profileHref = user ? "/profile" : "/login";
  const visibleNavLinks =
  isAdminLoginView
@@ -112,7 +118,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <Link href="/cart">
  <Button size="icon" variant="ghost" className="relative">
  <ShoppingBag className="h-4 w-4" />
- {!isAdminUser ? <CartCountBadge count={itemCount} /> : null}
+ {!isAdminUser ? <CartCountBadge count={visibleItemCount} /> : null}
  <span className="sr-only">Cart</span>
  </Button>
  </Link>
@@ -153,7 +159,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <Link href="/cart">
  <Button size="icon" variant="ghost" className="relative">
  <ShoppingBag className="h-4 w-4" />
- {!isAdminUser ? <CartCountBadge count={itemCount} /> : null}
+ {!isAdminUser ? <CartCountBadge count={visibleItemCount} /> : null}
  <span className="sr-only">Cart</span>
  </Button>
  </Link>
@@ -307,12 +313,12 @@ export function AppShell({ children, user }: AppShellProps) {
  <li key={tab.href}>
  <Link
  href={tab.href}
- aria-label={tab.href === "/cart" && !isAdminUser && itemCount > 0 ? `Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}` : tab.label}
+ aria-label={tab.href === "/cart" && !isAdminUser && visibleItemCount > 0 ? `Cart, ${visibleItemCount} item${visibleItemCount === 1 ? "" : "s"}` : tab.label}
  className={`flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[11px] ${active ? "text-foreground" : "text-muted-foreground"}`}
  >
  <span className={`relative rounded-full p-1 ${active ? "bg-black/10 " : ""}`}>
  <Icon className="size-4" />
- {tab.href === "/cart" && !isAdminUser ? <CartCountBadge count={itemCount} /> : null}
+ {tab.href === "/cart" && !isAdminUser ? <CartCountBadge count={visibleItemCount} /> : null}
  </span>
  {tab.label}
  </Link>

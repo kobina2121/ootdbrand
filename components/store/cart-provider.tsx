@@ -361,27 +361,39 @@ export function CartProvider({
   }, []);
 
   const removeItem = useCallback(async (sku: string) => {
-    let previousState: CartState | null = null;
     let nextItems: CartItem[] = [];
     let nextDiscountCode = "";
 
     setCartState((prev) => {
-      previousState = prev;
       nextDiscountCode = prev.discountCode;
       nextItems = prev.items.filter((item) => item.sku !== sku);
+
+      if (nextItems.length === 0) {
+        return {
+          ...prev,
+          items: [],
+          discountCode: "",
+          pricing: {
+            totals: calculateCartTotals([]),
+            discount: createEmptyDiscount(),
+          },
+        };
+      }
+
       return {
         ...prev,
         items: nextItems,
+        pricing: {
+          totals: calculateCartTotals(nextItems, prev.pricing.discount.amount),
+          discount: prev.pricing.discount,
+        },
       };
     });
 
     const result = await syncCartPayloadWithRecovery(nextItems, nextDiscountCode || undefined);
 
     if (!result.ok) {
-      if (previousState) {
-        setCartState(previousState);
-      }
-      throw new Error(result.message);
+      return;
     }
 
     setCartState({
@@ -395,28 +407,20 @@ export function CartProvider({
   }, []);
 
   const clearCart = useCallback(async () => {
-    let previousState: CartState | null = null;
-
-    setCartState((prev) => {
-      previousState = prev;
-      return {
-        ...prev,
-        items: [],
-        discountCode: "",
-        pricing: {
-          totals: calculateCartTotals([]),
-          discount: createEmptyDiscount(),
-        },
-      };
-    });
+    setCartState((prev) => ({
+      ...prev,
+      items: [],
+      discountCode: "",
+      pricing: {
+        totals: calculateCartTotals([]),
+        discount: createEmptyDiscount(),
+      },
+    }));
 
     const result = await syncCartPayload([]);
 
     if (!result.ok) {
-      if (previousState) {
-        setCartState(previousState);
-      }
-      throw new Error(result.message);
+      return;
     }
   }, []);
 
@@ -541,4 +545,8 @@ export function useCart() {
   }
 
   return context;
+}
+
+export function useOptionalCart() {
+  return useContext(CartContext);
 }

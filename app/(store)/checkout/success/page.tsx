@@ -24,6 +24,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
  const reference = typeof params.reference === "string" ? params.reference : "";
 
  let state: SuccessViewState = "pending";
+ let successfulOrderType: "store" | "custom" | null = null;
 
  if (!reference) {
  state = "missing-reference";
@@ -74,7 +75,8 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
  });
 
  const reconcile = orderReconcile ?? customOrderReconcile;
- state = reconcile?.status === "Success" ? "success" : "failed";
+ state = reconcile?.status === "Success" ? "success" : reconcile?.status === "Failed" ? "failed" : "pending";
+ successfulOrderType = state === "success" ? (orderReconcile ? "store" : "custom") : null;
  }
  } catch {
  state = "error";
@@ -88,7 +90,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
  <CardTitle className="font-heading text-5xl leading-none ">Payment Successful</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
- <ClearCartOnSuccess />
+ <ClearCartOnSuccess shouldClear={Boolean(successfulOrderType)} />
  <p className="text-sm text-muted-foreground">Your order has been placed and is being prepared.</p>
  <Link href="/orders">
  <Button className="rounded-full">View Orders</Button>
@@ -180,7 +182,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
  return (
  <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
- <PaymentStatusVerifier references={reference ? [reference] : []} maxAttempts={6} />
+ <PaymentStatusVerifier references={reference ? [reference] : []} maxAttempts={6} clearCartOnSuccess />
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Payment Pending</CardTitle>
  </CardHeader>

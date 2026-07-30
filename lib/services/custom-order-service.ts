@@ -10,6 +10,7 @@ import {
 import { CustomOrderModel } from "@/lib/db/models/custom-order";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { ProductModel } from "@/lib/db/models/product";
+import { notifyAdminNewOrder } from "@/lib/services/admin-alert-service";
 import type { AppUser } from "@/lib/services/user-service";
 
 export type CreatePendingCustomOrderInput = {
@@ -47,7 +48,13 @@ export type CustomOrderReconcileResult = {
   customOrderId: string;
   status: "Pending" | "Success" | "Failed";
   changed: boolean;
-  reason: "already-success" | "verified-success" | "verification-failed" | "amount-mismatch" | "currency-mismatch";
+  reason:
+    | "already-success"
+    | "verified-success"
+    | "gateway-incomplete"
+    | "verification-failed"
+    | "amount-mismatch"
+    | "currency-mismatch";
 };
 
 function toValidDate(value?: string | null) {
@@ -57,6 +64,11 @@ function toValidDate(value?: string | null) {
 
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+function shouldKeepGatewayStatusPending(status: string) {
+  const normalizedStatus = status.trim().toLowerCase();
+  return normalizedStatus !== "success" && normalizedStatus !== "failed" && normalizedStatus !== "reversed";
 }
 
 export async function createPendingCustomOrder(input: CreatePendingCustomOrderInput, user?: AppUser | null) {
@@ -169,6 +181,27 @@ export async function reconcileCustomOrderAfterVerification(
   const sameAmount = expectedAmountSubunit === Math.round(verification.amountSubunit);
   const isGatewaySuccess = verification.status.toLowerCase() === "success";
 
+  if (!isGatewaySuccess && shouldKeepGatewayStatusPending(verification.status)) {
+    const pending = await CustomOrderModel.findOneAndUpdate(
+      { paymentReference: reference, status: { $ne: "Success" } },
+      {
+        $set: {
+          status: "Pending",
+          paymentGatewayStatus: verification.status,
+          paymentGatewayResponse: verification.gatewayResponse ?? "payment-incomplete",
+        },
+      },
+      { returnDocument: "after" },
+    ).lean();
+
+    return {
+      customOrderId: String(customOrder._id),
+      status: pending?.status ?? customOrder.status,
+      changed: Boolean(pending),
+      reason: "gateway-incomplete",
+    };
+  }
+
   if (isGatewaySuccess && sameCurrency && sameAmount) {
     const paidAt = toValidDate(verification.paidAt);
 
@@ -184,6 +217,18 @@ export async function reconcileCustomOrderAfterVerification(
       },
       { returnDocument: "after" },
     ).lean();
+
+    if (update) {
+      await notifyAdminNewOrder({
+        orderType: "custom-order",
+        reference: update.paymentReference,
+        customerName: update.fullName,
+        customerEmail: update.email,
+        customerPhone: update.phone,
+        amount: update.amountTotal,
+        createdAt: update.createdAt ?? new Date(),
+      }).catch(() => null);
+    }
 
     return {
       customOrderId: String(customOrder._id),
@@ -327,6 +372,79 @@ export async function listCustomOrders(filters: { status?: "Pending" | "Success"
   } catch {
     return [];
   }
+}
+
+export async function getCustomOrderDetailsByReference(reference: string, userId?: string) {
+  const query: { paymentReference: string; userId?: Types.ObjectId } = {
+    paymentReference: reference,
+  };
+
+  if (userId) {
+    if (!Types.ObjectId.isValid(userId)) {
+      return null;
+    }
+
+    query.userId = new Types.ObjectId(userId);
+  }
+
+  await connectToDatabase();
+  const doc = await CustomOrderModel.findOne(query).lean();
+
+  if (!doc) {
+    return null;
+  }
+
+  return {
+    id: String(doc._id),
+    productSlug: doc.productSlug,
+    productName: doc.productNameSnapshot,
+    productImage: doc.productImageSnapshot ?? "",
+    variantSku: doc.variantSkuSnapshot,
+    variantUnitPrice: doc.variantUnitPriceSnapshot,
+    baseUnitPrice: doc.baseProductPriceSnapshot,
+    customizationCharge: doc.customizationChargeSnapshot ?? 0,
+    transactionFee: doc.transactionFeeSnapshot ?? 0,
+    paymentReference: doc.paymentReference,
+    fullName: doc.fullName,
+    email: doc.email,
+    phone: doc.phone,
+    type: doc.type ?? "",
+    category: doc.category,
+    size: doc.size,
+    color: doc.color,
+    amountTotal: doc.amountTotal,
+    currency: doc.currency,
+    paymentProvider: doc.paymentProvider,
+    deliveryStatus: doc.deliveryStatus ?? "Pending",
+    trackingNumber: doc.trackingNumber ?? "",
+    trackingUrl: doc.trackingUrl ?? "",
+    adminUpdate: doc.adminUpdate ?? "",
+    measurements: doc.measurements,
+    bustSize: doc.bustSize ?? "",
+    waistSize: doc.waistSize ?? "",
+    hipSize: doc.hipSize ?? "",
+    additionalMeasurements: doc.additionalMeasurements ?? "",
+    notes: doc.notes ?? "",
+    referenceImage: doc.referenceImage ?? "",
+    referenceImages:
+      doc.referenceImages?.length
+        ? doc.referenceImages
+        : doc.referenceImage
+          ? [doc.referenceImage]
+          : [],
+    paymentGatewayStatus: doc.paymentGatewayStatus ?? "",
+    paymentGatewayResponse: doc.paymentGatewayResponse ?? "",
+    paidAt: doc.paidAt ?? null,
+    deliveryAddress: {
+      addressLine: doc.deliveryAddress.addressLine,
+      city: doc.deliveryAddress.city,
+      stateRegion: doc.deliveryAddress.stateRegion,
+      country: doc.deliveryAddress.country,
+    },
+    status: doc.status,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  };
 }
 
 export async function getCustomOrdersByUserId(userId: string) {

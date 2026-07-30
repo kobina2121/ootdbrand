@@ -22,6 +22,17 @@ type AdminCustomOrdersPageProps = {
  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+function shouldVerifyPaymentStatus(order: Awaited<ReturnType<typeof listCustomOrders>>[number]) {
+ const gatewayStatus = order.paymentGatewayStatus.toLowerCase();
+ const gatewayResponse = order.paymentGatewayResponse.toLowerCase();
+
+ return (
+ order.status === "Pending" ||
+ (order.status === "Failed" &&
+ (gatewayStatus === "abandoned" || gatewayResponse.includes("not completed") || gatewayResponse.includes("incomplete")))
+ );
+}
+
 export default async function AdminCustomOrdersPage({ searchParams }: AdminCustomOrdersPageProps) {
  const params = await searchParams;
  const statusParam = typeof params.status === "string" ? params.status : "all";
@@ -35,7 +46,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  const safePage = Math.min(page, totalPages);
  const customOrders = allCustomOrders.slice((safePage - 1) * pageSize, safePage * pageSize);
  const pendingPaymentReferences = customOrders
- .filter((order) => order.status === "Pending")
+ .filter(shouldVerifyPaymentStatus)
  .map((order) => order.paymentReference);
 
  const successCount = allCustomOrders.filter((order) => order.status === "Success").length;
@@ -104,7 +115,70 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  </CardHeader>
  </Card>
 
- <Card className="border-black/10 bg-white/90 shadow-sm ">
+ <div className="space-y-3 lg:hidden">
+ {customOrders.length === 0 ? (
+ <Card className="border-black/10 bg-white/90 shadow-sm">
+ <CardContent className="py-10 text-center text-muted-foreground">
+ <div className="flex flex-col items-center gap-2">
+ <Ruler className="size-6 text-muted-foreground" />
+ <p>No custom orders yet.</p>
+ </div>
+ </CardContent>
+ </Card>
+ ) : (
+ customOrders.map((order) => {
+ const uploadedReferences = order.referenceImages?.length
+ ? order.referenceImages
+ : order.referenceImage
+ ? [order.referenceImage]
+ : [];
+
+ return (
+ <article key={order.id} className="group relative space-y-3 rounded-2xl border border-black/10 bg-white/90 p-4 shadow-sm transition active:scale-[0.99]">
+ <Link href={`/admin/custom-orders/${encodeURIComponent(order.paymentReference)}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={`View custom order ${order.paymentReference}`} />
+ <div className="relative z-10 space-y-3 pointer-events-none">
+ <div className="flex items-start justify-between gap-3">
+ <div>
+ <p className="text-xs uppercase tracking-wide text-muted-foreground">Reference</p>
+ <p className="font-medium">{order.paymentReference}</p>
+ <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
+ </div>
+ <Badge
+ variant={order.status === "Failed" ? "destructive" : "default"}
+ className={order.status === "Success" ? "bg-emerald-600 text-white hover:bg-emerald-600" : undefined}
+ >
+ {order.status}
+ </Badge>
+ </div>
+ <div className="flex gap-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3">
+ <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-black/5">
+ {order.productImage ? (
+ <Image src={order.productImage} alt={order.productName} width={80} height={80} unoptimized className="h-full w-full object-cover" />
+ ) : null}
+ </div>
+ <div className="min-w-0 flex-1">
+ <p className="truncate font-medium">{order.productName}</p>
+ <p className="text-xs text-muted-foreground">{order.category} · {order.size} · {order.color}</p>
+ <p className="text-xs text-muted-foreground">References: {uploadedReferences.length}</p>
+ </div>
+ </div>
+ <div className="grid gap-2 text-sm sm:grid-cols-2">
+ <p><span className="text-muted-foreground">Customer:</span> {order.fullName}</p>
+ <p><span className="text-muted-foreground">Total:</span> {formatPriceNgn(order.amountTotal)}</p>
+ <p><span className="text-muted-foreground">Delivery:</span> {order.deliveryStatus}</p>
+ <p><span className="text-muted-foreground">Gateway:</span> {order.paymentGatewayStatus || "N/A"}</p>
+ </div>
+ <div className="pointer-events-auto border-t border-black/10 pt-3">
+ <OrderTableActions reference={order.paymentReference} customerEmail={order.email} orderType="custom" />
+ </div>
+ </div>
+ </article>
+ );
+ })
+ )}
+ </div>
+
+ <Card className="hidden border-black/10 bg-white/90 shadow-sm lg:block">
  <CardContent className="overflow-x-auto p-0">
  <Table className="min-w-[1180px]">
  <TableHeader>
@@ -128,16 +202,21 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  </TableCell>
  </TableRow>
  ) : (
- customOrders.map((order) => (
- <TableRow key={order.id}>
+ customOrders.map((order) => {
+ const orderHref = `/admin/custom-orders/${encodeURIComponent(order.paymentReference)}`;
+
+ return (
+ <TableRow key={order.id} className="cursor-pointer">
  <TableCell className="align-top">
- <div className="space-y-1">
- <p className="font-medium">{order.paymentReference}</p>
+ <Link href={orderHref} className="block space-y-1 text-inherit hover:no-underline">
+ <span className="font-medium hover:underline">
+ {order.paymentReference}
+ </span>
  <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
- </div>
+ </Link>
  </TableCell>
  <TableCell className="align-top">
- <div className="space-y-1">
+ <Link href={orderHref} className="block space-y-1 text-inherit hover:no-underline">
  <p className="font-medium">{order.fullName}</p>
  <p className="text-xs text-muted-foreground">{order.email}</p>
  <p className="text-xs text-muted-foreground">{order.phone}</p>
@@ -145,9 +224,10 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  {order.deliveryAddress.addressLine}, {order.deliveryAddress.city}, {order.deliveryAddress.stateRegion},{" "}
  {order.deliveryAddress.country}
  </p>
- </div>
+ </Link>
  </TableCell>
  <TableCell className="align-top">
+ <Link href={orderHref} className="block text-inherit hover:no-underline">
  {(() => {
  const uploadedReferences = order.referenceImages?.length
  ? order.referenceImages
@@ -251,6 +331,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  </div>
  );
  })()}
+ </Link>
  </TableCell>
  <TableCell className="align-top">
  <div className="space-y-1">
@@ -275,7 +356,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  </div>
  </TableCell>
  <TableCell className="align-top">
- <div className="space-y-1">
+ <Link href={orderHref} className="block space-y-1 text-inherit hover:no-underline">
  <Badge
  variant={order.status === "Failed" ? "destructive" : "default"}
  className={order.status === "Success" ? "bg-emerald-600 text-white hover:bg-emerald-600" : undefined}
@@ -283,13 +364,14 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  {order.status}
  </Badge>
  <p className="text-xs text-muted-foreground">{order.deliveryStatus}</p>
- </div>
+ </Link>
  </TableCell>
  <TableCell className="text-right">
  <OrderTableActions reference={order.paymentReference} customerEmail={order.email} orderType="custom" />
  </TableCell>
  </TableRow>
- ))
+ );
+ })
  )}
  </TableBody>
  </Table>

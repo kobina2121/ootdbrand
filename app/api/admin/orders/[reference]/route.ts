@@ -8,6 +8,7 @@ import { connectToDatabase } from "@/lib/db/mongoose";
 import { checkRateLimit } from "@/lib/security/guards";
 
 const deliveryUpdateSchema = z.object({
+  status: z.enum(["Pending", "Success", "Failed"]).optional(),
   deliveryStatus: z.enum(["Pending", "Processing", "Shipped", "Delivered", "Cancelled"]).optional(),
   trackingNumber: z.string().trim().max(120).optional(),
   trackingUrl: z.string().trim().url().max(500).optional(),
@@ -46,13 +47,27 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
 
     const payload = parsed.data;
-    if (!payload.deliveryStatus && !payload.trackingNumber && !payload.trackingUrl && !payload.adminUpdate) {
+    if (!payload.status && !payload.deliveryStatus && !payload.trackingNumber && !payload.trackingUrl && !payload.adminUpdate) {
       return NextResponse.json(failure("No update provided"), { status: 400 });
     }
 
     await connectToDatabase();
 
-    const update: Record<string, string> = {};
+    const update: Record<string, string | Date> = {};
+    if (payload.status) {
+      update.status = payload.status;
+      update.paymentGatewayStatus = payload.status === "Success" ? "manual_success" : payload.status === "Failed" ? "manual_failed" : "manual_pending";
+      update.paymentGatewayResponse =
+        payload.status === "Success"
+          ? "Marked successful by admin after payment confirmation."
+          : payload.status === "Failed"
+            ? "Marked failed by admin."
+            : "Marked pending by admin.";
+
+      if (payload.status === "Success") {
+        update.paidAt = new Date();
+      }
+    }
     if (payload.deliveryStatus) {
       update.deliveryStatus = payload.deliveryStatus;
     }

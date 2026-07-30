@@ -124,6 +124,35 @@ describe("Admin custom order reference route", () => {
     );
   });
 
+  it("marks a custom order as manually paid", async () => {
+    mockRequireAdminUser.mockResolvedValue({ user: { id: "admin-id", role: "admin" } } as never);
+    mockFindOneAndUpdate.mockReturnValue(
+      mockLeanResult({ _id: "custom-paid", paymentReference: "CUS-ORDER-123", status: "Success" }) as never,
+    );
+
+    const request = new Request("http://localhost:3000/api/admin/custom-orders/CUS-ORDER-123", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ status: "Success" }),
+    });
+
+    const response = await PATCH(request, context);
+
+    expect(response.status).toBe(200);
+    expect(mockFindOneAndUpdate).toHaveBeenCalledWith(
+      { paymentReference: "CUS-ORDER-123" },
+      {
+        $set: {
+          status: "Success",
+          paymentGatewayStatus: "manual_success",
+          paymentGatewayResponse: "Marked successful by admin after payment confirmation.",
+          paidAt: expect.any(Date),
+        },
+      },
+      { returnDocument: "after" },
+    );
+  });
+
   it("deletes a custom order successfully", async () => {
     mockRequireAdminUser.mockResolvedValue({ user: { id: "admin-id", role: "admin" } } as never);
     mockFindOneAndDelete.mockReturnValue(

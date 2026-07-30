@@ -3,15 +3,19 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
+import { useOptionalCart } from "@/components/store/cart-provider";
+
 type PaymentStatusVerifierProps = {
  references: string[];
  maxAttempts?: number;
+ clearCartOnSuccess?: boolean;
 };
 
 type VerifyResponse = {
  ok?: boolean;
  data?: {
  orderStatus?: "Pending" | "Success" | "Failed";
+ orderType?: "store" | "custom";
  };
 };
 
@@ -21,8 +25,9 @@ function wait(ms: number) {
  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function PaymentStatusVerifier({ references, maxAttempts = 1 }: PaymentStatusVerifierProps) {
+export function PaymentStatusVerifier({ references, maxAttempts = 1, clearCartOnSuccess = false }: PaymentStatusVerifierProps) {
  const router = useRouter();
+ const cart = useOptionalCart();
  const verifiedKeyRef = useRef("");
 
  useEffect(() => {
@@ -57,8 +62,13 @@ export function PaymentStatusVerifier({ references, maxAttempts = 1 }: PaymentSt
 
  const payload = (await response.json()) as VerifyResponse;
  const orderStatus = payload.data?.orderStatus;
+ const orderType = payload.data?.orderType;
 
  if (payload.ok && orderStatus && orderStatus !== "Pending") {
+ if (clearCartOnSuccess && orderStatus === "Success" && orderType && cart?.userRole !== "admin") {
+ await cart?.clearCart().catch(() => null);
+ }
+
  if (!isCancelled) {
  router.refresh();
  }
@@ -86,7 +96,7 @@ export function PaymentStatusVerifier({ references, maxAttempts = 1 }: PaymentSt
  return () => {
  isCancelled = true;
  };
- }, [maxAttempts, references, router]);
+ }, [cart, clearCartOnSuccess, maxAttempts, references, router]);
 
  return null;
 }

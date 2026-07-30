@@ -51,6 +51,7 @@ export default function CartPage() {
  userRole,
  } = useCart();
  const [pendingSku, setPendingSku] = useState<string | null>(null);
+ const [removingSku, setRemovingSku] = useState<string | null>(null);
  const [couponCodeInput, setCouponCodeInput] = useState(discountCode);
  const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>({});
  const previousQuantitiesRef = useRef<Record<string, number>>({});
@@ -173,12 +174,15 @@ export default function CartPage() {
  };
 
  const handleRemoveItem = async (sku: string) => {
+ setRemovingSku(sku);
  try {
  await removeItem(sku);
  toast.success("Item removed from cart");
  } catch (error) {
  const message = error instanceof Error ? error.message : "Could not remove item.";
  toast.error(message);
+ } finally {
+ setRemovingSku(null);
  }
  };
 
@@ -245,7 +249,7 @@ export default function CartPage() {
  <p className="text-sm font-medium text-[#4b433c] ">{formatPriceNgn(item.unitPrice)}</p>
  </div>
  </div>
-	 <div className="flex flex-wrap items-center gap-2">
+	 <div className="flex flex-wrap items-center gap-2 sm:justify-end">
  <Input
  value={quantityDrafts[item.sku] ?? item.quantity}
  type="number"
@@ -275,8 +279,15 @@ export default function CartPage() {
  void handleQuantityUpdate(item.sku, value);
  }}
  />
- <Button variant="outline" className="rounded-full " onClick={() => void handleRemoveItem(item.sku)}>
- Remove
+ <Button
+ type="button"
+ variant="outline"
+ className="min-h-11 rounded-full border-red-200 px-5 text-red-700 hover:border-red-300 hover:bg-red-50 hover:text-red-800"
+ onClick={() => void handleRemoveItem(item.sku)}
+ disabled={removingSku === item.sku}
+ aria-label={`Remove ${item.name} from cart`}
+ >
+ {removingSku === item.sku ? "Removing..." : "Remove"}
  </Button>
  </div>
  {pendingSku === item.sku ? <span className="text-xs text-muted-foreground ">Syncing...</span> : null}

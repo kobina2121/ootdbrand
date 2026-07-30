@@ -4,12 +4,12 @@ import { useEffect, useRef } from "react";
 
 import { useCart } from "@/components/store/cart-provider";
 
-export function ClearCartOnSuccess() {
-  const { clearCart, itemCount, userRole } = useCart();
+export function ClearCartOnSuccess({ shouldClear = true }: { shouldClear?: boolean }) {
+  const { clearCart, userRole } = useCart();
   const hasRun = useRef(false);
 
   useEffect(() => {
-    if (hasRun.current || userRole === "admin" || itemCount === 0) {
+    if (!shouldClear || hasRun.current || userRole === "admin") {
       return;
     }
 
@@ -17,7 +17,7 @@ export function ClearCartOnSuccess() {
     void clearCart().catch(() => {
       hasRun.current = false;
     });
-  }, [clearCart, itemCount, userRole]);
+  }, [clearCart, shouldClear, userRole]);
 
   return null;
 }

@@ -28,14 +28,14 @@ function adminOrdersLink(orderType: AdminAlertOrderInput["orderType"]) {
 export async function notifyAdminNewOrder(input: AdminAlertOrderInput) {
   const typeLabel = orderTypeLabel(input.orderType);
   const baseUrl = getAppBaseUrl();
-  const linkPath = adminOrdersLink(input.orderType);
+  const linkPath = `${adminOrdersLink(input.orderType)}/${encodeURIComponent(input.reference)}`;
   const link = `${baseUrl}${linkPath}`;
   const amountText = formatPriceNgn(input.amount);
 
   await createAdminNotification({
     type: input.orderType,
-    title: `New ${typeLabel}`,
-    message: `${input.customerName} placed a ${input.orderType === "custom-order" ? "custom" : "store"} order (${amountText}).`,
+    title: `Paid ${typeLabel}`,
+    message: `${input.customerName} paid for a ${input.orderType === "custom-order" ? "custom" : "store"} order (${amountText}).`,
     link: linkPath,
     metadata: {
       reference: input.reference,
