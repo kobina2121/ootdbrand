@@ -6,6 +6,7 @@ import { OrderTableActions } from "@/components/admin/order-table-actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ClickableContainer } from "@/components/ui/clickable-container";
 import { PaymentStatusVerifier } from "@/components/store/payment-status-verifier";
 import {
  Table,
@@ -134,9 +135,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  : [];
 
  return (
- <article key={order.id} className="group relative space-y-3 rounded-2xl border border-black/10 bg-white/90 p-4 shadow-sm transition active:scale-[0.99]">
- <Link href={`/admin/custom-orders/${encodeURIComponent(order.paymentReference)}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={`View custom order ${order.paymentReference}`} />
- <div className="relative z-10 space-y-3 pointer-events-none">
+ <ClickableContainer key={order.id} href={`/admin/custom-orders/${encodeURIComponent(order.paymentReference)}`} className="group space-y-3 rounded-2xl border border-black/10 bg-white/90 p-4 shadow-sm transition active:scale-[0.99]">
  <div className="flex items-start justify-between gap-3">
  <div>
  <p className="text-xs uppercase tracking-wide text-muted-foreground">Reference</p>
@@ -168,11 +167,10 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  <p><span className="text-muted-foreground">Delivery:</span> {order.deliveryStatus}</p>
  <p><span className="text-muted-foreground">Gateway:</span> {order.paymentGatewayStatus || "N/A"}</p>
  </div>
- <div className="pointer-events-auto border-t border-black/10 pt-3">
+ <div className="border-t border-black/10 pt-3">
  <OrderTableActions reference={order.paymentReference} customerEmail={order.email} orderType="custom" />
  </div>
- </div>
- </article>
+ </ClickableContainer>
  );
  })
  )}
@@ -206,7 +204,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  const orderHref = `/admin/custom-orders/${encodeURIComponent(order.paymentReference)}`;
 
  return (
- <TableRow key={order.id} className="cursor-pointer">
+ <ClickableContainer as="tr" key={order.id} href={orderHref}>
  <TableCell className="align-top">
  <Link href={orderHref} className="block space-y-1 text-inherit hover:no-underline">
  <span className="font-medium hover:underline">
@@ -369,7 +367,7 @@ export default async function AdminCustomOrdersPage({ searchParams }: AdminCusto
  <TableCell className="text-right">
  <OrderTableActions reference={order.paymentReference} customerEmail={order.email} orderType="custom" />
  </TableCell>
- </TableRow>
+ </ClickableContainer>
  );
  })
  )}
