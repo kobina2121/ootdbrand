@@ -286,16 +286,15 @@ export function AppShell({ children, user }: AppShellProps) {
 
  <div className="mt-10 grid gap-2 border-t border-black/10 pt-6 text-center text-sm text-[#5f5954] sm:grid-cols-3 sm:items-center sm:text-left">
               <p>© <span suppressHydrationWarning>{new Date().getFullYear()}</span> theootd.brand. All rights reserved.</p>
- <div className="space-y-1 sm:text-center">
- <p>Made by Kobina.</p>
+ <div className="space-y-2 sm:text-center">
  <p>
- Product of Loo<span className="text-[#ff4028]">prompt.</span>
+ A Loo<span className="text-[#de3f7c]">prompt</span> Product
  </p>
  <Image
- src="/images/logo/looprompt-icon.png"
- alt="Looprompt"
- width={24}
- height={24}
+ src="/images/logo/looprompt-mark.png"
+ alt="Looprompt mark"
+ width={28}
+ height={31}
  className="mx-auto"
  />
  </div>
