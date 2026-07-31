@@ -1,15 +1,21 @@
 import Link from "next/link";
 
 import { ClearCartOnSuccess } from "@/components/store/clear-cart-on-success";
+import { PurchaseThankYouDialog } from "@/components/store/purchase-thank-you-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { verifyPaystackTransaction } from "@/lib/paystack/client";
 import {
+  getCustomOrderDetailsByReference,
   isCustomOrderReferenceOwnedByUser,
   reconcileCustomOrderAfterVerification,
 } from "@/lib/services/custom-order-service";
-import { isOrderReferenceOwnedByUser, reconcileOrderAfterVerification } from "@/lib/services/order-service";
+import {
+  getOrderDetailsByReference,
+  isOrderReferenceOwnedByUser,
+  reconcileOrderAfterVerification,
+} from "@/lib/services/order-service";
 import { recordPaymentEvent } from "@/lib/services/payment-event-service";
 
 type FailedPageProps = {
@@ -23,6 +29,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  const reference = typeof params.reference === "string" ? params.reference : "";
  let state: FailedViewState = "failed";
  let checkoutOrderType: "store" | "custom" | null = null;
+ let customerName = "Customer";
 
  if (reference) {
  const session = await requireAuthenticatedUser();
@@ -44,9 +51,17 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  }
 
  if (session.user.role !== "admin") {
+ customerName = session.user.name?.trim() || "Customer";
  const ownsStoreOrder = await isOrderReferenceOwnedByUser(reference, session.user.id);
  const ownsCustomOrder = ownsStoreOrder ? false : await isCustomOrderReferenceOwnedByUser(reference, session.user.id);
  checkoutOrderType = ownsStoreOrder ? "store" : ownsCustomOrder ? "custom" : null;
+ if (checkoutOrderType === "store") {
+ const orderDetails = await getOrderDetailsByReference(reference, session.user.id);
+ customerName = orderDetails?.shippingAddress.fullName?.trim() || customerName;
+ } else if (checkoutOrderType === "custom") {
+ const customOrderDetails = await getCustomOrderDetailsByReference(reference, session.user.id);
+ customerName = customOrderDetails?.fullName?.trim() || customerName;
+ }
 
  if (!ownsStoreOrder && !ownsCustomOrder) {
  return (
@@ -107,6 +122,11 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  if (state === "success") {
  return (
  <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <PurchaseThankYouDialog
+ customerName={customerName}
+ orderHref={`/orders/${encodeURIComponent(reference)}`}
+ status="success"
+ />
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Payment Successful</CardTitle>
  </CardHeader>
@@ -125,6 +145,13 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  return (
  <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <ClearCartOnSuccess shouldClear={checkoutOrderType === "store"} />
+ {checkoutOrderType ? (
+ <PurchaseThankYouDialog
+ customerName={customerName}
+ orderHref={`/orders/${encodeURIComponent(reference)}`}
+ status="pending"
+ />
+ ) : null}
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Payment Pending</CardTitle>
  </CardHeader>
