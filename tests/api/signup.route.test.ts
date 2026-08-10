@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { isSmtpConfigured, sendSignupVerificationEmail } from "@/lib/email/smtp";
+import { isResendConfigured, sendSignupVerificationEmail } from "@/lib/email/resend";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { createCustomerUser, DuplicateUserError } from "@/lib/services/user-service";
 
-vi.mock("@/lib/email/smtp", () => ({
-  isSmtpConfigured: vi.fn(),
+vi.mock("@/lib/email/resend", () => ({
+  isResendConfigured: vi.fn(),
   sendSignupVerificationEmail: vi.fn(),
 }));
 
@@ -27,7 +27,7 @@ vi.mock("@/lib/services/user-service", () => ({
 
 import { POST } from "@/app/api/auth/signup/route";
 
-const mockIsSmtpConfigured = vi.mocked(isSmtpConfigured);
+const mockIsResendConfigured = vi.mocked(isResendConfigured);
 const mockSendSignupVerificationEmail = vi.mocked(sendSignupVerificationEmail);
 const mockCheckRateLimit = vi.mocked(checkRateLimit);
 const mockIsJsonRequest = vi.mocked(isJsonRequest);
@@ -37,7 +37,7 @@ const mockCreateCustomerUser = vi.mocked(createCustomerUser);
 describe("POST /api/auth/signup", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockIsSmtpConfigured.mockReturnValue(true);
+    mockIsResendConfigured.mockReturnValue(true);
     mockCheckRateLimit.mockReturnValue({ ok: true, retryAfterSeconds: 0 });
     mockIsJsonRequest.mockReturnValue(true);
     mockIsTrustedOrigin.mockReturnValue(true);
@@ -85,7 +85,7 @@ describe("POST /api/auth/signup", () => {
   });
 
   it("returns 500 when signup email verification is not configured", async () => {
-    mockIsSmtpConfigured.mockReturnValue(false);
+    mockIsResendConfigured.mockReturnValue(false);
 
     const request = new Request("http://localhost:3000/api/auth/signup", {
       method: "POST",
@@ -103,7 +103,7 @@ describe("POST /api/auth/signup", () => {
     expect(response.status).toBe(500);
     expect(body).toMatchObject({
       ok: false,
-      message: "Signup verification is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM.",
+      message: "Signup verification is not configured. Set RESEND_API_KEY and EMAIL_FROM.",
     });
     expect(mockCreateCustomerUser).not.toHaveBeenCalled();
   });

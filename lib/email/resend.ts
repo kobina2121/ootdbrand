@@ -1,5 +1,3 @@
-import nodemailer from "nodemailer";
-
 type SendResetPasswordEmailInput = {
   to: string;
   resetUrl: string;
@@ -33,26 +31,25 @@ type SendAdminOrderEmailInput = {
 };
 
 const DEFAULT_ADMIN_ORDER_NOTIFICATION_EMAIL = "adelineyeboah62@gmail.com";
+const RESEND_EMAIL_ENDPOINT = "https://api.resend.com/emails";
 
-function getSmtpConfig() {
-  const host = process.env.SMTP_HOST?.trim();
-  const port = Number(process.env.SMTP_PORT || "587");
-  const user = process.env.SMTP_USER?.trim();
-  const pass = process.env.SMTP_PASS;
+type SendEmailInput = {
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+};
+
+function getResendConfig() {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.EMAIL_FROM?.trim();
 
-  if (!host || !port || !user || !pass || !from) {
+  if (!apiKey || !from) {
     return null;
   }
 
   return {
-    host,
-    port,
-    secure: port === 465,
-    auth: {
-      user,
-      pass,
-    },
+    apiKey,
     from,
   };
 }
@@ -66,8 +63,8 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#39;");
 }
 
-export function isSmtpConfigured() {
-  return Boolean(getSmtpConfig());
+export function isResendConfigured() {
+  return Boolean(getResendConfig());
 }
 
 function getAdminOrderNotificationEmail() {
@@ -77,26 +74,47 @@ function getAdminOrderNotificationEmail() {
   );
 }
 
-export async function sendResetPasswordEmail(input: SendResetPasswordEmailInput) {
-  const config = getSmtpConfig();
+async function sendEmail(input: SendEmailInput) {
+  const config = getResendConfig();
 
   if (!config) {
-    throw new Error("SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM.");
+    throw new Error("Email is not configured. Set RESEND_API_KEY and EMAIL_FROM.");
   }
 
-  const transporter = nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    auth: config.auth,
+  const response = await fetch(RESEND_EMAIL_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: config.from,
+      to: input.to,
+      subject: input.subject,
+      text: input.text,
+      html: input.html,
+    }),
   });
 
+  if (!response.ok) {
+    let details = "";
+    try {
+      const errorBody = (await response.json()) as { message?: string; error?: string };
+      details = errorBody.message || errorBody.error || "";
+    } catch {
+      details = await response.text().catch(() => "");
+    }
+
+    throw new Error(`Resend email failed with status ${response.status}${details ? `: ${details}` : ""}`);
+  }
+}
+
+export async function sendResetPasswordEmail(input: SendResetPasswordEmailInput) {
   const brandName = input.brandName || "theootd.brand";
   const safeBrandName = escapeHtml(brandName);
   const safeResetUrl = escapeHtml(input.resetUrl);
 
-  await transporter.sendMail({
-    from: config.from,
+  await sendEmail({
     to: input.to,
     subject: `${brandName} password reset`,
     text: `You requested a password reset.\n\nOpen this link to reset your password:\n${input.resetUrl}\n\nIf you did not request this, you can ignore this email.`,
@@ -120,27 +138,13 @@ export async function sendResetPasswordEmail(input: SendResetPasswordEmailInput)
 }
 
 export async function sendEmailChangeVerificationEmail(input: SendEmailChangeVerificationEmailInput) {
-  const config = getSmtpConfig();
-
-  if (!config) {
-    throw new Error("SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM.");
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    auth: config.auth,
-  });
-
   const brandName = input.brandName || "theootd.brand";
   const safeBrandName = escapeHtml(brandName);
   const safeCurrentEmail = escapeHtml(input.currentEmail);
   const safeVerificationCode = escapeHtml(input.verificationCode);
   const safeVerifyUrl = input.verifyUrl ? escapeHtml(input.verifyUrl) : null;
 
-  await transporter.sendMail({
-    from: config.from,
+  await sendEmail({
     to: input.to,
     subject: `${brandName} email verification`,
     text: [
@@ -185,26 +189,12 @@ export async function sendEmailChangeVerificationEmail(input: SendEmailChangeVer
 }
 
 export async function sendSignupVerificationEmail(input: SendSignupVerificationEmailInput) {
-  const config = getSmtpConfig();
-
-  if (!config) {
-    throw new Error("SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM.");
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    auth: config.auth,
-  });
-
   const brandName = input.brandName || "theootd.brand";
   const safeBrandName = escapeHtml(brandName);
   const safeVerificationCode = escapeHtml(input.verificationCode);
   const safeVerifyUrl = input.verifyUrl ? escapeHtml(input.verifyUrl) : null;
 
-  await transporter.sendMail({
-    from: config.from,
+  await sendEmail({
     to: input.to,
     subject: `${brandName} signup verification code`,
     text: [
@@ -241,19 +231,11 @@ export async function sendSignupVerificationEmail(input: SendSignupVerificationE
 }
 
 export async function sendAdminOrderEmail(input: SendAdminOrderEmailInput) {
-  const config = getSmtpConfig();
   const adminEmail = getAdminOrderNotificationEmail();
 
-  if (!config || !adminEmail) {
+  if (!getResendConfig() || !adminEmail) {
     return;
   }
-
-  const transporter = nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    auth: config.auth,
-  });
 
   const safeType = escapeHtml(input.orderType);
   const safeReference = escapeHtml(input.reference);
@@ -264,8 +246,7 @@ export async function sendAdminOrderEmail(input: SendAdminOrderEmailInput) {
   const safeCreatedAt = escapeHtml(input.createdAtText);
   const safeAdminLink = escapeHtml(input.adminLink);
 
-  await transporter.sendMail({
-    from: config.from,
+  await sendEmail({
     to: adminEmail,
     subject: `[theootd.brand] Paid ${input.orderType} • ${input.reference}`,
     text: [

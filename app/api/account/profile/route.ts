@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
-import { isSmtpConfigured, sendEmailChangeVerificationEmail } from "@/lib/email/smtp";
+import { isResendConfigured, sendEmailChangeVerificationEmail } from "@/lib/email/resend";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { updateProfileForUser } from "@/lib/services/user-service";
 
@@ -51,9 +51,9 @@ export async function PATCH(request: Request) {
     const requestedEmail = parsed.data.email.toLowerCase();
     const currentEmail = session.user.email?.trim().toLowerCase();
 
-    if (currentEmail && requestedEmail !== currentEmail && !isSmtpConfigured()) {
+    if (currentEmail && requestedEmail !== currentEmail && !isResendConfigured()) {
       return NextResponse.json(
-        failure("Email verification is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM."),
+        failure("Email verification is not configured. Set RESEND_API_KEY and EMAIL_FROM."),
         { status: 500 },
       );
     }

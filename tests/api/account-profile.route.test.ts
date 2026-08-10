@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
-import { isSmtpConfigured, sendEmailChangeVerificationEmail } from "@/lib/email/smtp";
+import { isResendConfigured, sendEmailChangeVerificationEmail } from "@/lib/email/resend";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { updateProfileForUser } from "@/lib/services/user-service";
 
@@ -15,8 +15,8 @@ vi.mock("@/lib/security/guards", () => ({
   isTrustedOrigin: vi.fn(),
 }));
 
-vi.mock("@/lib/email/smtp", () => ({
-  isSmtpConfigured: vi.fn(),
+vi.mock("@/lib/email/resend", () => ({
+  isResendConfigured: vi.fn(),
   sendEmailChangeVerificationEmail: vi.fn(),
 }));
 
@@ -30,7 +30,7 @@ const mockRequireAuthenticatedUser = vi.mocked(requireAuthenticatedUser);
 const mockCheckRateLimit = vi.mocked(checkRateLimit);
 const mockIsJsonRequest = vi.mocked(isJsonRequest);
 const mockIsTrustedOrigin = vi.mocked(isTrustedOrigin);
-const mockIsSmtpConfigured = vi.mocked(isSmtpConfigured);
+const mockIsResendConfigured = vi.mocked(isResendConfigured);
 const mockSendEmailChangeVerificationEmail = vi.mocked(sendEmailChangeVerificationEmail);
 const mockUpdateProfileForUser = vi.mocked(updateProfileForUser);
 
@@ -40,7 +40,7 @@ describe("PATCH /api/account/profile", () => {
     mockIsTrustedOrigin.mockReturnValue(true);
     mockIsJsonRequest.mockReturnValue(true);
     mockCheckRateLimit.mockReturnValue({ ok: true, retryAfterSeconds: 0 });
-    mockIsSmtpConfigured.mockReturnValue(true);
+    mockIsResendConfigured.mockReturnValue(true);
   });
 
   it("updates the authenticated user profile when the email is unchanged", async () => {

@@ -1,4 +1,4 @@
-import { sendAdminOrderEmail } from "@/lib/email/smtp";
+import { sendAdminOrderEmail } from "@/lib/email/resend";
 import { formatPriceNgn } from "@/lib/products";
 import { createAdminNotification } from "@/lib/services/admin-notification-service";
 

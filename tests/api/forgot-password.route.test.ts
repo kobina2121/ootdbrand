@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
-import { isSmtpConfigured, sendResetPasswordEmail } from "@/lib/email/smtp";
+import { isResendConfigured, sendResetPasswordEmail } from "@/lib/email/resend";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { requestPasswordReset } from "@/lib/services/user-service";
 
@@ -9,8 +9,8 @@ vi.mock("@/lib/auth/guards", () => ({
   requireAuthenticatedUser: vi.fn(),
 }));
 
-vi.mock("@/lib/email/smtp", () => ({
-  isSmtpConfigured: vi.fn(),
+vi.mock("@/lib/email/resend", () => ({
+  isResendConfigured: vi.fn(),
   sendResetPasswordEmail: vi.fn(),
 }));
 
@@ -27,7 +27,7 @@ vi.mock("@/lib/services/user-service", () => ({
 import { POST } from "@/app/api/auth/forgot-password/route";
 
 const mockRequireAuthenticatedUser = vi.mocked(requireAuthenticatedUser);
-const mockIsSmtpConfigured = vi.mocked(isSmtpConfigured);
+const mockIsResendConfigured = vi.mocked(isResendConfigured);
 const mockSendResetPasswordEmail = vi.mocked(sendResetPasswordEmail);
 const mockCheckRateLimit = vi.mocked(checkRateLimit);
 const mockIsJsonRequest = vi.mocked(isJsonRequest);
@@ -38,7 +38,7 @@ describe("POST /api/auth/forgot-password", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRequireAuthenticatedUser.mockResolvedValue(null);
-    mockIsSmtpConfigured.mockReturnValue(true);
+    mockIsResendConfigured.mockReturnValue(true);
     mockCheckRateLimit.mockReturnValue({ ok: true, retryAfterSeconds: 0 });
     mockIsJsonRequest.mockReturnValue(true);
     mockIsTrustedOrigin.mockReturnValue(true);

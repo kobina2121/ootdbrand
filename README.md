@@ -28,10 +28,8 @@ Copy `.env.example` to `.env` and fill values:
 - `NEXT_PUBLIC_APP_URL`
 - `STORE_DISCOUNT_CODES` (optional JSON array of active coupon rules)
 - `EMAIL_FROM` (e.g. `"theootd.brand <no-reply@yourdomain.com>"`)
-- `SMTP_HOST`
-- `SMTP_PORT` (usually `587` or `465`)
-- `SMTP_USER`
-- `SMTP_PASS`
+- `RESEND_API_KEY`
+- `ADMIN_ORDER_NOTIFICATION_EMAIL` (optional; defaults to `adelineyeboah62@gmail.com`)
 
 For local Google OAuth, add this redirect URI in Google Cloud Console:
 

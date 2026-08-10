@@ -24,10 +24,8 @@ Set all required env vars in your deployment platform:
 - [ ] `PAYSTACK_WEBHOOK_SECRET`
 - [ ] `NEXT_PUBLIC_APP_URL`
 - [ ] `EMAIL_FROM`
-- [ ] `SMTP_HOST`
-- [ ] `SMTP_PORT`
-- [ ] `SMTP_USER`
-- [ ] `SMTP_PASS`
+- [ ] `RESEND_API_KEY`
+- [ ] `ADMIN_ORDER_NOTIFICATION_EMAIL`
 - [ ] `ADMIN_EMAIL`
 - [ ] `ADMIN_PASSWORD`
 - [ ] `CUSTOM_ORDER_DEPOSIT_GHS` (optional, defaults to `150`)

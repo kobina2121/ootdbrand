@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { failure, success } from "@/lib/api-response";
-import { isSmtpConfigured, sendSignupVerificationEmail } from "@/lib/email/smtp";
+import { isResendConfigured, sendSignupVerificationEmail } from "@/lib/email/resend";
 import { checkRateLimit, isJsonRequest, isTrustedOrigin } from "@/lib/security/guards";
 import { createCustomerUser, DuplicateUserError } from "@/lib/services/user-service";
 
@@ -45,9 +45,9 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("Invalid signup details"), { status: 400 });
     }
 
-    if (!isSmtpConfigured()) {
+    if (!isResendConfigured()) {
       return NextResponse.json(
-        failure("Signup verification is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM."),
+        failure("Signup verification is not configured. Set RESEND_API_KEY and EMAIL_FROM."),
         { status: 500 },
       );
     }
