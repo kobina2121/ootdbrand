@@ -81,7 +81,6 @@ const editorialShowcase = {
  description:
  "Elevated silhouettes made to flatter every shape. Step into timeless pieces that carry confidence from day to night.",
  cta: "SHOP COLLECTION",
- image: "/images/categories/accessories.jpg",
  video: "/videos/editorial-showcase.mp4",
 } as const;
 
@@ -175,7 +174,6 @@ export default async function HomePage() {
 	 <div className="relative min-h-[320px] border-t border-black/5 sm:min-h-[420px] lg:border-l lg:border-t-0">
  <LazyShowcaseVideo
  src={editorialShowcase.video}
- poster={editorialShowcase.image}
  className="h-full w-full bg-cover bg-center object-cover object-center animate-hero-zoom"
  />
  </div>

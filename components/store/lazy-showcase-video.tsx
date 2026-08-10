@@ -8,7 +8,7 @@ export function LazyShowcaseVideo({
  className,
 }: {
  src: string;
- poster: string;
+ poster?: string;
  className?: string;
 }) {
  const containerRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +54,7 @@ export function LazyShowcaseVideo({
  aria-label="Signature dresses preview"
  role="img"
  className={className}
- style={{ backgroundImage: `url(${poster})` }}
+ style={poster ? { backgroundImage: `url(${poster})` } : undefined}
  />
  )}
  </div>
