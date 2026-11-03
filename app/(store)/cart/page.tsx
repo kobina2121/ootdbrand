@@ -242,14 +242,14 @@ export default function CartPage() {
  <h2 className="font-heading text-4xl leading-none font-medium text-[#1d1b1a] sm:text-5xl">
  {outfits.length === 1 ? "Your Outfit" : "Your Outfits"}
  </h2>
- <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
+ <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
  {outfits.map(({ top, bottom, quantity }) => (
  <figure key={`${top.sku}-${bottom.sku}`} className="space-y-2">
  <OutfitPreview
  topImage={top.image}
  bottomImage={bottom.image}
- label={`${top.name} worn with ${bottom.name}`}
- sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
+ label={`${top.name} with ${bottom.name}`}
+ sizes="(max-width: 767px) 50vw, (max-width: 1279px) 25vw, 16vw"
  />
  <figcaption className="text-sm text-[#3d3731]">
  {top.name} + {bottom.name}
@@ -258,7 +258,6 @@ export default function CartPage() {
  </figure>
  ))}
  </div>
- <p className="text-xs text-[#5f5954]">This preview joins the two product photos, so the real fit may look slightly different.</p>
  </section>
  ) : null}
 

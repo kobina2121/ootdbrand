@@ -389,14 +389,12 @@ export function ComboBuilder({
         <h2 className="font-heading text-4xl leading-none font-medium text-[#1d1b1a] sm:text-5xl">Your Combo</h2>
 
         {top && bottom && topSelection && bottomSelection ? (
-          <div className="mx-auto w-full max-w-[15rem]">
-            <OutfitPreview
-              topImage={getPreviewImage(top, topSelection, topVariant)}
-              bottomImage={getPreviewImage(bottom, bottomSelection, bottomVariant)}
-              label={`${top.name} worn with ${bottom.name}`}
-              sizes="15rem"
-            />
-          </div>
+          <OutfitPreview
+            topImage={getPreviewImage(top, topSelection, topVariant)}
+            bottomImage={getPreviewImage(bottom, bottomSelection, bottomVariant)}
+            label={`${top.name} with ${bottom.name}`}
+            sizes="(max-width: 1279px) 50vw, 11rem"
+          />
         ) : (
           <p className="text-sm leading-relaxed text-[#5f5954]">
             Choose a top and a bottom to see your outfit and save {formatPriceNgn(COMBO_DISCOUNT_GHS)}.
