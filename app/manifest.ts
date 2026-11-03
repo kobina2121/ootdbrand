@@ -5,14 +5,15 @@ const siteDescription = "Premium womenswear and custom pieces from theootd.brand
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: "/",
     name: siteName,
     short_name: siteName,
     description: siteDescription,
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#f7f5f1",
-    theme_color: "#f7f5f1",
+    background_color: "#f6f2ea",
+    theme_color: "#f6f2ea",
     icons: [
       {
         src: "/favicon.ico",
@@ -37,6 +38,12 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         src: "/apple-touch-icon.png",
         sizes: "180x180",
+        type: "image/png",
+      },
+      {
+        // Android Chrome needs both 192x192 and 512x512 PNGs to install without browser bars.
+        src: "/icon-192x192.png",
+        sizes: "192x192",
         type: "image/png",
       },
       {

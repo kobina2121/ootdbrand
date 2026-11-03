@@ -27,6 +27,11 @@ const cormorantGaramond = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   applicationName: siteName,
+  appleWebApp: {
+    capable: true,
+    title: siteName,
+    statusBarStyle: "default",
+  },
   title: {
     default: siteTitle,
     template: `%s | ${siteName}`,
