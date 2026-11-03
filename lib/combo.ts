@@ -68,6 +68,22 @@ export function pairComboItems(items: Array<{ sku: string; category: string; qua
   return pairs;
 }
 
+export function filterComboProducts<T extends { name: string; category: string }>(
+  products: T[],
+  query: string,
+  category: string,
+) {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  return products.filter(
+    (product) =>
+      (category === "all" || product.category === category) &&
+      (normalizedQuery === "" ||
+        product.name.toLowerCase().includes(normalizedQuery) ||
+        product.category.toLowerCase().includes(normalizedQuery)),
+  );
+}
+
 type SelectableVariant = {
   size: string;
   color: string;

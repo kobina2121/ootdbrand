@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   calculateComboDiscount,
+  filterComboProducts,
   getDefaultComboSelection,
   isBottomCategory,
   isTopCategory,
@@ -91,6 +92,38 @@ describe("pairComboItems", () => {
         { sku: "DRESS", category: "MAXI", quantity: 2 },
       ]),
     ).toEqual([]);
+  });
+});
+
+describe("filterComboProducts", () => {
+  const products = [
+    { name: "Ijeoma Capris", category: "CAPRIS" },
+    { name: "Wrap Skirt", category: "SKIRTS" },
+    { name: "Wide Leg Pants", category: "PANTS" },
+  ];
+  const names = (query: string, category = "all") => filterComboProducts(products, query, category).map((p) => p.name);
+
+  it("shows everything with no search or filter", () => {
+    expect(names("")).toHaveLength(3);
+    expect(names("   ")).toHaveLength(3);
+  });
+
+  it("searches names regardless of case and spacing", () => {
+    expect(names("  ijeoma ")).toEqual(["Ijeoma Capris"]);
+    expect(names("WRAP")).toEqual(["Wrap Skirt"]);
+  });
+
+  it("searches by type", () => {
+    expect(names("pants")).toEqual(["Wide Leg Pants"]);
+  });
+
+  it("combines search with the type filter", () => {
+    expect(names("", "SKIRTS")).toEqual(["Wrap Skirt"]);
+    expect(names("ijeoma", "SKIRTS")).toEqual([]);
+  });
+
+  it("returns nothing when no product matches", () => {
+    expect(names("zzz")).toEqual([]);
   });
 });
 
