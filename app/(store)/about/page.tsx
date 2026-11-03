@@ -84,7 +84,7 @@ export default function AboutPage() {
  <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[1.15fr_0.85fr]">
  <div className="flex items-end px-3 py-10 sm:px-5 sm:py-14 lg:px-6 lg:py-20 xl:px-8">
  <div className="space-y-6">
- <p className="text-xs tracking-[0.28em] text-[#7a1730] uppercase">About the brand</p>
+ <p className="text-xs tracking-[0.28em] text-[#c2185b] uppercase">About the brand</p>
  <h1 className="font-heading text-[clamp(3.5rem,11vw,10rem)] leading-[0.86] font-medium tracking-[-0.03em] text-[#1d1b1a] italic">
  theootd.brand
  </h1>
@@ -127,7 +127,7 @@ export default function AboutPage() {
  </section>
 
  <section className="grid gap-6 lg:grid-cols-12 lg:gap-10">
- <p className="text-xs tracking-[0.28em] text-[#7a1730] uppercase lg:col-span-3">Our Point Of View</p>
+ <p className="text-xs tracking-[0.28em] text-[#c2185b] uppercase lg:col-span-3">Our Point Of View</p>
  <div className="space-y-6 lg:col-span-9">
  <h2 className="font-heading text-[clamp(2.75rem,6.5vw,6rem)] leading-[0.98] font-medium tracking-[-0.02em] text-[#1d1b1a]">
  Clothing should make the moment feel sharper.
@@ -148,7 +148,7 @@ export default function AboutPage() {
  <section className="grid border-y border-[#1d1b1a] md:grid-cols-3 md:divide-x md:divide-[#1d1b1a]/20">
  {values.map((item, index) => (
  <article key={item.title} className="space-y-3 border-b border-[#1d1b1a]/20 py-6 last:border-b-0 md:border-b-0 md:px-6 md:py-8 md:first:pl-0 md:last:pr-0">
- <p className="font-heading text-2xl text-[#7a1730] italic">{String(index + 1).padStart(2, "0")}</p>
+ <p className="font-heading text-2xl text-[#c2185b] italic">{String(index + 1).padStart(2, "0")}</p>
  <h3 className="font-heading text-3xl leading-tight text-[#1d1b1a] sm:text-4xl">{item.title}</h3>
  <p className="text-sm leading-relaxed text-[#5f5954] sm:text-base">{item.description}</p>
  </article>
@@ -157,7 +157,7 @@ export default function AboutPage() {
 
  <section className="grid gap-12 lg:grid-cols-2 lg:gap-16">
  <div className="space-y-5 border-t border-[#1d1b1a] pt-4">
- <p className="text-xs tracking-[0.28em] text-[#7a1730] uppercase">Meet The Founder</p>
+ <p className="text-xs tracking-[0.28em] text-[#c2185b] uppercase">Meet The Founder</p>
  <h2 className="font-heading text-[clamp(2.5rem,4.5vw,4.25rem)] leading-[0.98] font-medium tracking-[-0.02em] text-[#1d1b1a]">
  Built with a designer eye and customer-first care.
  </h2>
@@ -172,14 +172,14 @@ export default function AboutPage() {
  </div>
 
  <div className="space-y-5 border-t border-[#1d1b1a] pt-4">
- <p className="text-xs tracking-[0.28em] text-[#7a1730] uppercase">How We Work</p>
+ <p className="text-xs tracking-[0.28em] text-[#c2185b] uppercase">How We Work</p>
  <h2 className="font-heading text-[clamp(2.5rem,4.5vw,4.25rem)] leading-[0.98] font-medium tracking-[-0.02em] text-[#1d1b1a]">
  Designed with intention, finished with care.
  </h2>
  <ol>
  {processSteps.map((step, index) => (
  <li key={step} className="flex items-baseline gap-4 border-t border-[#1d1b1a]/20 py-4">
- <span className="font-heading text-2xl text-[#7a1730] italic">{index + 1}</span>
+ <span className="font-heading text-2xl text-[#c2185b] italic">{index + 1}</span>
  <p className="text-sm text-[#3d3731] sm:text-base">{step}</p>
  </li>
  ))}

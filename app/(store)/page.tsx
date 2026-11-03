@@ -132,7 +132,7 @@ export default async function HomePage() {
  <p className="mb-3 text-[0.68rem] tracking-[0.35em] text-white/90 uppercase sm:text-xs">New Collection &mdash; Made in Ghana</p>
  <h1 className="font-heading text-[clamp(3.75rem,15vw,8rem)] leading-[0.84] font-medium tracking-[-0.03em] lg:text-[clamp(6rem,10.5vw,11rem)]">
  Wear Your
- <span className="block pl-[0.9em] font-heading italic lg:inline lg:pl-[0.22em]">Story</span>
+ <span className="block pl-[0.9em] font-heading text-[#f8a8c6] italic lg:inline lg:pl-[0.22em]">Story</span>
  </h1>
  <div className="mt-5 flex flex-col gap-4 sm:mt-8 sm:flex-row sm:items-end sm:justify-between">
  <p className="max-w-md text-sm text-white/90 sm:text-base">
@@ -141,7 +141,7 @@ export default async function HomePage() {
  <div className="flex shrink-0 flex-wrap items-center gap-5">
  <Link
  href="/products"
- className="inline-flex min-h-12 items-center bg-[#f6f2ea] px-8 text-xs font-medium tracking-[0.22em] text-[#1d1b1a] uppercase transition-colors hover:bg-white"
+ className="inline-flex min-h-12 items-center bg-[#f6f2ea] px-8 text-xs font-medium tracking-[0.22em] text-[#1d1b1a] uppercase transition-colors hover:bg-[#fbe4ec]"
  >
  Shop Now
  </Link>
@@ -157,14 +157,14 @@ export default async function HomePage() {
  </div>
  </section>
 
- <div aria-hidden className="full-bleed overflow-hidden border-b border-[#1d1b1a] py-3">
+ <div aria-hidden className="full-bleed overflow-hidden border-b border-[#1d1b1a] bg-[#fbe4ec] py-3">
  <div className="animate-marquee flex w-max">
  {[0, 1, 2, 3].map((group) => (
  <div key={group} className="flex shrink-0 items-center">
  {marqueeItems.map((item) => (
  <span key={item} className="flex items-center font-heading text-xl whitespace-nowrap text-[#1d1b1a] italic sm:text-2xl">
  {item}
- <span className="px-6 text-sm text-[#7a1730] not-italic">&#10022;</span>
+ <span className="px-6 text-sm text-[#c2185b] not-italic">&#10022;</span>
  </span>
  ))}
  </div>
@@ -207,7 +207,7 @@ export default async function HomePage() {
  <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
  <div className="flex items-center p-7 sm:p-10 lg:p-14">
  <div className="max-w-xl space-y-6">
- <p className="text-xs tracking-[0.28em] text-[#b9b1a6]">N&deg; 03 &mdash; {editorialShowcase.label}</p>
+ <p className="text-xs tracking-[0.28em] text-[#f48fb1]">N&deg; 03 &mdash; {editorialShowcase.label}</p>
  <h2 className="font-heading whitespace-pre-line text-[clamp(3.25rem,8vw,7.5rem)] leading-[0.9] font-medium tracking-[-0.02em] italic">
  {editorialShowcase.title}
  </h2>

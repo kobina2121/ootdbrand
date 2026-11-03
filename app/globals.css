@@ -64,7 +64,12 @@ body:has(.storefront) {
  --accent-foreground: #1d1b1a;
  --border: rgb(29 27 26 / 0.18);
  --input: rgb(29 27 26 / 0.3);
- --ring: #7a1730;
+ --ring: #c2185b;
+}
+
+body:has(.storefront) ::selection {
+ background: #f8bbd0;
+ color: #1d1b1a;
 }
 
 .storefront [data-slot="card"] {

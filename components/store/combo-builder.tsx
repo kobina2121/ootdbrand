@@ -287,7 +287,7 @@ function ComboPiecePicker({
     <section className="min-w-0 space-y-4 border-t border-[#1d1b1a] pt-4" aria-label={`Choose your ${label.toLowerCase()}`}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="font-heading text-4xl leading-none font-medium text-[#1d1b1a] sm:text-5xl">{label}</h2>
-        <p className="text-xs tracking-[0.28em] text-[#7a1730]">N&deg; {number}</p>
+        <p className="text-xs tracking-[0.28em] text-[#c2185b]">N&deg; {number}</p>
       </div>
 
       {product && selection && !isBrowsing ? (
