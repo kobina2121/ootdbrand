@@ -33,8 +33,8 @@ export function HeroImageRotator({ images }: { images: readonly string[] }) {
  src={firstImage}
  alt="theootd.brand hero 1"
  fill
- sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), 1440px"
- className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"
+ sizes="100vw"
+ className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_38%] animate-hero-carousel"
  style={{ animationDelay: "0s" }}
  priority
  />
@@ -45,8 +45,8 @@ export function HeroImageRotator({ images }: { images: readonly string[] }) {
  src={image}
  alt={`theootd.brand hero ${index + 2}`}
  fill
- sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), 1440px"
- className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_16%] animate-hero-carousel"
+ sizes="100vw"
+ className="absolute inset-0 h-full w-full object-cover object-[center_22%] lg:object-[center_38%] animate-hero-carousel"
  style={{ animationDelay: `${index + 1}s` }}
  />
  ))

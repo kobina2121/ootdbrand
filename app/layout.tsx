@@ -20,6 +20,7 @@ const montserrat = Montserrat({
 
 const cormorantGaramond = Cormorant_Garamond({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   variable: "--font-cormorant-garamond",
 });
 

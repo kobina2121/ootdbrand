@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PageMasthead } from "@/components/store/page-masthead";
 import { ProductGrid } from "@/components/store/product-grid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,10 @@ export const metadata: Metadata = {
 type PageProps = {
  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+function filterLinkClass(isActive: boolean) {
+ return `inline-flex min-h-11 items-center text-xs tracking-[0.18em] uppercase underline-offset-8 transition-colors ${isActive ? "text-[#1d1b1a] underline" : "text-[#5f5954] hover:text-[#1d1b1a]"}`;
+}
 
 export default async function ProductListPage({ searchParams }: PageProps) {
  const params = await searchParams;
@@ -99,16 +104,12 @@ export default async function ProductListPage({ searchParams }: PageProps) {
 
  return (
  <div className="space-y-8">
-	 <section className="rounded-2xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-4 shadow-sm sm:rounded-3xl sm:p-7">
-	 <div className="flex flex-wrap items-start justify-between gap-4">
-	 <div className="space-y-2">
-	 <p className="text-[0.8rem] tracking-[0.18em] text-[#5f5954]">THEOOTD SHOP</p>
-	 <h1 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-6xl">All Products</h1>
- <p className="section-subtitle max-w-xl">
- Discover signature silhouettes crafted for confidence, comfort, and timeless elegance.
- </p>
- </div>
-	 <form action="/products" method="get" className="flex w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+ <PageMasthead
+ kicker="Theootd Shop"
+ title="All Products"
+ description="Discover signature silhouettes crafted for confidence, comfort, and timeless elegance."
+ >
+ <form action="/products" method="get" className="flex w-full items-stretch gap-2 lg:w-96">
  <input type="hidden" name="category" value={category} />
  <input type="hidden" name="sort" value={sort} />
  <Input
@@ -116,49 +117,40 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  defaultValue={q}
  placeholder="Search products..."
  aria-label="Search products"
- className="h-10 rounded-full border-black/15 bg-white/90 "
+ className="h-11 border-[#1d1b1a]/30 bg-transparent"
  />
- <Button type="submit" className="h-10 rounded-full px-5">
+ <Button type="submit" className="h-11 px-5">
  Search
  </Button>
  </form>
- </div>
- </section>
+ </PageMasthead>
 
-	 <section className="rounded-2xl border border-black/10 bg-white/80 p-3 shadow-sm sm:p-4">
- <div className="mb-3 flex items-center justify-between gap-3">
- <p className="text-[0.8rem] tracking-[0.16em] text-[#5f5954] uppercase">
- {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"} available
- </p>
- {q ? <Badge variant="secondary" className="rounded-full px-3 py-1">Search: {q}</Badge> : null}
- </div>
- <div className="flex flex-wrap items-center gap-2">
+ <section className="flex flex-col gap-2 border-b border-[#1d1b1a]/20 pb-2 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+ <div className="flex flex-wrap items-center gap-x-5">
  {categories.map((entry) => (
  <Link
  key={entry}
  href={buildProductsHref(entry, sort)}
  aria-current={entry === category ? "page" : undefined}
- className="inline-flex min-h-11 items-center rounded-full"
+ className={filterLinkClass(entry === category)}
  >
- <Badge variant={entry === category ? "default" : "outline"} className="rounded-full px-4 py-2">
  {entry === "all" ? "All" : entry}
- </Badge>
  </Link>
  ))}
- <Link href={buildProductsHref(category, "latest")} aria-current={sort === "latest" ? "page" : undefined}>
- <Button variant={sort === "latest" ? "default" : "outline"} className="rounded-full">
- Sort: Latest
- </Button>
+ </div>
+ <div className="flex flex-wrap items-center gap-x-5">
+ <p className="mr-auto text-xs tracking-[0.16em] text-[#5f5954] uppercase lg:mr-2">
+ {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"}
+ </p>
+ {q ? <Badge variant="secondary" className="px-3 py-1">Search: {q}</Badge> : null}
+ <Link href={buildProductsHref(category, "latest")} aria-current={sort === "latest" ? "page" : undefined} className={filterLinkClass(sort === "latest")}>
+ Latest
  </Link>
- <Link href={buildProductsHref(category, "price-asc")} aria-current={sort === "price-asc" ? "page" : undefined}>
- <Button variant={sort === "price-asc" ? "default" : "outline"} className="rounded-full">
+ <Link href={buildProductsHref(category, "price-asc")} aria-current={sort === "price-asc" ? "page" : undefined} className={filterLinkClass(sort === "price-asc")} aria-label="Price, low to high">
  Price ↑
- </Button>
  </Link>
- <Link href={buildProductsHref(category, "price-desc")} aria-current={sort === "price-desc" ? "page" : undefined}>
- <Button variant={sort === "price-desc" ? "default" : "outline"} className="rounded-full">
+ <Link href={buildProductsHref(category, "price-desc")} aria-current={sort === "price-desc" ? "page" : undefined} className={filterLinkClass(sort === "price-desc")} aria-label="Price, high to low">
  Price ↓
- </Button>
  </Link>
  </div>
  </section>
@@ -187,13 +179,13 @@ export default async function ProductListPage({ searchParams }: PageProps) {
 	 }))}
  />
  ) : (
- <div className="rounded-2xl border border-dashed border-black/25 bg-white/70 p-10 text-center ">
+ <div className="border border-dashed border-[#1d1b1a]/30 p-10 text-center">
  <p className="text-lg font-medium text-[#1f1b18] ">No products found</p>
  <p className="mt-1 text-sm text-muted-foreground">
  {q ? `No match for "${q}". Try another search or clear filters.` : "Try a different category or clear filters."}
  </p>
  <Link href="/products" className="mt-4 inline-block">
- <Button variant="outline" className="rounded-full">Reset filters</Button>
+ <Button variant="outline" className="rounded-none">Reset filters</Button>
  </Link>
  </div>
  )}
@@ -206,9 +198,9 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  aria-disabled={safePage <= 1}
  className={safePage <= 1 ? "pointer-events-none opacity-50" : ""}
  >
- <Button variant="outline" size="sm" className="rounded-full">Prev</Button>
+ <Button variant="outline" size="sm" className="rounded-none">Prev</Button>
  </Link>
- <Badge variant="outline" className="rounded-full px-3 py-1">
+ <Badge variant="outline" className="px-3 py-1">
  Page {safePage} of {totalPages}
  </Badge>
  <Link
@@ -216,7 +208,7 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  aria-disabled={safePage >= totalPages}
  className={safePage >= totalPages ? "pointer-events-none opacity-50" : ""}
  >
- <Button variant="outline" size="sm" className="rounded-full">Next</Button>
+ <Button variant="outline" size="sm" className="rounded-none">Next</Button>
  </Link>
  </section>
  ) : null}

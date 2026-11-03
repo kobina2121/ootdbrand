@@ -101,7 +101,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
  if (state === "success") {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <PurchaseThankYouDialog
  customerName={customerName}
  orderHref={`/orders/${encodeURIComponent(reference)}`}
@@ -114,7 +114,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
  <ClearCartOnSuccess shouldClear={checkoutOrderType === "store"} />
  <p className="text-sm text-muted-foreground">Your order has been placed and is being prepared.</p>
  <Link href="/orders">
- <Button className="rounded-full">View Orders</Button>
+ <Button className="rounded-none">View Orders</Button>
  </Link>
  </CardContent>
  </Card>
@@ -123,14 +123,14 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
  if (state === "failed") {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Payment Failed</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">Your payment was not confirmed. You can retry checkout.</p>
  <Link href="/checkout">
- <Button variant="outline" className="rounded-full">Return to Checkout</Button>
+ <Button variant="outline" className="rounded-none">Return to Checkout</Button>
  </Link>
  </CardContent>
  </Card>
@@ -139,14 +139,14 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
  if (state === "missing-reference") {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Payment Reference Missing</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">We could not verify this payment because no reference was provided.</p>
  <Link href="/orders">
- <Button className="rounded-full">View Orders</Button>
+ <Button className="rounded-none">View Orders</Button>
  </Link>
  </CardContent>
  </Card>
@@ -155,14 +155,14 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
  if (state === "auth-required") {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Sign In Required</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">Sign in to verify this payment and view your order.</p>
  <Link href="/login?next=/checkout/success">
- <Button className="rounded-full">Sign in</Button>
+ <Button className="rounded-none">Sign in</Button>
  </Link>
  </CardContent>
  </Card>
@@ -171,14 +171,14 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
  if (state === "not-found") {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Order Not Found</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">This payment reference is not connected to your account.</p>
  <Link href="/orders">
- <Button className="rounded-full">View Orders</Button>
+ <Button className="rounded-none">View Orders</Button>
  </Link>
  </CardContent>
  </Card>
@@ -187,14 +187,14 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
 
  if (state === "error") {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Verification Error</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">We could not verify your payment at the moment. Please check your orders shortly.</p>
  <Link href="/orders">
- <Button className="rounded-full">View Orders</Button>
+ <Button className="rounded-none">View Orders</Button>
  </Link>
  </CardContent>
  </Card>
@@ -202,7 +202,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
  }
 
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <ClearCartOnSuccess shouldClear={checkoutOrderType === "store"} />
  {checkoutOrderType ? (
  <PurchaseThankYouDialog
@@ -218,7 +218,7 @@ export default async function OrderSuccessPage({ searchParams }: SuccessPageProp
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">We are still awaiting confirmation from the payment gateway.</p>
  <Link href="/orders">
- <Button className="rounded-full">View Orders</Button>
+ <Button className="rounded-none">View Orders</Button>
  </Link>
  </CardContent>
  </Card>

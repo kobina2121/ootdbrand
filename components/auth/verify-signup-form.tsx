@@ -70,7 +70,7 @@ export function VerifySignupForm({ initialEmail = "" }: VerifySignupFormProps) {
   };
 
   return (
-    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ">
+    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-[#fbf9f4] ">
       <CardHeader className="space-y-2 border-b border-black/10 ">
         <p className="text-xs tracking-[0.24em] text-muted-foreground">EMAIL CONFIRMATION</p>
         <CardTitle className="font-heading text-5xl leading-none ">Verify Account</CardTitle>
@@ -110,18 +110,18 @@ export function VerifySignupForm({ initialEmail = "" }: VerifySignupFormProps) {
           </div>
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
           {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
-          <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
+          <Button className="h-11 w-full rounded-none" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Verifying..." : "Verify Email"}
           </Button>
         </form>
         <div className="flex flex-wrap gap-3">
           <Link href="/signup">
-            <Button type="button" variant="outline" className="rounded-full">
+            <Button type="button" variant="outline" className="rounded-none">
               Back to Signup
             </Button>
           </Link>
           <Link href="/login">
-            <Button type="button" variant="ghost" className="rounded-full">
+            <Button type="button" variant="ghost" className="rounded-none">
               Go to Login
             </Button>
           </Link>

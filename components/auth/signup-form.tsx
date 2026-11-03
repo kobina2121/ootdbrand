@@ -120,7 +120,7 @@ export function SignupForm() {
  };
 
  return (
- <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ">
+ <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-[#fbf9f4] ">
  <CardHeader className="space-y-2 border-b border-black/10 ">
  <p className="text-xs tracking-[0.24em] text-muted-foreground">CREATE ACCOUNT</p>
  <CardTitle className="font-heading text-5xl leading-none ">Create Customer Account</CardTitle>
@@ -130,7 +130,7 @@ export function SignupForm() {
  <Button
  type="button"
  variant="outline"
- className="mb-4 h-11 w-full rounded-full border-black/20 "
+ className="mb-4 h-11 w-full rounded-none border-black/20 "
  onClick={onGoogleSignup}
  disabled={!isGoogleAvailable || isGoogleSubmitting || isSubmitting}
  >
@@ -180,7 +180,7 @@ export function SignupForm() {
  <PasswordInput id="signup-password" name="password" placeholder="Create a password (min 8 characters)" className="h-11 rounded-xl border-black/15 " required />
  </div>
  {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
- <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
+ <Button className="h-11 w-full rounded-none" type="submit" disabled={isSubmitting}>
  {isSubmitting ? "Sending code..." : "Sign up"}
  </Button>
  </form>

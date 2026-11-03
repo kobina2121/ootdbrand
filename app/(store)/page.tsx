@@ -4,11 +4,11 @@ import { ArrowRight } from "lucide-react";
 import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
 import { HeroImageRotator } from "@/components/store/hero-image-rotator";
 import { LazyShowcaseVideo } from "@/components/store/lazy-showcase-video";
+import { NewArrivalsEditorial } from "@/components/store/new-arrivals-editorial";
+import { SectionHeading } from "@/components/store/section-heading";
 import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
-import { buttonVariants } from "@/components/ui/button";
-import { formatPriceNgn } from "@/lib/products";
+import { formatPriceNgn, type Product } from "@/lib/products";
 import { listProducts } from "@/lib/services/product-service";
-import { cn } from "@/lib/utils";
 
 const heroImages = [
  "/images/hero/hero-main.jpg",
@@ -75,6 +75,14 @@ const brandStats = [
  { value: "100%", label: "Premium Materials" },
 ] as const;
 
+const marqueeItems = [
+ "Elevated Womenswear",
+ "Made in Ghana",
+ "Custom Pieces",
+ "48-Hour Returns",
+ "Wear Your Story",
+] as const;
+
 const editorialShowcase = {
  label: "APPAREL",
  title: "Signature\nDresses",
@@ -84,123 +92,8 @@ const editorialShowcase = {
  video: "/videos/editorial-showcase.mp4",
 } as const;
 
-export default async function HomePage() {
- const catalogProducts = await listProducts({ activeOnly: true, sort: "latest" });
- const featuredCatalogProducts = catalogProducts.slice(0, 6);
-
- return (
- <div className="relative max-w-full overflow-x-clip space-y-10 sm:space-y-12">
- <div className="pointer-events-none absolute -left-20 top-20 hidden h-52 w-52 rounded-full bg-[#c8d4bc]/40 blur-3xl md:block animate-drift-x" />
- <div className="pointer-events-none absolute -right-16 top-[28rem] hidden h-64 w-64 rounded-full bg-[#d8c8ba]/35 blur-3xl md:block animate-drift-x-reverse" />
-
-	 <section className="animate-fade-up relative h-[58svh] min-h-[360px] overflow-hidden rounded-2xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] sm:min-h-[540px] sm:rounded-3xl lg:h-[88svh] lg:min-h-[760px]">
- <HeroImageRotator images={heroImages} />
- <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/70 lg:from-black/25 lg:via-black/5 lg:to-black/60" />
- <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.18),transparent_38%)]" />
-
-	 <div className="animate-fade-up-delay-1 absolute bottom-20 left-1/2 z-10 w-[calc(100%-1.5rem)] max-w-4xl -translate-x-1/2 px-3 py-3 text-center text-white sm:bottom-28 sm:w-full sm:px-5 sm:py-5 lg:bottom-20">
-	 <p className="mb-2 text-xs tracking-[0.35em] text-white/85 sm:text-sm">NEW COLLECTION</p>
-	 <h1 className="font-heading text-5xl font-semibold leading-[0.95] drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] sm:text-7xl lg:text-8xl">
-	 Wear Your Story
-	 </h1>
- <p className="mx-auto mt-2 max-w-2xl text-sm text-white/90 sm:text-base">
- Every stitch speaks confidence, elegance, and the woman you are becoming.
- </p>
- </div>
-
-	 <div className="animate-fade-up-delay-2 absolute bottom-7 left-1/2 z-10 flex w-[calc(100%-1.5rem)] max-w-max -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-10 sm:w-auto sm:gap-3 animate-soft-float">
- <Link
- href="/products"
- className={cn(
- buttonVariants({}),
-	 "animate-pulse-glow rounded-full bg-white px-5 text-[#3b2526] shadow-lg shadow-black/20 hover:!bg-white hover:text-[#3b2526] focus:!bg-white active:!bg-white sm:px-10",
- )}
- >
- SHOP NOW!
- </Link>
- <Link
- href="/products?sort=latest"
- className={cn(
- buttonVariants({ variant: "outline" }),
-	 "rounded-full border-white/70 bg-white/10 px-5 text-white backdrop-blur hover:bg-white/20 sm:px-6",
- )}
- >
- New In <ArrowRight className="size-4" />
- </Link>
- </div>
- </section>
-
- <section className="animate-fade-up-delay-1 rounded-2xl border border-black/10 bg-[linear-gradient(125deg,#f7f5f1_0%,#f0ece6_100%)] px-6 py-6 shadow-sm sm:px-10 sm:py-8">
- <div className="grid gap-5 text-center sm:grid-cols-3 sm:divide-x sm:divide-black/10 ">
- {brandStats.map((item) => (
- <div key={item.label} className="space-y-1 sm:px-6">
- <p className="animate-soft-float font-heading text-4xl leading-none tracking-wide text-[#1f1b18] sm:text-5xl">{item.value}</p>
- <p className="text-[0.68rem] tracking-[0.22em] text-[#6e6761] uppercase sm:text-xs">{item.label}</p>
- </div>
- ))}
- </div>
- </section>
-
- <section className="animate-fade-up-delay-2 space-y-4">
- <div className="space-y-4 text-center">
- <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f2937] sm:text-5xl">Top Selling</h2>
- <p className="mx-auto max-w-xl text-sm text-[#646464] sm:text-lg">
- Curated customer favorites from this season.
- </p>
- </div>
- <TopSellingCarousel items={categoryHighlights} />
- </section>
-
- <section className="animate-fade-up overflow-hidden rounded-3xl border border-black/10 bg-[#f4f3ef] shadow-sm ">
- <div className="grid lg:grid-cols-2">
- <div className="relative flex items-center p-7 sm:p-10 lg:p-14 ">
- <div className="pointer-events-none absolute right-0 top-0 h-28 w-28 rounded-full bg-[#d9ccc0]/45 blur-3xl " />
- <div className="max-w-md space-y-6">
- <p className="text-xs tracking-[0.3em] text-muted-foreground ">{editorialShowcase.label}</p>
-	 <h3 className="font-heading whitespace-pre-line text-4xl leading-[0.95] text-[#1d1b1a] sm:text-6xl">
- {editorialShowcase.title}
- </h3>
- <p className="text-base leading-relaxed text-[#6e6761] ">{editorialShowcase.description}</p>
- <Link
- href="/products"
- className="inline-flex items-center gap-2 border-b border-black/40 pb-1 text-sm tracking-[0.22em] text-[#222] transition-colors hover:text-black "
- >
- {editorialShowcase.cta}
- <ArrowRight className="size-4" />
- </Link>
- </div>
- </div>
-
-	 <div className="relative min-h-[320px] border-t border-black/5 sm:min-h-[420px] lg:border-l lg:border-t-0">
- <LazyShowcaseVideo
- src={editorialShowcase.video}
- className="h-full w-full bg-cover bg-center object-cover object-center animate-hero-zoom"
- />
- </div>
- </div>
- </section>
-
- <section className="animate-fade-up rounded-2xl border border-black/10 bg-white px-4 py-9 shadow-sm sm:px-6 sm:py-12">
- <div className="mx-auto max-w-6xl space-y-8 sm:space-y-10">
- <div className="space-y-4 text-center">
- <p className="text-[0.7rem] tracking-[0.42em] text-[#5e5e5e] ">Products</p>
- <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f2937] sm:text-5xl">Our Products</h2>
- <p className="mx-auto max-w-xl text-sm text-[#646464] sm:text-lg">
- Discover timeless pieces designed for confidence, elegance, and everyday luxury.
- </p>
- </div>
-
- <div className="flex items-center justify-center">
- <Link
- href="/products"
- className="inline-flex items-center justify-center rounded-xl border border-[#161616] px-6 py-3 text-base font-medium text-[#161616] transition-colors hover:bg-[#161616] hover:text-white "
- >
- View all
- </Link>
- </div>
-
- <FeaturedProductsCarousel
- items={featuredCatalogProducts.map((product) => ({
+function toCarouselItem(product: Product) {
+ return {
  slug: product.slug,
  name: product.name,
  category: product.category,
@@ -219,9 +112,135 @@ export default async function HomePage() {
 	 price: formatPriceNgn(product.basePrice),
  priceValue: product.basePrice,
  image: product.image || featuredImageBySlug[product.slug] || "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80",
- }))}
+ };
+}
+
+export default async function HomePage() {
+ const catalogProducts = await listProducts({ activeOnly: true, sort: "latest" });
+ const newArrivals = catalogProducts.slice(0, 4);
+ const featuredCatalogProducts = [...catalogProducts].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 6);
+
+ return (
+ <div className="space-y-16 sm:space-y-24">
+ <div>
+ <section className="full-bleed animate-fade-up relative -mt-5 h-[72svh] min-h-[480px] overflow-hidden bg-[#1d1b1a] sm:-mt-8 sm:h-[80svh] sm:min-h-[560px] lg:h-[calc(100svh-6.5rem)] lg:min-h-[640px]">
+ <HeroImageRotator images={heroImages} />
+ <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-black/85" />
+
+ <div className="absolute inset-x-0 bottom-0 z-10 text-white">
+ <div className="page-container pb-6 sm:pb-10">
+ <p className="mb-3 text-[0.68rem] tracking-[0.35em] text-white/90 uppercase sm:text-xs">New Collection &mdash; Made in Ghana</p>
+ <h1 className="font-heading text-[clamp(3.75rem,15vw,8rem)] leading-[0.84] font-medium tracking-[-0.03em] lg:text-[clamp(6rem,10.5vw,11rem)]">
+ Wear Your
+ <span className="block pl-[0.9em] font-heading italic lg:inline lg:pl-[0.22em]">Story</span>
+ </h1>
+ <div className="mt-5 flex flex-col gap-4 sm:mt-8 sm:flex-row sm:items-end sm:justify-between">
+ <p className="max-w-md text-sm text-white/90 sm:text-base">
+ Every stitch speaks confidence, elegance, and the woman you are becoming.
+ </p>
+ <div className="flex shrink-0 flex-wrap items-center gap-5">
+ <Link
+ href="/products"
+ className="inline-flex min-h-12 items-center bg-[#f6f2ea] px-8 text-xs font-medium tracking-[0.22em] text-[#1d1b1a] uppercase transition-colors hover:bg-white"
+ >
+ Shop Now
+ </Link>
+ <Link
+ href="/products?sort=latest"
+ className="inline-flex min-h-12 items-center gap-2 text-xs tracking-[0.22em] text-white uppercase underline underline-offset-8"
+ >
+ New In <ArrowRight className="size-4" />
+ </Link>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <div aria-hidden className="full-bleed overflow-hidden border-b border-[#1d1b1a] py-3">
+ <div className="animate-marquee flex w-max">
+ {[0, 1, 2, 3].map((group) => (
+ <div key={group} className="flex shrink-0 items-center">
+ {marqueeItems.map((item) => (
+ <span key={item} className="flex items-center font-heading text-xl whitespace-nowrap text-[#1d1b1a] italic sm:text-2xl">
+ {item}
+ <span className="px-6 text-sm text-[#7a1730] not-italic">&#10022;</span>
+ </span>
+ ))}
+ </div>
+ ))}
+ </div>
+ </div>
+ </div>
+
+ <section className="grid grid-cols-3 divide-x divide-[#1d1b1a]/20 text-center">
+ {brandStats.map((item) => (
+ <div key={item.label} className="space-y-2 px-2 sm:px-6">
+ <p className="font-heading text-[clamp(2.25rem,7vw,6rem)] leading-none text-[#1d1b1a]">{item.value}</p>
+ <p className="text-[0.62rem] tracking-[0.18em] text-[#5f5954] uppercase sm:text-xs sm:tracking-[0.22em]">{item.label}</p>
+ </div>
+ ))}
+ </section>
+
+ {newArrivals.length > 0 ? (
+ <section className="space-y-8 sm:space-y-12">
+ <SectionHeading
+ number="01"
+ title="New Arrivals"
+ description="The latest pieces to join the collection, fresh from the studio."
+ href="/products?sort=latest"
+ />
+ <NewArrivalsEditorial items={newArrivals.map(toCarouselItem)} />
+ </section>
+ ) : null}
+
+ <section className="space-y-8 sm:space-y-12">
+ <SectionHeading
+ number="02"
+ title="Top Selling"
+ description="Curated customer favorites from this season."
+ />
+ <TopSellingCarousel items={categoryHighlights} />
+ </section>
+
+ <section className="full-bleed bg-[#1d1b1a] text-[#f6f2ea]">
+ <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
+ <div className="flex items-center p-7 sm:p-10 lg:p-14">
+ <div className="max-w-xl space-y-6">
+ <p className="text-xs tracking-[0.28em] text-[#b9b1a6]">N&deg; 03 &mdash; {editorialShowcase.label}</p>
+ <h2 className="font-heading whitespace-pre-line text-[clamp(3.25rem,8vw,7.5rem)] leading-[0.9] font-medium tracking-[-0.02em] italic">
+ {editorialShowcase.title}
+ </h2>
+ <p className="text-base leading-relaxed text-[#d9d2c7]">{editorialShowcase.description}</p>
+ <Link
+ href="/products"
+ className="inline-flex min-h-11 items-center gap-2 border-b border-[#f6f2ea]/60 text-sm tracking-[0.22em] transition-colors hover:border-[#f6f2ea]"
+ >
+ {editorialShowcase.cta}
+ <ArrowRight className="size-4" />
+ </Link>
+ </div>
+ </div>
+
+ <div className="relative min-h-[420px] overflow-hidden lg:min-h-[720px]">
+ <div className="absolute inset-0">
+ <LazyShowcaseVideo
+ src={editorialShowcase.video}
+ className="h-full w-full bg-cover bg-center object-cover object-center animate-hero-zoom"
  />
  </div>
+ </div>
+ </div>
+ </section>
+
+ <section className="space-y-8 sm:space-y-12">
+ <SectionHeading
+ number="04"
+ title="Our Products"
+ description="Discover timeless pieces designed for confidence, elegance, and everyday luxury."
+ href="/products"
+ />
+ <FeaturedProductsCarousel items={featuredCatalogProducts.map(toCarouselItem)} />
  </section>
  </div>
  );

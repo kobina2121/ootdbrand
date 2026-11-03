@@ -82,7 +82,7 @@ export function TopSellingCarousel({ items }: { items: Slide[] }) {
               ref={(el) => {
                 itemRefs.current[index] = el;
               }}
-              className="group relative h-[340px] min-w-full snap-center overflow-hidden rounded-xl bg-[#efefef] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:h-[520px] md:h-[620px] md:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)]"
+              className="group relative h-[440px] min-w-full snap-center overflow-hidden bg-[#e9e4da] sm:h-[560px] md:h-[640px] md:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)]"
             >
               <Image
                 src={item.image}
@@ -91,7 +91,8 @@ export function TopSellingCarousel({ items }: { items: Slide[] }) {
                 sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
                 className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/14 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+              <p className="absolute bottom-4 left-4 font-heading text-2xl italic text-white">{item.title}</p>
             </div>
           ))}
         </div>
@@ -100,7 +101,7 @@ export function TopSellingCarousel({ items }: { items: Slide[] }) {
           type="button"
           size="icon"
           variant="secondary"
-          className="absolute left-3 top-1/2 hidden -translate-y-1/2 rounded-full md:inline-flex"
+          className="absolute left-3 top-1/2 hidden -translate-y-1/2 rounded-none md:inline-flex"
           onClick={prev}
         >
           <ChevronLeft className="h-5 w-5" />
@@ -111,7 +112,7 @@ export function TopSellingCarousel({ items }: { items: Slide[] }) {
           type="button"
           size="icon"
           variant="secondary"
-          className="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-full md:inline-flex"
+          className="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-none md:inline-flex"
           onClick={next}
         >
           <ChevronRight className="h-5 w-5" />
@@ -128,7 +129,7 @@ export function TopSellingCarousel({ items }: { items: Slide[] }) {
             className="flex h-11 min-w-11 items-center justify-center rounded-full transition-all"
             aria-label={`Go to slide ${dot + 1}`}
           >
-            <span className={`block h-2.5 rounded-full transition-all ${activeIndex === dot ? "w-7 bg-foreground" : "w-2.5 bg-foreground/30"}`} />
+            <span className={`block h-0.5 transition-all ${activeIndex === dot ? "w-8 bg-foreground" : "w-4 bg-foreground/30"}`} />
           </button>
         ))}
       </div>

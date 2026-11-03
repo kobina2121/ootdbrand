@@ -68,7 +68,7 @@ export function VerifyEmailChangeForm({ token }: { token?: string }) {
   }, [token]);
 
   return (
-    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ">
+    <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-[#fbf9f4] ">
       <CardHeader className="space-y-2 border-b border-black/10 ">
         <p className="text-xs tracking-[0.24em] text-muted-foreground">ACCOUNT SECURITY</p>
         <CardTitle className="font-heading text-5xl leading-none ">Verify Email</CardTitle>
@@ -79,10 +79,10 @@ export function VerifyEmailChangeForm({ token }: { token?: string }) {
         {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
         <div className="flex flex-wrap gap-3">
           <Link href="/profile">
-            <Button className="rounded-full">Back to Profile</Button>
+            <Button className="rounded-none">Back to Profile</Button>
           </Link>
           <Link href="/login">
-            <Button type="button" variant="outline" className="rounded-full">
+            <Button type="button" variant="outline" className="rounded-none">
               Go to Login
             </Button>
           </Link>

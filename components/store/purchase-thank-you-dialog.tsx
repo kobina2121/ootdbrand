@@ -38,10 +38,10 @@ export function PurchaseThankYouDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="overflow-hidden rounded-[2rem] border border-black/10 bg-[#fffaf3] p-0 text-left shadow-2xl sm:max-w-lg">
+      <DialogContent className="overflow-hidden border border-black/10 bg-[#fffaf3] p-0 text-left sm:max-w-lg">
         <div className="bg-[#1f1b18] px-6 py-5 text-white sm:px-8">
           <p className="text-[0.68rem] uppercase tracking-[0.28em] text-[#d8c9b8]">theootd.brand</p>
-          <div className="mt-5 inline-flex size-12 items-center justify-center rounded-full bg-white text-2xl text-[#1f1b18]">
+          <div className="mt-5 inline-flex size-12 items-center justify-center rounded-full bg-[#fbf9f4] text-2xl text-[#1f1b18]">
             ✓
           </div>
         </div>
@@ -54,18 +54,18 @@ export function PurchaseThankYouDialog({
               {description}
             </DialogDescription>
           </DialogHeader>
-          <div className="rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm text-[#6d6660]">
+          <div className="rounded-2xl border border-black/10 bg-[#fbf9f4] px-4 py-3 text-sm text-[#6d6660]">
             <span className="font-medium text-[#1f1b18]">Order update:</span>{" "}
             {status === "success" ? "Payment confirmed." : "Payment confirmation in progress."}
           </div>
           <DialogFooter className="-mx-6 -mb-6 gap-3 rounded-b-[2rem] border-black/10 bg-[#f7f1e8] px-6 py-5 sm:-mx-8 sm:-mb-8 sm:px-8">
             <Link href="/products" className="w-full sm:w-auto">
-              <Button variant="outline" className="w-full rounded-full border-black/15 bg-white">
+              <Button variant="outline" className="w-full rounded-none border-black/15 bg-[#fbf9f4]">
                 Continue Shopping
               </Button>
             </Link>
             <Link href={orderHref} className="w-full sm:w-auto">
-              <Button className="w-full rounded-full bg-[#1f1b18] text-white hover:bg-[#332c27]">
+              <Button className="w-full rounded-none bg-[#1f1b18] text-white hover:bg-[#332c27]">
                 View My Order
               </Button>
             </Link>

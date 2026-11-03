@@ -85,22 +85,23 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  setSelectedSize(imageVariant.size);
  };
 
+
  return (
-	 <div className="grid gap-5 rounded-2xl border border-black/10 bg-white/85 p-3 shadow-sm sm:gap-8 sm:rounded-3xl sm:p-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:p-6">
+	 <div className="grid gap-6 sm:gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)] lg:gap-14">
 	 <div className="space-y-4">
-	 <div className="relative overflow-hidden rounded-2xl border border-black/5 bg-[#f7f1eb] shadow-[0_18px_44px_rgba(20,17,15,0.08)] sm:rounded-[1.75rem]">
+	 <div className="relative overflow-hidden bg-[#e9e4da]">
 	 <Image
 	 src={selectedImage}
 	 alt={selectedProductName}
 	 width={1200}
 	 height={1440}
-	 sizes="(max-width: 1023px) calc(100vw - 2rem), 58vw"
-	 className="h-[min(62svh,460px)] min-h-[280px] w-full object-cover object-center sm:h-[min(72svh,520px)] sm:min-h-[340px] lg:h-[620px]"
+	 sizes="(max-width: 1023px) 100vw, 60vw"
+	 className="aspect-[3/4] h-auto w-full object-cover object-top"
 	 />
 	 </div>
 
  {galleryImages.length > 1 ? (
-	 <div className="flex flex-nowrap justify-start gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:gap-3">
+	 <div className="flex flex-nowrap justify-start gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-3">
  {galleryImages.map((image, index) => {
  const isActive = image === selectedImage;
 
@@ -109,9 +110,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  key={`${image}-${index}`}
  type="button"
  onClick={() => selectImage(image)}
-	 className={`group relative w-[5.75rem] shrink-0 overflow-hidden rounded-xl border bg-[#f7f1eb] transition-all sm:w-[7.75rem] sm:rounded-2xl ${
+	 className={`group relative w-[5.75rem] shrink-0 overflow-hidden border bg-[#e9e4da] transition-all sm:w-[7.75rem] ${
  isActive
- ? "border-black shadow-[0_10px_25px_rgba(20,17,15,0.14)] "
+ ? "border-black "
  : "border-black/10 hover:border-black/30 "
  }`}
  aria-label={`View image ${index + 1} of ${galleryImages.length}`}
@@ -123,7 +124,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  width={220}
  height={260}
  sizes="8rem"
-	 className="h-20 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-24"
+	 className="aspect-[3/4] h-auto w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.03]"
  />
  </button>
  );
@@ -132,15 +133,15 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  ) : null}
  </div>
 
-	 <section className="mx-auto flex w-full max-w-[34rem] flex-col items-center space-y-4 text-center sm:space-y-5">
-	 <h1 className="max-w-[14ch] font-heading text-4xl leading-none text-[#1f1b18] sm:max-w-[13ch] sm:text-5xl">
+	 <section className="flex w-full flex-col items-start space-y-5 text-left lg:sticky lg:top-32 lg:self-start">
+ <h1 className="font-heading text-[clamp(2.75rem,5vw,4.75rem)] leading-[0.95] font-medium tracking-[-0.02em] text-[#1d1b1a]">
  {selectedProductName}
  </h1>
- <p className="max-w-[28rem] text-sm text-[#6c655f] sm:text-base">{product.description}</p>
+ <p className="max-w-[28rem] text-sm leading-relaxed text-[#5f5954] sm:text-base">{product.description}</p>
 
  <div className="space-y-3">
- <p className="text-sm tracking-[0.18em] text-muted-foreground ">SELECT COLOR</p>
- <div className="flex flex-wrap justify-center gap-2">
+ <p className="text-xs tracking-[0.22em] text-muted-foreground">SELECT COLOR</p>
+ <div className="flex flex-wrap justify-start gap-2">
  {colorOptions.map((colorOption) => {
  const colorIsSelected = selectedColor === colorOption.name;
 
@@ -148,10 +149,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  <button
  key={`color-${colorOption.name}`}
  type="button"
- className={`inline-flex min-h-12 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
+ className={`inline-flex min-h-12 items-center gap-2 rounded-none border px-4 py-2 text-sm font-medium transition ${
  colorIsSelected
- ? "border-black bg-black text-white shadow-sm "
- : "border-black/20 bg-white text-black hover:border-black/40 "
+ ? "border-black bg-black text-white "
+ : "border-black/20 bg-[#fbf9f4] text-black hover:border-black/40 "
  }`}
  onClick={() => {
  setHasSelectedVariant(true);
@@ -186,8 +187,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  </div>
 
  <div className="space-y-3">
- <p className="text-sm tracking-[0.18em] text-muted-foreground ">AVAILABLE SIZES</p>
- <div className="flex flex-wrap justify-center gap-2">
+ <p className="text-xs tracking-[0.22em] text-muted-foreground">AVAILABLE SIZES</p>
+ <div className="flex flex-wrap justify-start gap-2">
  {availableSizes.map((size) => {
  const sizeVariant = variantsForColor.find((variant) => variant.size === size);
  const isSelectedSize = selectedSize === size;
@@ -199,10 +200,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  type="button"
  className={`inline-flex min-h-12 min-w-16 flex-col items-center justify-center rounded-2xl border px-4 py-2 text-sm font-medium leading-tight transition ${
  isSelectedSize && hasSelectedVariant && !isSizeInStock
- ? "border-red-600 bg-red-50 text-red-700 shadow-sm "
+ ? "border-red-600 bg-red-50 text-red-700 "
  : isSelectedSize
- ? "border-black bg-black text-white shadow-sm "
- : "border-black/20 bg-white text-black hover:border-black/40 "
+ ? "border-black bg-black text-white "
+ : "border-black/20 bg-[#fbf9f4] text-black hover:border-black/40 "
  }`}
  onClick={() => {
  setHasSelectedVariant(true);
@@ -218,7 +219,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  </div>
  </div>
 
- <p className="text-2xl font-semibold text-[#1f1b18] ">
+ <p className="font-heading text-4xl font-medium text-[#1d1b1a]">
  {new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(
  product.basePrice,
  )}
@@ -242,7 +243,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  ) : null}
 
  {selectedVariant ? (
- <AddToCartForm product={product} sku={selectedVariant.sku} hideVariantSelect centered />
+ <AddToCartForm product={product} sku={selectedVariant.sku} hideVariantSelect />
  ) : (
  <p className="text-sm text-muted-foreground">This item is currently unavailable.</p>
  )}

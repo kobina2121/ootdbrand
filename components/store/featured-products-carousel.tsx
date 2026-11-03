@@ -149,13 +149,7 @@ export function FeaturedProductsCarousel({ items }: { items: FeaturedProductSlid
  className="flex h-11 min-w-11 items-center justify-center rounded-full transition-all"
  aria-label={`Go to featured product ${dot + 1}`}
  >
- {activeIndex === dot ? (
- <span className="flex h-4 w-4 items-center justify-center rounded-full border border-[#1f2937] bg-transparent">
- <span className="block h-1.5 w-1.5 rounded-full bg-[#1f2937] " />
- </span>
- ) : (
- <span className="block h-2.5 w-2.5 rounded-full bg-[#1f2937]/80 " />
- )}
+ <span className={cn("block h-0.5 transition-all", activeIndex === dot ? "w-8 bg-[#1d1b1a]" : "w-4 bg-[#1d1b1a]/30")} />
  </button>
  ))}
  </div>
@@ -282,29 +276,29 @@ function FeaturedProductCard({
 
  return (
  <div ref={itemRef} className="min-w-[82%] snap-center sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] xl:min-w-[calc(25%-12px)]">
- <Card className="group h-full overflow-hidden border-[#cfd3d8] bg-white shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-md ">
- <div className="relative aspect-[4/3] overflow-hidden bg-[#dedede] p-3 sm:p-6">
+ <Card className="group h-full gap-0 overflow-hidden rounded-none bg-transparent py-0 shadow-none ring-0">
+ <div className="relative aspect-[3/4] overflow-hidden bg-[#e9e4da]">
  <Image
  src={previewImage}
  alt={selectedColor ? `${product.name} in ${selectedColor}` : product.name}
  fill
  sizes="(max-width: 639px) 88vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
- className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+ className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
  />
  </div>
- <CardContent className="space-y-2 p-3 text-center sm:space-y-3 sm:p-5">
+ <CardContent className="space-y-2 px-0 pt-3 pb-1 text-left sm:space-y-3 sm:pt-4">
  <Link
  href={`/products?category=${encodeURIComponent(product.category)}`}
  className="inline-flex text-[0.7rem] uppercase tracking-[0.2em] text-[#6b7280] underline-offset-4 transition hover:text-[#1f2937] hover:underline "
  >
  {product.category}
  </Link>
- <h3 className="font-heading text-[1.35rem] leading-tight text-[#1f2937] sm:text-[1.7rem]">{product.name}</h3>
+ <h3 className="font-heading text-[1.35rem] leading-tight text-[#1d1b1a] sm:text-[1.7rem]">{product.name}</h3>
  <div className="space-y-2 text-sm text-[#5f6368] ">
  {colorOptions.length > 0 ? (
  <div className="space-y-1">
  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[#7a7f85] ">Available Colors</p>
- <div className="flex flex-wrap justify-center gap-1.5">
+ <div className="flex flex-wrap justify-start gap-1.5">
  {colorOptions.map((color) => {
  const isSelected = selectedColor === color.name;
 
@@ -343,7 +337,7 @@ function FeaturedProductCard({
  {availableSizes.length > 0 ? (
  <div className="space-y-1">
  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[#7a7f85] ">Available Sizes</p>
- <div className="flex flex-wrap justify-center gap-1.5">
+ <div className="flex flex-wrap justify-start gap-1.5">
  {availableSizes.map(({ size, inStock }) => {
  const isSelected = selectedSize === size;
 
@@ -355,12 +349,12 @@ function FeaturedProductCard({
  disabled={Boolean(selectedColor) && !inStock}
  aria-pressed={isSelected}
  className={cn(
- "inline-flex min-w-9 items-center justify-center rounded-full border px-2.5 py-1 text-[0.68rem] font-medium transition",
+ "inline-flex min-w-9 items-center justify-center border px-2.5 py-1 text-[0.68rem] font-medium transition",
  isSelected
  ? "border-black bg-black text-white"
  : Boolean(selectedColor) && !inStock
  ? "border-red-200 bg-red-50 text-red-700 opacity-60"
- : "border-black/10 bg-[#f8f5f1] text-[#3d3731] hover:border-black/40",
+ : "border-black/20 bg-transparent text-[#3d3731] hover:border-black/60",
  )}
  >
  {size}
@@ -379,13 +373,13 @@ function FeaturedProductCard({
  {reviewCount} review{reviewCount === 1 ? "" : "s"}
  </p>
  </div>
- <p className="pt-2 text-center text-2xl font-semibold text-[#111827] ">{product.price}</p>
+ <p className="pt-2 text-left text-xl font-medium text-[#1d1b1a] ">{product.price}</p>
  <div className="grid grid-cols-[1fr_auto] gap-2 pt-1 text-center">
  <Link
  href={`/products/${encodeProductSlugForPath(product.slug)}`}
  className={cn(
  buttonVariants({ variant: "outline", size: "sm" }),
- "min-h-11 rounded-full border-black/20 px-5 text-[#1f2937] hover:border-black hover:bg-black hover:text-white ",
+ "min-h-11 rounded-none border-[#1d1b1a] bg-transparent px-5 text-[#1d1b1a] hover:bg-[#1d1b1a] hover:text-[#f6f2ea] ",
  )}
  >
  View Product
@@ -395,7 +389,7 @@ function FeaturedProductCard({
  type="button"
  size="icon"
  variant={isSelectedVariantInCart || (selectedVariantInStock && userRole !== "admin") ? "default" : "outline"}
- className="h-11 w-11 rounded-full"
+ className="h-11 w-11 rounded-none"
  onClick={handleQuickAdd}
  disabled={isAdding || isSelectedVariantInCart || !selectedVariantInStock || userRole === "admin"}
  aria-label={
@@ -414,7 +408,7 @@ function FeaturedProductCard({
  ) : null}
  </div>
  {isSelectedVariantInCart ? (
- <p className="text-center text-[0.68rem] font-medium uppercase tracking-[0.14em] text-emerald-700">
+ <p className="text-left text-[0.68rem] font-medium uppercase tracking-[0.14em] text-emerald-700">
  In cart · {cartItem?.quantity ?? 1}
  </p>
  ) : null}

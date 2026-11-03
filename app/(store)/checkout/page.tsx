@@ -6,6 +6,7 @@ import { CreditCard, MapPin, Smartphone } from "lucide-react";
 
 import { useCart } from "@/components/store/cart-provider";
 import { Button } from "@/components/ui/button";
+import { PageMasthead } from "@/components/store/page-masthead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { formatPriceNgn } from "@/lib/products";
@@ -77,7 +78,7 @@ export default function CheckoutPage() {
 
  if (!isClientReady) {
  return (
- <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
 	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Loading checkout</CardTitle>
  </CardHeader>
@@ -90,13 +91,13 @@ export default function CheckoutPage() {
 
  if (userRole === "admin") {
  return (
- <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
 	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Checkout Disabled for Admin</CardTitle>
  </CardHeader>
  <CardContent className="space-y-3">
  <p className="text-sm text-muted-foreground">Admin accounts cannot complete customer checkout.</p>
- <Button className="rounded-full" onClick={() => window.location.assign("/admin/products")}>
+ <Button className="rounded-none" onClick={() => window.location.assign("/admin/products")}>
  Go to Admin Dashboard
  </Button>
  </CardContent>
@@ -106,7 +107,7 @@ export default function CheckoutPage() {
 
  if (userRole === null) {
  return (
- <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
 	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Sign in to Checkout</CardTitle>
  </CardHeader>
@@ -114,7 +115,7 @@ export default function CheckoutPage() {
  <p className="text-sm text-muted-foreground">
  Sign in before checkout so your cart and order stay connected to your account only.
  </p>
- <Button className="rounded-full" onClick={() => window.location.assign("/login?next=/checkout")}>
+ <Button className="rounded-none" onClick={() => window.location.assign("/login?next=/checkout")}>
  Sign in
  </Button>
  </CardContent>
@@ -124,7 +125,7 @@ export default function CheckoutPage() {
 
  if (items.length === 0) {
  return (
- <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
  <CardHeader>
 	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">No items to checkout</CardTitle>
  </CardHeader>
@@ -224,13 +225,10 @@ export default function CheckoutPage() {
 
  return (
  <div className="space-y-6">
-	 <section className="rounded-2xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-4 shadow-sm sm:rounded-3xl sm:p-7">
-	 <h1 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-6xl">Checkout</h1>
- <p className="section-subtitle mt-2">Complete your details and continue to secure payment.</p>
- </section>
+ <PageMasthead title="Checkout" description="Complete your details and continue to secure payment." />
 
 	 <form className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)] xl:gap-6" onSubmit={onSubmit}>
- <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm ">
+ <Card className="rounded-2xl border-black/10 bg-[#fbf9f4] ">
  <CardHeader className="border-b border-black/10 pb-4 ">
  <div className="inline-flex items-center gap-2 text-[#1f1b18] ">
  <MapPin className="size-4" />
@@ -297,7 +295,7 @@ export default function CheckoutPage() {
  </p>
  ) : null}
  </div>
- <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
+ <div className="space-y-3 rounded-xl border border-black/10 bg-[#ece6da]/50 p-3 sm:p-4">
  <p className="form-section-title">Delivery Address</p>
  <div className="space-y-2">
  <label htmlFor="checkout-address-line" className="text-sm font-medium text-[#1f1b18]">
@@ -379,7 +377,7 @@ export default function CheckoutPage() {
  ) : null}
  </div>
  </div>
- <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3 sm:p-4">
+ <div className="space-y-3 rounded-xl border border-black/10 bg-[#ece6da]/50 p-3 sm:p-4">
  <p className="form-section-title">Payment Method</p>
  <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Payment method">
  <button
@@ -390,7 +388,7 @@ export default function CheckoutPage() {
  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
  paymentMethod === "card"
  ? "border-black bg-black text-white "
- : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50 "
+ : "border-black/20 bg-[#fbf9f4] text-[#1f1b18] hover:border-black/50 "
  }`}
  >
  <CreditCard className="size-4" />
@@ -404,7 +402,7 @@ export default function CheckoutPage() {
  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
  paymentMethod === "mobile_money"
  ? "border-black bg-black text-white "
- : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50 "
+ : "border-black/20 bg-[#fbf9f4] text-[#1f1b18] hover:border-black/50 "
  }`}
  >
  <Smartphone className="size-4" />
@@ -420,7 +418,7 @@ export default function CheckoutPage() {
  </CardContent>
  </Card>
 
-	 <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm lg:sticky lg:top-24">
+	 <Card className="rounded-2xl border-black/10 bg-[#fbf9f4] lg:sticky lg:top-24">
  <CardHeader>
  <div className="inline-flex items-center gap-2 ">
  <CreditCard className="size-4" />
@@ -450,7 +448,7 @@ export default function CheckoutPage() {
  {discountCode && discountMessage ? <p className="text-xs text-destructive">{discountMessage}</p> : null}
  <p className="text-xs text-muted-foreground">Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).</p>
  <Button
- className="w-full rounded-full"
+ className="w-full rounded-none"
  type="submit"
  disabled={isSubmitting || Boolean(discountCode && discountMessage)}
  >

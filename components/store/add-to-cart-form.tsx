@@ -21,7 +21,6 @@ type AddToCartFormProps = {
  sku?: string;
  onSkuChange?: (sku: string) => void;
  hideVariantSelect?: boolean;
- centered?: boolean;
 };
 
 export function AddToCartForm({
@@ -29,7 +28,6 @@ export function AddToCartForm({
  sku,
  onSkuChange,
  hideVariantSelect = false,
- centered = false,
 }: AddToCartFormProps) {
  const firstAvailableSku = useMemo(
  () => product.variants.find((entry) => entry.stock > 0)?.sku ?? product.variants[0]?.sku ?? "",
@@ -125,17 +123,15 @@ export function AddToCartForm({
  };
 
  return (
- <div className={`space-y-4 ${centered ? "mx-auto flex w-full max-w-[24rem] flex-col items-center" : ""}`}>
+ <div className="w-full space-y-4">
  <div
- className={`grid gap-3 ${centered ? "w-full justify-items-center" : ""} ${
- hideVariantSelect ? "" : "sm:grid-cols-2"
- }`}
+ className={`grid gap-3 ${hideVariantSelect ? "" : "sm:grid-cols-2"}`}
  >
  {hideVariantSelect ? null : (
- <div className={centered ? "w-full text-center sm:text-left" : ""}>
+ <div>
  <p className="mb-2 text-sm font-medium text-[#1f1b18] ">Variant</p>
  <Select value={activeSku} onValueChange={(value) => setSku(value ?? product.variants[0]?.sku ?? "")}>
- <SelectTrigger className="h-11 rounded-xl border-black/15 bg-white ">
+ <SelectTrigger className="h-11 rounded-xl border-black/15 bg-[#fbf9f4] ">
  <SelectValue placeholder="Select variant" />
  </SelectTrigger>
  <SelectContent className=" ">
@@ -150,16 +146,16 @@ export function AddToCartForm({
  </div>
  )}
 
- <div className={centered ? "flex w-full flex-col items-center text-center" : ""}>
- <label htmlFor={quantityInputId} className="mb-2 text-sm font-medium text-[#1f1b18] ">
+ <div>
+ <label htmlFor={quantityInputId} className="mb-2 block text-sm font-medium text-[#1f1b18] ">
  Quantity
  </label>
- <div className={`flex items-center gap-2 ${centered ? "justify-center" : ""}`}>
+ <div className="flex items-center gap-2">
  <Button
  type="button"
  variant="outline"
  size="icon"
- className="h-11 w-11 rounded-full border-black/15 bg-white"
+ className="h-11 w-11 rounded-none border-black/15 bg-[#fbf9f4]"
  onClick={() => updateQuantity(safeQuantity - 1)}
  disabled={!variantInStock || safeQuantity <= 1}
  aria-label="Decrease quantity"
@@ -194,15 +190,13 @@ export function AddToCartForm({
  updateQuantity(previousQuantityRef.current);
  }
  }}
- className={`h-11 rounded-xl border-black/15 bg-white text-center ${
- centered ? "mx-auto w-28" : "w-28"
- }`}
+ className="h-11 w-28 border-black/15 bg-[#fbf9f4] text-center"
  />
  <Button
  type="button"
  variant="outline"
  size="icon"
- className="h-11 w-11 rounded-full border-black/15 bg-white"
+ className="h-11 w-11 rounded-none border-black/15 bg-[#fbf9f4]"
  onClick={() => updateQuantity(safeQuantity + 1)}
  disabled={!variantInStock || safeQuantity >= variant.stock}
  aria-label="Increase quantity"
@@ -216,7 +210,7 @@ export function AddToCartForm({
 
  <Button
  size="lg"
- className={`h-11 rounded-full ${centered ? "mx-auto flex w-full max-w-[19rem]" : "w-full sm:w-auto"}`}
+ className="h-12 w-full rounded-none"
  onClick={onAddToCart}
  disabled={isAdding || isVariantInCart || isAdminUser || !variantInStock}
  >
