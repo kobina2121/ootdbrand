@@ -221,6 +221,32 @@ describe("listProducts", () => {
     );
   });
 
+  it("orders latest products by newest createdAt first", async () => {
+    mockProductLean.mockResolvedValue([
+      { ...storefrontProductDoc, slug: "oldest", name: "Alpha", createdAt: new Date("2026-01-01") },
+      { ...storefrontProductDoc, slug: "undated", name: "Beta" },
+      { ...storefrontProductDoc, slug: "newest", name: "Zeta", createdAt: new Date("2026-03-01") },
+      { ...storefrontProductDoc, slug: "middle", name: "Gamma", createdAt: new Date("2026-02-01") },
+    ]);
+    const { listProducts } = await import("@/lib/services/product-service");
+
+    const products = await listProducts({ activeOnly: true, sort: "latest" });
+
+    expect(products.map((product) => product.slug)).toEqual(["newest", "middle", "oldest", "undated"]);
+  });
+
+  it("keeps alphabetical order when no sort is requested", async () => {
+    mockProductLean.mockResolvedValue([
+      { ...storefrontProductDoc, slug: "zeta", name: "Zeta", createdAt: new Date("2026-03-01") },
+      { ...storefrontProductDoc, slug: "alpha", name: "Alpha", createdAt: new Date("2026-01-01") },
+    ]);
+    const { listProducts } = await import("@/lib/services/product-service");
+
+    const products = await listProducts({ activeOnly: true });
+
+    expect(products.map((product) => product.slug)).toEqual(["alpha", "zeta"]);
+  });
+
   it("shows available stock without subtracting pending unpaid orders", async () => {
     const { listProducts } = await import("@/lib/services/product-service");
 

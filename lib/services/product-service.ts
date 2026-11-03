@@ -207,6 +207,11 @@ function toUiProduct(
 }
 
 function sortProducts(items: Product[], sort: ProductFilters["sort"]) {
+  // listProducts orders "latest" by createdAt before mapping, since Product has no date field.
+  if (sort === "latest") {
+    return items;
+  }
+
   if (sort === "price-asc") {
     return [...items].sort((a, b) => a.basePrice - b.basePrice);
   }
@@ -232,12 +237,20 @@ export async function listProducts(filters: ProductFilters = {}) {
     query.category = new RegExp(`^${filters.category}$`, "i");
   }
 
-  const docs = await ProductModel.find(query, "slug name category description basePrice images variants").lean();
+  const docs = await ProductModel.find(query, "slug name category description basePrice images variants createdAt").lean();
+  const orderedDocs =
+    filters.sort === "latest"
+      ? [...docs].sort(
+          (a, b) =>
+            new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime() ||
+            a.name.localeCompare(b.name),
+        )
+      : docs;
   const [salesBySku, reviewStatsBySlug] = await Promise.all([
     getSuccessfulVariantSalesBySku(getAllVariantSkus(docs)),
     getApprovedReviewStatsBySlug(docs.map((doc) => doc.slug)),
   ]);
-  const mapped = docs.map((doc) => ({
+  const mapped = orderedDocs.map((doc) => ({
     slug: doc.slug,
     name: doc.name,
     category: doc.category,
