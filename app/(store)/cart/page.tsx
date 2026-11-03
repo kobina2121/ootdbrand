@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useCart } from "@/components/store/cart-provider";
 import { ProductGrid } from "@/components/store/product-grid";
 import { Button } from "@/components/ui/button";
+import { OutfitPreview } from "@/components/store/outfit-preview";
 import { PageMasthead } from "@/components/store/page-masthead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -41,6 +42,9 @@ export default function CartPage() {
  discountCode,
  appliedDiscountCode,
  discountMessage,
+ comboApplied,
+ discountNotice,
+ comboPairs,
  transactionFee,
  total,
  updateQuantity,
@@ -222,9 +226,41 @@ export default function CartPage() {
  }
  };
 
+ const outfits = comboPairs.flatMap((pair) => {
+ const top = items.find((item) => item.sku === pair.topSku);
+ const bottom = items.find((item) => item.sku === pair.bottomSku);
+
+ return top && bottom ? [{ top, bottom, quantity: pair.quantity }] : [];
+ });
+
  return (
  <div className="space-y-6">
  <PageMasthead title="Shopping Cart" description="Review your picks and continue to secure checkout." />
+
+ {outfits.length > 0 ? (
+ <section className="space-y-4">
+ <h2 className="font-heading text-4xl leading-none font-medium text-[#1d1b1a] sm:text-5xl">
+ {outfits.length === 1 ? "Your Outfit" : "Your Outfits"}
+ </h2>
+ <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
+ {outfits.map(({ top, bottom, quantity }) => (
+ <figure key={`${top.sku}-${bottom.sku}`} className="space-y-2">
+ <OutfitPreview
+ topImage={top.image}
+ bottomImage={bottom.image}
+ label={`${top.name} worn with ${bottom.name}`}
+ sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
+ />
+ <figcaption className="text-sm text-[#3d3731]">
+ {top.name} + {bottom.name}
+ {quantity > 1 ? ` × ${quantity}` : ""}
+ </figcaption>
+ </figure>
+ ))}
+ </div>
+ <p className="text-xs text-[#5f5954]">This preview joins the two product photos, so the real fit may look slightly different.</p>
+ </section>
+ ) : null}
 
 	 <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)] xl:gap-6">
  <Card className="rounded-2xl border-black/10 bg-[#fbf9f4] ">
@@ -320,9 +356,9 @@ export default function CartPage() {
  {isApplyingCoupon ? "Applying..." : appliedDiscountCode ? "Update" : "Apply"}
  </Button>
  </div>
- {appliedDiscountCode ? (
+ {appliedDiscountCode || discountNotice ? (
  <div className="flex items-center justify-between gap-3">
- <p className="text-xs text-emerald-700 ">Coupon {appliedDiscountCode} applied.</p>
+ <p className="text-xs text-emerald-700 ">{discountNotice ?? `Coupon ${appliedDiscountCode} applied.`}</p>
  <Button
  type="button"
  variant="ghost"
@@ -342,7 +378,7 @@ export default function CartPage() {
  </div>
  {discount > 0 ? (
  <div className="flex items-center justify-between text-sm text-emerald-700 ">
- <span>Discount</span>
+ <span>{comboApplied ? "Combo saving" : "Discount"}</span>
  <span>-{formatPriceNgn(discount)}</span>
  </div>
  ) : null}

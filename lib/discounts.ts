@@ -21,6 +21,11 @@ export type DiscountResolution = {
   message: string | null;
 };
 
+export type CartDiscountResolution = DiscountResolution & {
+  comboApplied: boolean;
+  notice: string | null;
+};
+
 const DISCOUNT_CONFIG_ENV = "STORE_DISCOUNT_CODES";
 const DEFAULT_DISCOUNT_RULES: DiscountRule[] = [];
 
@@ -135,4 +140,27 @@ export function resolveDiscount(items: CartItem[], code?: string | null): Discou
     amount,
     message: null,
   };
+}
+
+// A coupon and the combo saving never stack: the customer gets whichever is larger.
+export function resolveBestDiscount(
+  items: CartItem[],
+  code: string | null | undefined,
+  comboAmount: number,
+): CartDiscountResolution {
+  const coupon = resolveDiscount(items, code);
+  const comboSaving = Math.max(0, Math.min(comboAmount, calculateSubtotal(items)));
+
+  if (comboSaving > coupon.amount) {
+    return {
+      requestedCode: coupon.requestedCode,
+      appliedCode: null,
+      amount: comboSaving,
+      message: coupon.message,
+      comboApplied: true,
+      notice: coupon.appliedCode ? "Your combo saving is bigger than this coupon, so we applied the combo saving." : null,
+    };
+  }
+
+  return { ...coupon, comboApplied: false, notice: null };
 }

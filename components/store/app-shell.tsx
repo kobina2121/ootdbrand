@@ -15,6 +15,7 @@ import { socialLinks } from "@/lib/social-links";
 const navLinks = [
  { href: "/", label: "Home" },
  { href: "/products", label: "Shop" },
+ { href: "/combo", label: "Build a Combo" },
  { href: "/about", label: "About" },
  { href: "/custom-order", label: "Custom Order" },
  { href: "/orders", label: "Track Order" },
@@ -249,8 +250,12 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="space-y-2 text-[#d9d2c7] ">
  <Link href="/products" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Shop All</Link>
  <Link href="/products?category=TOPS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Tops</Link>
+ <Link href="/products?category=SKIRTS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Skirts</Link>
+ <Link href="/products?category=PANTS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Pants</Link>
+ <Link href="/products?category=CAPRIS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Capris</Link>
  <Link href="/products?category=MAXI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Maxi</Link>
  <Link href="/products?category=MIDI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Midi</Link>
+ <Link href="/combo" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Build a Combo</Link>
  <Link href="/custom-order" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Custom Order</Link>
  </div>
  </div>

@@ -4,7 +4,8 @@ import { Types } from "mongoose";
 
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { OrderModel, type OrderStatus } from "@/lib/db/models/order";
-import { resolveDiscount } from "@/lib/discounts";
+import { COMBO_DISCOUNT_LABEL, calculateComboDiscount } from "@/lib/combo";
+import { resolveBestDiscount } from "@/lib/discounts";
 import { ProductModel } from "@/lib/db/models/product";
 import { calculateShipping, calculateTransactionFee } from "@/lib/products";
 import { notifyAdminNewOrder } from "@/lib/services/admin-alert-service";
@@ -79,11 +80,13 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
   }));
 
   const amountSubtotal = resolvedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-  const discount = resolveDiscount(pricingItems, input.discountCode);
+  const discount = resolveBestDiscount(pricingItems, input.discountCode, calculateComboDiscount(resolvedItems));
 
-  if (discount.requestedCode && !discount.appliedCode) {
-    throw new Error(discount.message ?? "Invalid coupon code.");
+  if (discount.requestedCode && discount.message) {
+    throw new Error(discount.message);
   }
+
+  const orderDiscountCode = discount.comboApplied ? COMBO_DISCOUNT_LABEL : discount.appliedCode;
 
   const discountedSubtotal = Math.max(0, amountSubtotal - discount.amount);
   const shippingFee = calculateShipping(discountedSubtotal);
@@ -95,7 +98,7 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
     userId: user && Types.ObjectId.isValid(user.id) ? new Types.ObjectId(user.id) : undefined,
     items: resolvedItems,
     amountSubtotal,
-    discountCode: discount.appliedCode ?? undefined,
+    discountCode: orderDiscountCode ?? undefined,
     discountAmount: discount.amount,
     shippingFee,
     transactionFee,
@@ -118,7 +121,7 @@ export async function createPendingOrder(input: CheckoutOrderInput, user?: AppUs
     paymentReference,
     amountTotal,
     amountSubtotal,
-    discountCode: discount.appliedCode,
+    discountCode: orderDiscountCode,
     discountAmount: discount.amount,
     shippingFee,
     transactionFee,

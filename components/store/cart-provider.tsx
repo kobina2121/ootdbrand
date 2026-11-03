@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import type { ComboPair } from "@/lib/combo";
 import { calculateCartTotals, type CartItem, type CartTotals } from "@/lib/products";
 
 type AddPayload = Omit<CartItem, "quantity"> & { quantity?: number };
@@ -12,6 +13,9 @@ type CartDiscountState = {
   appliedCode: string | null;
   amount: number;
   message: string | null;
+  comboApplied: boolean;
+  notice: string | null;
+  comboPairs: ComboPair[];
 };
 
 type CartPricingState = {
@@ -35,10 +39,14 @@ type CartContextValue = {
   discountCode: string;
   appliedDiscountCode: string | null;
   discountMessage: string | null;
+  comboApplied: boolean;
+  discountNotice: string | null;
+  comboPairs: ComboPair[];
   shipping: number;
   transactionFee: number;
   total: number;
   addItem: (payload: AddPayload) => Promise<void>;
+  addItems: (payloads: AddPayload[]) => Promise<void>;
   removeItem: (sku: string) => Promise<void>;
   updateQuantity: (sku: string, quantity: number) => Promise<void>;
   applyDiscountCode: (code: string) => Promise<void>;
@@ -58,6 +66,9 @@ function createEmptyDiscount(requestedCode?: string | null): CartDiscountState {
     appliedCode: null,
     amount: 0,
     message: null,
+    comboApplied: false,
+    notice: null,
+    comboPairs: [],
   };
 }
 
@@ -248,12 +259,13 @@ export function CartProvider({
     }));
   }, [cartState.discountCode, cartState.items]);
 
-  const addItem = useCallback(async (payload: AddPayload) => {
-    if (pendingAddSkusRef.current.has(payload.sku)) {
+  // Adding several items in one update means one sync, so a slower response can't drop a piece.
+  const addItems = useCallback(async (payloads: AddPayload[]) => {
+    if (payloads.some((payload) => pendingAddSkusRef.current.has(payload.sku))) {
       throw new Error("This item is already being added.");
     }
 
-    pendingAddSkusRef.current.add(payload.sku);
+    payloads.forEach((payload) => pendingAddSkusRef.current.add(payload.sku));
     let previousState: CartState | null = null;
     let nextItems: CartItem[] = [];
     let nextDiscountCode = "";
@@ -261,25 +273,23 @@ export function CartProvider({
     setCartState((prev) => {
       previousState = prev;
       nextDiscountCode = prev.discountCode;
-      const existing = prev.items.find((item) => item.sku === payload.sku);
+      nextItems = payloads.reduce((items, payload) => {
+        const existing = items.find((item) => item.sku === payload.sku);
 
-      if (existing) {
-        nextItems = prev.items.map((item) =>
-          item.sku === payload.sku
-            ? {
-                ...item,
-                quantity: item.quantity + (payload.quantity ?? 1),
-              }
-            : item,
-        );
+        if (existing) {
+          return items.map((item) =>
+            item.sku === payload.sku
+              ? {
+                  ...item,
+                  quantity: item.quantity + (payload.quantity ?? 1),
+                }
+              : item,
+          );
+        }
 
-        return {
-          ...prev,
-          items: nextItems,
-        };
-      }
+        return [...items, { ...payload, quantity: payload.quantity ?? 1 }];
+      }, prev.items);
 
-      nextItems = [...prev.items, { ...payload, quantity: payload.quantity ?? 1 }];
       return {
         ...prev,
         items: nextItems,
@@ -298,19 +308,6 @@ export function CartProvider({
           return;
         }
 
-        if (result.removedSku === payload.sku) {
-          setCartState({
-            items: result.items,
-            discountCode: result.discount.requestedCode ?? "",
-            pricing: {
-              totals: result.totals,
-              discount: result.discount,
-            },
-          });
-          toast.error("This product option is no longer available.");
-          return;
-        }
-
         setCartState({
           items: result.items,
           discountCode: result.discount.requestedCode ?? "",
@@ -319,11 +316,17 @@ export function CartProvider({
             discount: result.discount,
           },
         });
+
+        if (payloads.some((payload) => payload.sku === result.removedSku)) {
+          toast.error("This product option is no longer available.");
+        }
       } finally {
-        pendingAddSkusRef.current.delete(payload.sku);
+        payloads.forEach((payload) => pendingAddSkusRef.current.delete(payload.sku));
       }
     })();
   }, []);
+
+  const addItem = useCallback((payload: AddPayload) => addItems([payload]), [addItems]);
 
   const updateQuantity = useCallback(async (sku: string, quantity: number) => {
     const safeQuantity = Math.max(1, quantity);
@@ -501,10 +504,14 @@ export function CartProvider({
       discountCode: userRole === "admin" ? "" : cartState.discountCode,
       appliedDiscountCode: effectiveDiscount.appliedCode,
       discountMessage: effectiveDiscount.message,
+      comboApplied: effectiveDiscount.comboApplied,
+      discountNotice: effectiveDiscount.notice,
+      comboPairs: effectiveDiscount.comboPairs,
       shipping: effectiveTotals.shipping,
       transactionFee: effectiveTotals.transactionFee,
       total: effectiveTotals.total,
       addItem,
+      addItems,
       removeItem,
       updateQuantity,
       applyDiscountCode,
@@ -514,12 +521,16 @@ export function CartProvider({
     }),
     [
       addItem,
+      addItems,
       applyDiscountCode,
       cartState.discountCode,
       clearCart,
       clearDiscountCode,
       effectiveDiscount.appliedCode,
+      effectiveDiscount.comboApplied,
+      effectiveDiscount.comboPairs,
       effectiveDiscount.message,
+      effectiveDiscount.notice,
       effectiveItems,
       effectiveTotals.discount,
       effectiveTotals.discountedSubtotal,

@@ -87,7 +87,7 @@ type ProductFormProps = {
  initialValues?: ProductEditorInputValues;
 };
 
-const productCategories = ["TOPS", "MAXI", "MIDI", "MINI"] as const;
+const productCategories = ["TOPS", "SKIRTS", "PANTS", "CAPRIS", "MAXI", "MIDI", "MINI"] as const;
 const sizeOptions = ["XS", "S", "M", "L", "XL"] as const;
 
 const fieldClassName =

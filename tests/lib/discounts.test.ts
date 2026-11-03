@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { normalizeDiscountCode, resolveDiscount } from "@/lib/discounts";
+import { normalizeDiscountCode, resolveBestDiscount, resolveDiscount } from "@/lib/discounts";
 import type { CartItem } from "@/lib/products";
 
 const items: CartItem[] = [
@@ -63,5 +63,48 @@ describe("discount resolution", () => {
       amount: 0,
       message: "Coupon code is invalid or inactive.",
     });
+  });
+});
+
+describe("best discount resolution", () => {
+  const coupon = (value: number) => {
+    process.env.STORE_DISCOUNT_CODES = JSON.stringify([{ code: "OOTD", type: "fixed", value }]);
+  };
+
+  it("applies the combo saving when there is no coupon", () => {
+    expect(resolveBestDiscount(items, null, 20)).toMatchObject({ amount: 20, comboApplied: true, appliedCode: null, notice: null });
+  });
+
+  it("uses the combo saving and explains why when it beats a valid coupon", () => {
+    coupon(10);
+
+    const result = resolveBestDiscount(items, "OOTD", 20);
+
+    expect(result).toMatchObject({ amount: 20, comboApplied: true, appliedCode: null, requestedCode: "OOTD", message: null });
+    expect(result.notice).toContain("combo saving");
+  });
+
+  it("uses the coupon when it beats or matches the combo saving", () => {
+    coupon(50);
+    expect(resolveBestDiscount(items, "OOTD", 20)).toMatchObject({ amount: 50, comboApplied: false, appliedCode: "OOTD" });
+
+    coupon(20);
+    expect(resolveBestDiscount(items, "OOTD", 20)).toMatchObject({ amount: 20, comboApplied: false, appliedCode: "OOTD" });
+  });
+
+  it("keeps the invalid coupon message alongside the combo saving", () => {
+    expect(resolveBestDiscount(items, "NOPE", 20)).toMatchObject({
+      amount: 20,
+      comboApplied: true,
+      message: "Coupon code is invalid or inactive.",
+    });
+  });
+
+  it("never discounts more than the subtotal", () => {
+    expect(resolveBestDiscount(items, null, 500).amount).toBe(240);
+  });
+
+  it("gives no discount without a combo or coupon", () => {
+    expect(resolveBestDiscount(items, null, 0)).toMatchObject({ amount: 0, comboApplied: false });
   });
 });

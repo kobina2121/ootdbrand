@@ -29,6 +29,7 @@ export type ProductVariantStockCheck = {
 export type ResolvedOrderItem = {
   productId: string;
   productNameSnapshot: string;
+  category: string;
   variant: {
     size: string;
     color: {
@@ -401,6 +402,7 @@ export async function resolveOrderItemsFromCart(items: CartItem[]): Promise<Reso
     {
       productId: string;
       productNameSnapshot: string;
+      category: string;
       size: string;
       color: { name: string; code: string };
       sku: string;
@@ -414,6 +416,7 @@ export async function resolveOrderItemsFromCart(items: CartItem[]): Promise<Reso
       variantMap.set(variant.sku, {
         productId: String(doc._id),
         productNameSnapshot: variant.name?.trim() || doc.name,
+        category: doc.category,
         size: variant.size,
         color: {
           name: variant.color?.name ?? "Unknown",
@@ -440,6 +443,7 @@ export async function resolveOrderItemsFromCart(items: CartItem[]): Promise<Reso
     return {
       productId: found.productId,
       productNameSnapshot: found.productNameSnapshot,
+      category: found.category,
       variant: {
         size: found.size,
         color: found.color,

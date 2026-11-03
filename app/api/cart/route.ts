@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 
 import { getCurrentSession } from "@/lib/auth/guards";
 import { failure, success } from "@/lib/api-response";
+import { calculateComboDiscount, pairComboItems } from "@/lib/combo";
 import { calculateCartTotals } from "@/lib/products";
-import { resolveDiscount } from "@/lib/discounts";
+import { resolveBestDiscount } from "@/lib/discounts";
 import { checkRateLimit } from "@/lib/security/guards";
-import { resolveOrderItemsFromCart } from "@/lib/services/product-service";
+import { resolveOrderItemsFromCart, type ResolvedOrderItem } from "@/lib/services/product-service";
 import { cartPayloadSchema } from "@/lib/validators/cart";
 
 export async function POST(request: Request) {
@@ -34,8 +35,10 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("Invalid cart payload"), { status: 400 });
     }
 
+    let resolvedItems: ResolvedOrderItem[];
+
     try {
-      await resolveOrderItemsFromCart(parsed.data.items);
+      resolvedItems = await resolveOrderItemsFromCart(parsed.data.items);
     } catch (error) {
       if (error instanceof Error && error.message) {
         return NextResponse.json(failure(error.message), { status: 409 });
@@ -44,14 +47,23 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("One or more items are unavailable or out of stock"), { status: 409 });
     }
 
-    const discount = resolveDiscount(parsed.data.items, parsed.data.discountCode);
+    const discount = resolveBestDiscount(
+      parsed.data.items,
+      parsed.data.discountCode,
+      calculateComboDiscount(resolvedItems),
+    );
     const totals = calculateCartTotals(parsed.data.items, discount.amount);
 
     return NextResponse.json(
       success("Cart synced", {
         itemsCount: parsed.data.items.length,
         totals,
-        discount,
+        discount: {
+          ...discount,
+          comboPairs: pairComboItems(
+            resolvedItems.map((item) => ({ sku: item.variant.sku, category: item.category, quantity: item.quantity })),
+          ),
+        },
       }),
     );
   } catch {

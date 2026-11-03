@@ -32,6 +32,7 @@ export default function CheckoutPage() {
  discountCode,
  appliedDiscountCode,
  discountMessage,
+ comboApplied,
  transactionFee,
  total,
  syncCart,
@@ -433,7 +434,7 @@ export default function CheckoutPage() {
  </div>
  {discount > 0 ? (
  <div className="flex items-center justify-between text-sm text-emerald-700 ">
- <span>Discount{appliedDiscountCode ? ` (${appliedDiscountCode})` : ""}</span>
+ <span>{comboApplied ? "Combo saving" : `Discount${appliedDiscountCode ? ` (${appliedDiscountCode})` : ""}`}</span>
  <span>-{formatPriceNgn(discount)}</span>
  </div>
  ) : null}

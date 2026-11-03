@@ -1,10 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AddToCartForm } from "@/components/store/add-to-cart-form";
-import { type Product } from "@/lib/products";
+import { COMBO_DISCOUNT_GHS, isBottomCategory, isTopCategory } from "@/lib/combo";
+import { formatPriceNgn, type Product } from "@/lib/products";
 
 type ProductDetailClientProps = {
  product: Product;
@@ -85,6 +88,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  setSelectedSize(imageVariant.size);
  };
 
+ const comboHref = isTopCategory(product.category)
+ ? `/combo?top=${encodeURIComponent(product.slug)}`
+ : isBottomCategory(product.category)
+ ? `/combo?bottom=${encodeURIComponent(product.slug)}`
+ : null;
 
  return (
 	 <div className="grid gap-6 sm:gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)] lg:gap-14">
@@ -247,6 +255,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  ) : (
  <p className="text-sm text-muted-foreground">This item is currently unavailable.</p>
  )}
+ {comboHref ? (
+ <Link
+ href={comboHref}
+ className="inline-flex min-h-11 items-center gap-2 text-xs tracking-[0.22em] text-[#1d1b1a] uppercase underline underline-offset-8"
+ >
+ Pair it in a combo &amp; save {formatPriceNgn(COMBO_DISCOUNT_GHS)} <ArrowRight className="size-4" />
+ </Link>
+ ) : null}
  </section>
  </div>
  );
