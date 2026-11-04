@@ -89,7 +89,7 @@ const editorialShowcase = {
  description:
  "Elevated silhouettes made to flatter every shape. Step into timeless pieces that carry confidence from day to night.",
  cta: "SHOP COLLECTION",
- video: "/videos/editorial-showcase.mp4",
+ video: "/videos/signature-dresses.mp4",
 } as const;
 
 function toCarouselItem(product: Product) {
@@ -204,7 +204,7 @@ export default async function HomePage() {
  </section>
 
  <section className="full-bleed bg-[#1d1b1a] text-[#f6f2ea]">
- <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
+ <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
  <div className="flex items-center p-7 sm:p-10 lg:p-14">
  <div className="max-w-xl space-y-6">
  <p className="text-xs tracking-[0.28em] text-[#b9b1a6]">N&deg; 03 &mdash; {editorialShowcase.label}</p>
@@ -222,11 +222,11 @@ export default async function HomePage() {
  </div>
  </div>
 
- <div className="relative min-h-[420px] overflow-hidden lg:min-h-[720px]">
+ <div className="relative aspect-[3/4] overflow-hidden lg:aspect-auto lg:min-h-[860px]">
  <div className="absolute inset-0">
  <LazyShowcaseVideo
  src={editorialShowcase.video}
- className="h-full w-full bg-cover bg-center object-cover object-center animate-hero-zoom"
+ className="h-full w-full bg-cover bg-center object-cover object-[center_30%] animate-hero-zoom"
  />
  </div>
  </div>
