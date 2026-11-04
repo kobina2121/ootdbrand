@@ -3,8 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   encodeProductSlugForPath,
   getProductSlugLookupCandidates,
-  normalizeProductSlug,
-} from "@/lib/product-slug";
+  normalizeProductSlug, buildProductHref } from "@/lib/product-slug";
 
 describe("product slug helpers", () => {
   it("normalizes admin-entered product names into URL-safe slugs", () => {
@@ -24,5 +23,16 @@ describe("product slug helpers", () => {
       "yellow-20dress",
       "yellow-dress",
     ]);
+  });
+});
+
+describe("buildProductHref", () => {
+  it("links to the product with no options", () => {
+    expect(buildProductHref("square-top")).toBe("/products/square-top");
+  });
+
+  it("carries the chosen color and size", () => {
+    expect(buildProductHref("skirt", { color: "Hot Pink" })).toBe("/products/skirt?color=Hot+Pink");
+    expect(buildProductHref("skirt", { size: "M" })).toBe("/products/skirt?size=M");
   });
 });

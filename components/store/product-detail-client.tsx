@@ -7,13 +7,15 @@ import { useMemo, useState } from "react";
 
 import { AddToCartForm } from "@/components/store/add-to-cart-form";
 import { COMBO_DISCOUNT_GHS, isBottomCategory, isTopCategory } from "@/lib/combo";
-import { formatPriceNgn, type Product } from "@/lib/products";
+import { findInitialVariant, formatPriceNgn, type Product } from "@/lib/products";
 
 type ProductDetailClientProps = {
  product: Product;
+ requestedColor?: string;
+ requestedSize?: string;
 };
 
-export function ProductDetailClient({ product }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, requestedColor, requestedSize }: ProductDetailClientProps) {
  const baseImages = useMemo(() => {
  const uploaded = product.images?.filter(Boolean) ?? [];
  return uploaded.length > 0 ? uploaded : [product.image].filter(Boolean);
@@ -34,10 +36,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  return Array.from(colorMap.values());
  }, [product.variants]);
 
- const firstVariant = product.variants.find((variant) => variant.stock > 0) ?? product.variants[0];
+ const firstVariant = findInitialVariant(product.variants, { color: requestedColor, size: requestedSize });
  const [selectedColor, setSelectedColor] = useState(firstVariant?.color ?? "");
  const [selectedSize, setSelectedSize] = useState(firstVariant?.size ?? "");
- const [hasSelectedVariant, setHasSelectedVariant] = useState(false);
+ const [hasSelectedVariant, setHasSelectedVariant] = useState(Boolean(requestedColor || requestedSize));
 
  const variantsForColor = useMemo(
  () => product.variants.filter((variant) => variant.color === selectedColor),
@@ -72,7 +74,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
  return Array.from(new Set(ordered));
  }, [baseImages, product.image, product.variants, selectedVariant?.image]);
 
- const [selectedImage, setSelectedImage] = useState<string>(firstVariant?.image ?? galleryImages[0] ?? product.image);
+ const [selectedImage, setSelectedImage] = useState<string>(
+ firstVariant?.image ||
+ product.variants.find((variant) => variant.color === firstVariant?.color && variant.image)?.image ||
+ galleryImages[0] ||
+ product.image,
+ );
  const selectImage = (image: string) => {
  setSelectedImage(image);
  const imageVariant =

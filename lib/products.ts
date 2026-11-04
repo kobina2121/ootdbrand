@@ -129,6 +129,26 @@ export function formatPriceNgn(value: number) {
   }).format(value);
 }
 
+// Picks the option a product page opens on, honouring a color or size chosen before arriving.
+export function findInitialVariant(
+  variants: ProductVariant[],
+  requested: { color?: string; size?: string } = {},
+) {
+  const requestedColor = requested.color?.trim().toLowerCase();
+  const requestedSize = requested.size?.trim().toLowerCase();
+  const matchingColor = requestedColor
+    ? variants.filter((variant) => variant.color.toLowerCase() === requestedColor)
+    : [];
+  const candidates = matchingColor.length > 0 ? matchingColor : variants;
+
+  return (
+    candidates.find((variant) => variant.size.toLowerCase() === requestedSize && variant.stock > 0) ??
+    candidates.find((variant) => variant.size.toLowerCase() === requestedSize) ??
+    candidates.find((variant) => variant.stock > 0) ??
+    candidates[0]
+  );
+}
+
 export function getVariantPrice(product: Product, sku: string) {
   const variant = product.variants.find((entry) => entry.sku === sku);
   if (!variant) {

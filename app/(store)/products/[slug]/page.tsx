@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 type ProductDetailPageProps = {
  params: Promise<{ slug: string }>;
+ searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
@@ -69,8 +70,12 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
 
 export default async function ProductDetailPage({
  params,
+ searchParams,
 }: ProductDetailPageProps) {
  const { slug } = await params;
+ const query = (await searchParams) ?? {};
+ const requestedColor = typeof query.color === "string" ? query.color : undefined;
+ const requestedSize = typeof query.size === "string" ? query.size : undefined;
  const [product, allProducts, session, productReviews] = await Promise.all([
  getProductBySlug(slug),
  listProducts({ activeOnly: true, sort: "latest" }),
@@ -126,7 +131,12 @@ export default async function ProductDetailPage({
  Back to shop
  </Link>
 
- <ProductDetailClient product={product} />
+ <ProductDetailClient
+ key={`${product.slug}-${requestedColor ?? ""}-${requestedSize ?? ""}`}
+ product={product}
+ requestedColor={requestedColor}
+ requestedSize={requestedSize}
+ />
 
  <ProductReviews
  productSlug={product.slug}

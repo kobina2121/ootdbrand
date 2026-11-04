@@ -13,6 +13,21 @@ export function encodeProductSlugForPath(slug: string) {
   return encodeURIComponent(slug);
 }
 
+export function buildProductHref(slug: string, options: { color?: string; size?: string } = {}) {
+  const query = new URLSearchParams();
+
+  if (options.color) {
+    query.set("color", options.color);
+  }
+
+  if (options.size) {
+    query.set("size", options.size);
+  }
+
+  const queryString = query.toString();
+  return `/products/${encodeProductSlugForPath(slug)}${queryString ? `?${queryString}` : ""}`;
+}
+
 export function getProductSlugLookupCandidates(value: string) {
   const trimmed = value.trim();
   const decoded = safeDecodeURIComponent(trimmed);
