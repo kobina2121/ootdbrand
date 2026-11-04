@@ -37,7 +37,7 @@ function CartCountBadge({ count }: { count: number }) {
  return (
  <span
  suppressHydrationWarning
- className="absolute -right-1 -top-1 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[#c2185b] px-1 text-[10px] font-semibold leading-none text-white shadow-sm"
+ className="absolute -right-1 -top-1 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground shadow-sm"
  >
  {count > 99 ? "99+" : count}
  </span>
@@ -219,7 +219,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <Link
  key={link.href}
  href={link.href}
- className={`relative flex min-h-10 items-center whitespace-nowrap text-[11px] tracking-[0.18em] uppercase transition xl:text-xs ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1d1b1a] after:absolute after:bottom-1.5 after:left-0 after:h-px after:w-full after:bg-[#c2185b] " : "text-[#5f5954] hover:text-[#1d1b1a]"}`}
+ className={`relative flex min-h-10 items-center whitespace-nowrap text-[11px] tracking-[0.18em] uppercase transition xl:text-xs ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1d1b1a] after:absolute after:bottom-1.5 after:left-0 after:h-px after:w-full after:bg-[#1d1b1a] " : "text-[#5f5954] hover:text-[#1d1b1a]"}`}
  >
  {link.label}
  </Link>
@@ -246,7 +246,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <div className="border-t border-white/20 pt-8 sm:pt-10">
  <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
  <div className="space-y-4">
- <p className="text-xs tracking-[0.24em] text-[#f48fb1] ">QUICK LINKS</p>
+ <p className="text-xs tracking-[0.24em] text-[#b9b1a6] ">QUICK LINKS</p>
  <div className="space-y-2 text-[#d9d2c7] ">
  <Link href="/products" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Shop All</Link>
  <Link href="/products?category=TOPS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Tops</Link>
@@ -261,7 +261,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
 
  <div className="space-y-4">
- <p className="text-xs tracking-[0.24em] text-[#f48fb1] ">NEED HELP</p>
+ <p className="text-xs tracking-[0.24em] text-[#b9b1a6] ">NEED HELP</p>
  <div className="space-y-2 text-[#d9d2c7] ">
  <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">+233 53 647 7207</a>
  <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">WhatsApp Us</a>
@@ -271,7 +271,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
 
  <div className="space-y-4">
- <p className="text-xs tracking-[0.24em] text-[#f48fb1] ">OUR POLICY</p>
+ <p className="text-xs tracking-[0.24em] text-[#b9b1a6] ">OUR POLICY</p>
  <div className="space-y-2 text-[#d9d2c7] ">
  <p className="text-[1.15rem] text-white ">48-Hour Returns</p>
  <p className="max-w-xs leading-relaxed">
@@ -281,7 +281,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
 
  <div className="space-y-4">
- <p className="text-xs tracking-[0.24em] text-[#f48fb1] ">FOLLOW US</p>
+ <p className="text-xs tracking-[0.24em] text-[#b9b1a6] ">FOLLOW US</p>
  <div className="space-y-2 text-[#d9d2c7] ">
                 <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Instagram →</a>
  <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">WhatsApp →</a>
@@ -322,7 +322,7 @@ export function AppShell({ children, user }: AppShellProps) {
  aria-label={tab.href === "/cart" && !isAdminUser && visibleItemCount > 0 ? `Cart, ${visibleItemCount} item${visibleItemCount === 1 ? "" : "s"}` : tab.label}
  className={`flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[11px] ${active ? "text-foreground" : "text-muted-foreground"}`}
  >
- <span className={`relative p-1 ${active ? "border-b border-[#c2185b] " : ""}`}>
+ <span className={`relative p-1 ${active ? "border-b border-[#1d1b1a] " : ""}`}>
  <Icon className="size-4" />
  {tab.href === "/cart" && !isAdminUser ? <CartCountBadge count={visibleItemCount} /> : null}
  </span>

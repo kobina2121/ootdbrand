@@ -17,7 +17,7 @@ export function SectionHeading({
   return (
     <div className="border-t border-[#1d1b1a] pt-4">
       <div className="flex min-h-11 items-baseline justify-between gap-4">
-        {number ? <p className="text-xs tracking-[0.28em] text-[#c2185b]">N&deg; {number}</p> : <span />}
+        {number ? <p className="text-xs tracking-[0.28em] text-[#7a1730]">N&deg; {number}</p> : <span />}
         {href ? (
           <Link
             href={href}
