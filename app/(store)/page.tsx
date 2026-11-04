@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
-import { HeroImageRotator } from "@/components/store/hero-image-rotator";
+import { HeroLookCarousel } from "@/components/store/hero-look-carousel";
 import { LazyShowcaseVideo } from "@/components/store/lazy-showcase-video";
 import { NewArrivalsEditorial } from "@/components/store/new-arrivals-editorial";
 import { SectionHeading } from "@/components/store/section-heading";
@@ -10,11 +10,27 @@ import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
 import { formatPriceNgn, type Product } from "@/lib/products";
 import { listProducts } from "@/lib/services/product-service";
 
-const heroImages = [
- "/images/hero/hero-main.jpg",
- "/images/hero/hero-bench.jpg",
- "/images/hero/hero-walk.jpg",
- "/images/hero/hero-pose.jpg",
+const looks = [
+ {
+ src: "/images/hero/look-pink-dress.jpg",
+ alt: "Model in a pink one-shoulder mini dress on a lawn",
+ position: "center 25%",
+ },
+ {
+ src: "/images/hero/look-solo-blue-skirt.jpg",
+ alt: "Model in a black halter top and blue handkerchief skirt",
+ position: "center 45%",
+ },
+ {
+ src: "/images/hero/look-yellow-dress.jpg",
+ alt: "Model in a yellow maxi dress on a sunlit lawn",
+ position: "center 85%",
+ },
+ {
+ src: "/images/hero/look-white-top.jpg",
+ alt: "Model in a white one-shoulder top and coral skirt",
+ position: "center 40%",
+ },
 ] as const;
 
 const categoryHighlights = [
@@ -124,7 +140,7 @@ export default async function HomePage() {
  <div className="space-y-16 sm:space-y-24">
  <div>
  <section className="full-bleed animate-fade-up relative -mt-5 h-[72svh] min-h-[480px] overflow-hidden bg-[#1d1b1a] sm:-mt-8 sm:h-[80svh] sm:min-h-[560px] lg:h-[calc(100svh-6.5rem)] lg:min-h-[640px]">
- <HeroImageRotator images={heroImages} />
+ <HeroLookCarousel looks={looks} />
  <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-black/85" />
 
  <div className="absolute inset-x-0 bottom-0 z-10 text-white">

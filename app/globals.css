@@ -262,28 +262,31 @@ body:has(.storefront) .rounded-3xl {
  }
  }
 
- @keyframes hero-carousel-fade {
- 0% {
- opacity: 1;
- transform: scale(1.02);
- }
- 42% {
- opacity: 1;
- transform: scale(1.05);
- }
- 50% {
- opacity: 0;
- transform: scale(1.055);
- }
- 100% {
- opacity: 0;
- transform: scale(1.015);
- }
- }
-
  @keyframes marquee {
  0% {
  transform: translateX(0);
+ }
+ 100% {
+ transform: translateX(-50%);
+ }
+ }
+
+ @keyframes look-carousel-slide {
+ 0%,
+ 20% {
+ transform: translateX(0);
+ }
+ 25%,
+ 45% {
+ transform: translateX(-12.5%);
+ }
+ 50%,
+ 70% {
+ transform: translateX(-25%);
+ }
+ 75%,
+ 95% {
+ transform: translateX(-37.5%);
  }
  100% {
  transform: translateX(-50%);
@@ -336,13 +339,6 @@ body:has(.storefront) .rounded-3xl {
  will-change: transform;
  }
 
- .animate-hero-carousel {
- animation: hero-carousel-fade 4s ease-in-out infinite;
- transform-origin: center center;
- opacity: 0;
- will-change: opacity, transform;
- }
-
  .animate-marquee {
  animation: marquee 36s linear infinite;
  }
@@ -350,6 +346,21 @@ body:has(.storefront) .rounded-3xl {
  @media (prefers-reduced-motion: reduce) {
  .animate-marquee {
  animation: none;
+ }
+ }
+
+ .animate-look-carousel {
+ animation: look-carousel-slide 28s ease-in-out infinite;
+ will-change: transform;
+ }
+
+ .animate-look-carousel:hover {
+ animation-play-state: paused;
+ }
+
+ @media (prefers-reduced-motion: reduce) {
+ .animate-look-carousel {
+ animation: none !important;
  }
  }
 
@@ -533,15 +544,5 @@ body:has(.storefront) .rounded-3xl {
  animation: none !important;
  opacity: 1 !important;
  transform: none !important;
- }
-
- .animate-hero-carousel {
- animation: none !important;
- opacity: 0 !important;
- transform: none !important;
- }
-
- .animate-hero-carousel:first-of-type {
- opacity: 1 !important;
  }
 }
