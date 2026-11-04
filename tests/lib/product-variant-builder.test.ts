@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildVariantRows } from "@/lib/product-variant-builder";
+import { buildVariantRows, getColorPhotoRows } from "@/lib/product-variant-builder";
 
 describe("buildVariantRows", () => {
   it("creates every selected size/color combination as its own variant row", () => {
@@ -81,5 +81,28 @@ describe("buildVariantRows", () => {
         stock: 0,
       },
     ]);
+  });
+});
+
+describe("getColorPhotoRows", () => {
+  const variant = (colorName: string, image?: string) => ({ colorName, colorCode: "#111827", image });
+
+  it("groups every size of a colour into one row", () => {
+    expect(getColorPhotoRows([variant("Black", "/black.jpg"), variant("Black", "/black.jpg"), variant("White", "/white.jpg")])).toEqual([
+      { colorName: "Black", colorCode: "#111827", image: "/black.jpg", isMixed: false },
+      { colorName: "White", colorCode: "#111827", image: "/white.jpg", isMixed: false },
+    ]);
+  });
+
+  it("treats a colour with no photo as empty", () => {
+    expect(getColorPhotoRows([variant("Black"), variant("Black", "")])[0]).toMatchObject({ image: "", isMixed: false });
+  });
+
+  it("flags a colour whose sizes use different photos", () => {
+    expect(getColorPhotoRows([variant("Black", "/a.jpg"), variant("Black", "/b.jpg")])[0]).toMatchObject({ image: "", isMixed: true });
+  });
+
+  it("skips rows without a colour name", () => {
+    expect(getColorPhotoRows([variant("  ")])).toEqual([]);
   });
 });

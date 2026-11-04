@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { buildImageBlobPath } from "@/lib/blob-upload";
 import { catalogColorOptions, type ColorOption } from "@/lib/color-options";
 import { normalizeProductSlug } from "@/lib/product-slug";
-import { buildVariantRows, type ProductVariantDraft } from "@/lib/product-variant-builder";
+import { buildVariantRows, getColorPhotoRows, type ProductVariantDraft } from "@/lib/product-variant-builder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -229,6 +229,16 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  setBulkSelectedSizes((previous) =>
  previous.includes(size) ? previous.filter((entry) => entry !== size) : [...previous, size],
  );
+ };
+
+ const colorPhotoRows = getColorPhotoRows(watchedVariants);
+
+ const setColorPhoto = (colorName: string, image: string) => {
+ form.getValues("variants").forEach((variant, index) => {
+ if (variant.colorName.trim() === colorName) {
+ form.setValue(`variants.${index}.image`, image, { shouldValidate: true, shouldDirty: true });
+ }
+ });
  };
 
  const toggleBulkColor = (colorCode: string) => {
@@ -769,6 +779,49 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
  <div className="rounded-lg border border-dashed border-black/10 bg-white/70 px-3 py-2 text-xs text-muted-foreground">
  {watchedVariants.length} saved combination(s) currently in this product.
  </div>
+
+ {colorPhotoRows.length > 0 ? (
+ <div className="space-y-3 rounded-xl border border-black/10 bg-white p-3">
+ <div className="space-y-1">
+ <p className="text-sm font-medium">Color Photos</p>
+ <p className="text-xs text-muted-foreground">
+ Choose the photo customers see when they click each color. It applies to every size of that color.
+ </p>
+ </div>
+ {colorPhotoRows.map((row) => (
+ <div key={row.colorName} className="grid items-center gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_auto]">
+ <div className="flex min-w-0 items-center gap-2 text-sm font-medium">
+ <span
+ className="inline-block size-4 shrink-0 rounded-full border border-black/20"
+ style={{ backgroundColor: row.colorCode }}
+ />
+ <span className="truncate">{row.colorName}</span>
+ </div>
+ <select
+ aria-label={`Photo for ${row.colorName}`}
+ className={selectClassName}
+ value={row.image}
+ onChange={(event) => setColorPhoto(row.colorName, event.target.value)}
+ >
+ <option value="">{row.isMixed ? "Different photos per size" : "No photo chosen"}</option>
+ {uploadedImages.map((imagePath, imageIndex) => (
+ <option key={`color-photo-${row.colorName}-${imageIndex}`} value={imagePath}>
+ Image {imageIndex + 1}
+ </option>
+ ))}
+ </select>
+ <div className="relative size-14 overflow-hidden rounded-lg border border-black/10 bg-muted">
+ {row.image ? <Image src={row.image} alt={`${row.colorName} photo`} fill sizes="56px" className="object-cover" /> : null}
+ </div>
+ </div>
+ ))}
+ {colorPhotoRows.length > 1 && colorPhotoRows.some((row) => !row.image) ? (
+ <p role="status" className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+ The photo won&apos;t change when customers click a color with no photo chosen.
+ </p>
+ ) : null}
+ </div>
+ ) : null}
 
  {variantFields.map((field, index) => (
  <div key={field.id} className="grid gap-2 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-3 ">

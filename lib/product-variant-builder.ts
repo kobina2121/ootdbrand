@@ -99,3 +99,36 @@ export function buildVariantRows({
     skippedCount,
   };
 }
+
+export type ColorPhotoRow = {
+  colorName: string;
+  colorCode: string;
+  image: string;
+  isMixed: boolean;
+};
+
+type ColorPhotoVariant = Pick<ProductVariantDraft, "colorName" | "colorCode" | "image">;
+
+// One row per colour, so a photo can be chosen once for all of that colour's sizes.
+export function getColorPhotoRows(variants: ColorPhotoVariant[]): ColorPhotoRow[] {
+  const rows = new Map<string, ColorPhotoRow>();
+
+  variants.forEach((variant) => {
+    const colorName = variant.colorName.trim();
+
+    if (!colorName) {
+      return;
+    }
+
+    const image = variant.image ?? "";
+    const existing = rows.get(colorName);
+
+    if (!existing) {
+      rows.set(colorName, { colorName, colorCode: variant.colorCode, image, isMixed: false });
+    } else if (existing.image !== image) {
+      existing.isMixed = true;
+    }
+  });
+
+  return Array.from(rows.values()).map((row) => (row.isMixed ? { ...row, image: "" } : row));
+}
