@@ -73,12 +73,12 @@ function ComboProductBrowser({
           onChange={(event) => setQuery(event.target.value)}
           placeholder={`Search ${noun}...`}
           aria-label={`Search ${noun}`}
-          className="h-11 border-[#1d1b1a]/30 bg-transparent pl-9"
+          className="h-11 rounded-full border-black/15 bg-white/90 pl-9"
         />
       </div>
 
       {categories.length > 1 ? (
-        <div className="flex flex-wrap gap-x-4" role="group" aria-label={`Filter ${noun} by type`}>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={`Filter ${noun} by type`}>
           {["all", ...categories].map((category) => (
             <button
               key={category}
@@ -86,8 +86,8 @@ function ComboProductBrowser({
               aria-pressed={activeCategory === category}
               onClick={() => setActiveCategory(category)}
               className={cn(
-                "inline-flex min-h-11 items-center text-xs tracking-[0.18em] uppercase underline-offset-8 transition-colors",
-                activeCategory === category ? "text-[#1d1b1a] underline" : "text-[#5f5954] hover:text-[#1d1b1a]",
+                "inline-flex min-h-11 items-center rounded-full border px-4 text-xs font-medium transition-colors",
+                activeCategory === category ? "border-black bg-black text-white" : "border-black/15 bg-white text-[#4f4841] hover:border-black/40",
               )}
             >
               {category === "all" ? "All" : category}
@@ -109,7 +109,7 @@ function ComboProductBrowser({
                   onClick={() => onSelect(product)}
                   className="group block w-full text-left"
                 >
-                  <span className="relative block aspect-[3/4] overflow-hidden bg-[#e9e4da]">
+                  <span className="relative block aspect-[3/4] overflow-hidden rounded-xl bg-[#f5f0ea]">
                     <Image
                       src={product.image}
                       alt=""
@@ -118,12 +118,12 @@ function ComboProductBrowser({
                       className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                     {isSoldOut ? (
-                      <span className="absolute top-2 left-2 bg-[#1d1b1a] px-2 py-1 text-[0.62rem] tracking-[0.14em] text-[#f6f2ea] uppercase">
+                      <span className="absolute top-2 left-2 rounded-full bg-[#1f1b18] px-2 py-1 text-[0.62rem] tracking-[0.14em] text-white uppercase">
                         Sold out
                       </span>
                     ) : null}
                   </span>
-                  <span className="mt-2 block font-heading text-xl leading-tight text-[#1d1b1a] underline-offset-4 group-hover:underline">
+                  <span className="mt-2 block font-heading text-xl leading-tight text-[#1f1b18] underline-offset-4 group-hover:underline">
                     {product.name}
                   </span>
                   <span className="mt-0.5 block text-sm font-medium text-[#3d3731]">{formatPriceNgn(product.basePrice)}</span>
@@ -133,7 +133,7 @@ function ComboProductBrowser({
           })}
         </ul>
       ) : (
-        <p className="border border-dashed border-[#1d1b1a]/30 p-6 text-center text-sm text-[#5f5954]" role="status">
+        <p className="rounded-2xl border border-dashed border-black/25 bg-white/70 p-6 text-center text-sm text-muted-foreground" role="status">
           No {noun} match your search.
         </p>
       )}
@@ -142,7 +142,7 @@ function ComboProductBrowser({
         <button
           type="button"
           onClick={onCancel}
-          className="inline-flex min-h-11 items-center text-xs tracking-[0.18em] text-[#1d1b1a] uppercase underline underline-offset-8"
+          className="inline-flex min-h-11 items-center rounded-full border border-black/20 px-5 text-sm font-medium text-[#1f1b18]"
         >
           Keep my choice
         </button>
@@ -167,7 +167,7 @@ function ComboPieceOptions({
 
   return (
     <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-4 sm:grid-cols-[10rem_minmax(0,1fr)]">
-      <div className="relative aspect-[3/4] overflow-hidden bg-[#e9e4da]">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#f5f0ea]">
         <Image
           src={getPreviewImage(product, selection, variant)}
           alt={`${product.name} in ${selection.color}`}
@@ -180,16 +180,16 @@ function ComboPieceOptions({
       <div className="min-w-0 space-y-1">
         <Link
           href={`/products/${encodeProductSlugForPath(product.slug)}`}
-          className="font-heading text-2xl leading-tight text-[#1d1b1a] underline-offset-4 hover:underline"
+          className="font-heading text-2xl leading-tight text-[#1f1b18] underline-offset-4 hover:underline"
         >
           {product.name}
         </Link>
-        <p className="text-base font-medium text-[#1d1b1a]">{formatPriceNgn(variant?.priceOverride ?? product.basePrice)}</p>
+        <p className="text-lg font-semibold text-[#1f1b18]">{formatPriceNgn(variant?.priceOverride ?? product.basePrice)}</p>
         <button
           type="button"
           onClick={onRequestChange}
           aria-label={`Change ${product.name}`}
-          className="inline-flex min-h-11 items-center text-xs tracking-[0.18em] text-[#1d1b1a] uppercase underline underline-offset-8"
+          className="inline-flex min-h-11 items-center rounded-full border border-black/20 px-5 text-sm font-medium text-[#1f1b18]"
         >
           Change
         </button>
@@ -247,7 +247,7 @@ function ComboPieceOptions({
                 aria-label={`${entry.size}${isInStock ? "" : ", out of stock"}`}
                 onClick={() => onChange({ ...selection, size: entry.size })}
                 className={cn(
-                  "inline-flex min-h-11 min-w-11 items-center justify-center border px-3 text-xs font-medium transition",
+                  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border px-3 text-xs font-medium transition",
                   isSelected
                     ? "border-black bg-black text-white"
                     : isInStock
@@ -284,10 +284,10 @@ function ComboPiecePicker({
   const product = products.find((entry) => entry.slug === selection?.slug);
 
   return (
-    <section className="min-w-0 space-y-4 border-t border-[#1d1b1a] pt-4" aria-label={`Choose your ${label.toLowerCase()}`}>
+    <section className="min-w-0 space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-5" aria-label={`Choose your ${label.toLowerCase()}`}>
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-heading text-4xl leading-none font-medium text-[#1d1b1a] sm:text-5xl">{label}</h2>
-        <p className="text-xs tracking-[0.28em] text-[#7a1730]">N&deg; {number}</p>
+        <h2 className="text-2xl font-semibold text-[#1f1b18]">{label}</h2>
+        <p className="text-xs tracking-[0.18em] text-[#5f5954]">Step {number}</p>
       </div>
 
       {product && selection && !isBrowsing ? (
@@ -385,8 +385,8 @@ export function ComboBuilder({
         onChange={setBottomSelection}
       />
 
-      <aside className="space-y-4 border-t border-[#1d1b1a] pt-4 md:col-span-2 xl:sticky xl:top-32 xl:col-span-1 xl:self-start">
-        <h2 className="font-heading text-4xl leading-none font-medium text-[#1d1b1a] sm:text-5xl">Your Combo</h2>
+      <aside className="space-y-4 rounded-2xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] p-4 shadow-sm sm:p-5 md:col-span-2 xl:sticky xl:top-24 xl:col-span-1 xl:self-start">
+        <h2 className="text-2xl font-semibold text-[#1f1b18]">Your Combo</h2>
 
         {top && bottom && topSelection && bottomSelection ? (
           <OutfitPreview
@@ -420,9 +420,9 @@ export function ComboBuilder({
                 <dt>Combo saving</dt>
                 <dd>-{formatPriceNgn(COMBO_DISCOUNT_GHS)}</dd>
               </div>
-              <div className="flex items-baseline justify-between gap-4 border-t border-[#1d1b1a]/20 pt-3 text-[#1d1b1a]">
+              <div className="flex items-baseline justify-between gap-4 border-t border-black/10 pt-3 text-[#1f1b18]">
                 <dt className="font-medium">Combo price</dt>
-                <dd className="font-heading text-4xl font-medium">
+                <dd className="text-2xl font-semibold">
                   {formatPriceNgn(topPrice + bottomPrice - COMBO_DISCOUNT_GHS)}
                 </dd>
               </div>
@@ -431,7 +431,7 @@ export function ComboBuilder({
         </dl>
         <Button
           type="button"
-          className="h-12 w-full rounded-none"
+          className="h-12 w-full rounded-full"
           onClick={() => void handleAddCombo()}
           disabled={!isAvailable || isAdding || userRole === "admin"}
         >
@@ -451,7 +451,7 @@ export function ComboBuilder({
         </Button>
         <Link
           href="/cart"
-          className="inline-flex min-h-11 items-center gap-2 text-xs tracking-[0.22em] text-[#1d1b1a] uppercase underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#1f1b18] underline-offset-4 hover:underline"
         >
           View cart <ArrowRight className="size-4" />
         </Link>

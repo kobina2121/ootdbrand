@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Heart, Ruler, Sparkles, Target } from "lucide-react";
 
-import { SectionHeading } from "@/components/store/section-heading";
+import { Card, CardContent } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 import { absoluteUrl, searchLogoPath, siteName } from "@/lib/site-metadata";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
  title: "About",
@@ -52,14 +54,17 @@ const milestones = [
 
 const values = [
  {
+ icon: Sparkles,
  title: "Intentional Style",
  description: "Every silhouette is chosen for elegance, movement, and wearability.",
  },
  {
+ icon: Ruler,
  title: "Thoughtful Fit",
  description: "Proportions, measurements, and finishing details are treated with care.",
  },
  {
+ icon: Heart,
  title: "Made To Feel Personal",
  description: "Each piece is designed to help the wearer feel confident, seen, and fully herself.",
  },
@@ -79,37 +84,39 @@ const ownerProfile = {
 
 export default function AboutPage() {
  return (
- <div className="space-y-16 sm:space-y-24">
- <section className="full-bleed animate-fade-up -mt-5 border-b border-[#1d1b1a] sm:-mt-8">
- <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[1.15fr_0.85fr]">
- <div className="flex items-end px-3 py-10 sm:px-5 sm:py-14 lg:px-6 lg:py-20 xl:px-8">
- <div className="space-y-6">
- <p className="text-xs tracking-[0.28em] text-[#7a1730] uppercase">About the brand</p>
- <h1 className="font-heading text-[clamp(3.5rem,11vw,10rem)] leading-[0.86] font-medium tracking-[-0.03em] text-[#1d1b1a] italic">
+ <div className="space-y-10 sm:space-y-12">
+ <section className="overflow-hidden rounded-3xl border border-black/10 bg-[#f4f3ef] shadow-sm">
+ <div className="grid lg:grid-cols-[1fr_0.82fr]">
+	 <div className="flex min-h-[320px] items-center p-7 sm:min-h-[420px] sm:p-10 lg:p-14">
+ <div className="max-w-3xl space-y-6">
+ <p className="text-xs uppercase tracking-[0.28em] text-[#6f6860]">About the brand</p>
+ <div className="space-y-4">
+	 <h1 className="font-heading text-5xl font-semibold leading-[0.9] text-[#1f1b18] sm:text-7xl lg:text-[7rem]">
  theootd.brand
  </h1>
- <p className="max-w-2xl text-base leading-relaxed text-[#5f5954] sm:text-lg">
+ <p className="max-w-2xl text-base leading-relaxed text-[#625b54] sm:text-lg">
  Elevated womenswear made for confident entrances, soft details, and the feeling of wearing something
  that was chosen with intention.
  </p>
- <div className="flex flex-wrap items-center gap-5">
+ </div>
+ <div className="flex flex-wrap gap-3">
  <Link
  href="/products"
- className="inline-flex min-h-12 items-center gap-2 bg-[#1d1b1a] px-8 text-xs font-medium tracking-[0.22em] text-[#f6f2ea] uppercase transition-colors hover:bg-[#332f2c]"
+ className={cn(buttonVariants({}), "rounded-full px-7")}
  >
  Shop Pieces
  <ArrowRight className="size-4" />
  </Link>
  <Link
  href="/custom-order"
- className="inline-flex min-h-12 items-center text-xs tracking-[0.22em] text-[#1d1b1a] uppercase underline underline-offset-8"
+ className={cn(buttonVariants({ variant: "outline" }), "rounded-full border-black/20 bg-white/70 px-7")}
  >
  Start Custom Order
  </Link>
  </div>
  </div>
  </div>
- <div className="relative min-h-[460px] overflow-hidden sm:min-h-[620px] lg:min-h-[760px]">
+	 <div className="relative min-h-[320px] overflow-hidden border-t border-black/10 sm:min-h-[420px] lg:border-l lg:border-t-0">
  <Image
  src={ownerProfile.image}
  alt={`${ownerProfile.name}, ${ownerProfile.title} of theootd.brand`}
@@ -119,116 +126,133 @@ export default function AboutPage() {
  priority
  />
  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent p-6 text-white">
- <p className="font-heading text-3xl leading-none italic drop-shadow-md">{ownerProfile.name}</p>
+ <p className="font-heading text-3xl leading-none drop-shadow-md">{ownerProfile.name}</p>
  <p className="mt-1 text-xs uppercase tracking-[0.22em] text-white drop-shadow-md">{ownerProfile.title}</p>
  </div>
  </div>
  </div>
  </section>
 
- <section className="grid gap-6 lg:grid-cols-12 lg:gap-10">
- <p className="text-xs tracking-[0.28em] text-[#7a1730] uppercase lg:col-span-3">Our Point Of View</p>
- <div className="space-y-6 lg:col-span-9">
- <h2 className="font-heading text-[clamp(2.75rem,6.5vw,6rem)] leading-[0.98] font-medium tracking-[-0.02em] text-[#1d1b1a]">
+ <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+ <Card className="border-black/10 bg-white/90 shadow-sm">
+ <CardContent className="space-y-5 p-6 sm:p-8">
+ <p className="text-xs uppercase tracking-[0.26em] text-muted-foreground">Our Point Of View</p>
+ <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f1b18] sm:text-5xl">
  Clothing should make the moment feel sharper.
  </h2>
- <div className="grid gap-4 text-sm leading-relaxed text-[#5f5954] sm:grid-cols-2 sm:gap-8 sm:text-base">
- <p>
+ <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
  theootd.brand creates pieces for women who want polish without losing softness. The work is feminine,
  expressive, and grounded in everyday wearability.
  </p>
- <p>
+ <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
  From ready-to-wear drops to custom pieces, the goal is the same: refined silhouettes, clean finishing,
  and outfits that feel personal the first time they are worn.
  </p>
- </div>
- </div>
- </section>
+ </CardContent>
+ </Card>
 
- <section className="grid border-y border-[#1d1b1a] md:grid-cols-3 md:divide-x md:divide-[#1d1b1a]/20">
- {values.map((item, index) => (
- <article key={item.title} className="space-y-3 border-b border-[#1d1b1a]/20 py-6 last:border-b-0 md:border-b-0 md:px-6 md:py-8 md:first:pl-0 md:last:pr-0">
- <p className="font-heading text-2xl text-[#7a1730] italic">{String(index + 1).padStart(2, "0")}</p>
- <h3 className="font-heading text-3xl leading-tight text-[#1d1b1a] sm:text-4xl">{item.title}</h3>
- <p className="text-sm leading-relaxed text-[#5f5954] sm:text-base">{item.description}</p>
+ <Card className="border-black/10 bg-[#f7f5f1] shadow-sm">
+ <CardContent className="grid gap-3 p-6 sm:p-8">
+ {values.map((item) => {
+ const Icon = item.icon;
+
+ return (
+ <article key={item.title} className="grid gap-3 rounded-2xl border border-black/10 bg-white/80 p-4 sm:grid-cols-[auto_1fr]">
+ <div className="flex size-10 items-center justify-center rounded-full bg-black/[0.04]">
+ <Icon className="size-4 text-[#2a241f]" />
+ </div>
+ <div>
+ <h3 className="text-sm font-semibold text-[#1f1b18] sm:text-base">{item.title}</h3>
+ <p className="mt-1 text-sm leading-relaxed text-[#6e6761]">{item.description}</p>
+ </div>
  </article>
- ))}
+ );
+ })}
+ </CardContent>
+ </Card>
  </section>
 
- <section className="grid gap-12 lg:grid-cols-2 lg:gap-16">
- <div className="space-y-5 border-t border-[#1d1b1a] pt-4">
- <p className="text-xs tracking-[0.28em] text-[#7a1730] uppercase">Meet The Founder</p>
- <h2 className="font-heading text-[clamp(2.5rem,4.5vw,4.25rem)] leading-[0.98] font-medium tracking-[-0.02em] text-[#1d1b1a]">
+ <section className="grid gap-4 lg:grid-cols-2">
+ <Card className="border-black/10 bg-white/90 shadow-sm">
+ <CardContent className="space-y-4 p-6 sm:p-8">
+ <p className="text-xs uppercase tracking-[0.26em] text-muted-foreground">Meet The Founder</p>
+ <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f1b18] sm:text-5xl">
  Built with a designer eye and customer-first care.
  </h2>
- <p className="text-sm leading-relaxed text-[#5f5954] sm:text-base">
+ <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
  For Adeline, the brand is about the quiet power of a well-made outfit. A dress can change posture,
  mood, and confidence before a word is spoken.
  </p>
- <p className="text-sm leading-relaxed text-[#5f5954] sm:text-base">
+ <p className="text-sm leading-relaxed text-[#6b655f] sm:text-base">
  That belief guides every collection: pieces are edited until they feel beautiful, wearable, and easy
  to make your own.
  </p>
- </div>
+ </CardContent>
+ </Card>
 
- <div className="space-y-5 border-t border-[#1d1b1a] pt-4">
- <p className="text-xs tracking-[0.28em] text-[#7a1730] uppercase">How We Work</p>
- <h2 className="font-heading text-[clamp(2.5rem,4.5vw,4.25rem)] leading-[0.98] font-medium tracking-[-0.02em] text-[#1d1b1a]">
+ <Card className="border-black/10 bg-[#f4f3ef] shadow-sm">
+ <CardContent className="space-y-4 p-6 sm:p-8">
+ <p className="text-xs uppercase tracking-[0.26em] text-muted-foreground">How We Work</p>
+ <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f1b18] sm:text-5xl">
  Designed with intention, finished with care.
  </h2>
- <ol>
+ <div className="space-y-3 pt-2">
  {processSteps.map((step, index) => (
- <li key={step} className="flex items-baseline gap-4 border-t border-[#1d1b1a]/20 py-4">
- <span className="font-heading text-2xl text-[#7a1730] italic">{index + 1}</span>
- <p className="text-sm text-[#3d3731] sm:text-base">{step}</p>
- </li>
- ))}
- </ol>
+ <div key={step} className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white/80 px-4 py-3">
+ <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1f1b18] text-xs font-semibold text-white">
+ {index + 1}
+ </span>
+ <p className="text-sm text-[#514b45] sm:text-base">{step}</p>
  </div>
+ ))}
+ </div>
+ </CardContent>
+ </Card>
  </section>
 
- <section className="space-y-8 sm:space-y-12">
- <SectionHeading title="How We Grew" />
- <div>
+ <section className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+ <Card className="border-black/10 bg-[#f4f3ef] shadow-sm">
+ <CardContent className="space-y-4 p-6 sm:p-8">
+ <p className="text-xs uppercase tracking-[0.26em] text-muted-foreground">Our History</p>
+ <h2 className="font-heading text-4xl font-semibold leading-none text-[#1f1b18] sm:text-5xl">How We Grew</h2>
+ <div className="space-y-4 pt-2">
  {milestones.map((item) => (
- <article key={item.year} className="grid gap-2 border-t border-[#1d1b1a]/20 py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)] md:items-baseline md:gap-8">
- <p className="font-heading text-[clamp(3rem,6vw,5.5rem)] leading-none text-[#1d1b1a] italic">{item.year}</p>
- <h3 className="font-heading text-2xl text-[#1d1b1a] sm:text-3xl">{item.title}</h3>
- <p className="text-sm leading-relaxed text-[#5f5954] sm:text-base">{item.description}</p>
+ <article key={item.year} className="rounded-2xl border border-black/10 bg-white px-4 py-4">
+ <p className="text-xs text-muted-foreground">{item.year}</p>
+ <h3 className="mt-1 text-sm font-semibold text-[#231f1c] sm:text-base">{item.title}</h3>
+ <p className="mt-1 text-sm leading-relaxed text-[#6b655f]">{item.description}</p>
  </article>
  ))}
  </div>
- </section>
+ </CardContent>
+ </Card>
 
- <section className="full-bleed bg-[#1d1b1a] text-[#f6f2ea]">
- <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
- <div className="flex items-center p-7 sm:p-10 lg:p-14">
- <div className="max-w-xl space-y-6">
- <h2 className="font-heading text-[clamp(3rem,6.5vw,6.5rem)] leading-[0.92] font-medium tracking-[-0.02em] italic">
+	 <section className="relative flex min-h-[360px] overflow-hidden rounded-3xl border border-black/10 text-white shadow-sm sm:min-h-[520px]">
+ <Image
+ src="/images/about/presence-cta.jpg"
+ alt="Woman in a yellow dress from theootd.brand"
+ fill
+ className="object-cover object-center"
+ sizes="(min-width: 1024px) 40vw, 100vw"
+ />
+ <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+ <div className="relative z-10 mt-auto max-w-lg space-y-5 p-6 sm:p-8">
+ <Target className="size-8 text-white/75" />
+ <h2 className="font-heading text-4xl font-semibold leading-none sm:text-5xl">
  Made for women who dress with presence.
  </h2>
- <p className="text-sm leading-relaxed text-[#d9d2c7] sm:text-base">
+ <p className="text-sm leading-relaxed text-white/75 sm:text-base">
  Explore ready-to-wear pieces or request something custom for your next standout moment.
  </p>
  <Link
  href="/custom-order"
- className="inline-flex min-h-11 items-center gap-2 border-b border-[#f6f2ea]/60 text-sm uppercase tracking-[0.18em] transition hover:border-[#f6f2ea]"
+ className="inline-flex items-center gap-2 border-b border-white/50 pb-1 text-sm uppercase tracking-[0.18em] text-white transition hover:border-white"
  >
  Create Your Piece
  <ArrowRight className="size-4" />
  </Link>
  </div>
- </div>
- <div className="relative aspect-[4/5] overflow-hidden lg:aspect-auto lg:min-h-[760px]">
- <Image
- src="/images/about/presence-cta.jpg"
- alt="Woman in a yellow dress from theootd.brand"
- fill
- className="object-cover object-top"
- sizes="(min-width: 1024px) 50vw, 100vw"
- />
- </div>
- </div>
+ </section>
  </section>
  </div>
  );

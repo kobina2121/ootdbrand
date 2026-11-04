@@ -162,7 +162,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialPendingE
 
  return (
  <div className="space-y-6">
- <Card className="rounded-3xl border-black/10 bg-[#fbf9f4] ">
+ <Card className="rounded-3xl border-black/10 bg-white/90 shadow-sm ">
  <CardHeader className="space-y-2 border-b border-black/10 ">
  <p className="text-xs tracking-[0.24em] text-muted-foreground">PROFILE</p>
  <CardTitle className="font-heading text-5xl leading-none text-[#1f1b18] ">
@@ -173,7 +173,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialPendingE
  </p>
  </CardHeader>
  <CardContent className="space-y-5 pt-6">
- <div className="grid gap-3 rounded-2xl border border-black/10 bg-[#ece6da]/50 p-4 text-sm text-[#4c443d] sm:grid-cols-3">
+ <div className="grid gap-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 text-sm text-[#4c443d] sm:grid-cols-3">
  <div>
  <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">Current role</p>
  <p className="mt-1 font-medium capitalize">{role}</p>
@@ -213,7 +213,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialPendingE
  </div>
  </div>
  {pendingEmail ? (
- <div className="space-y-3 rounded-2xl border border-black/10 bg-[#ece6da]/50 p-4">
+ <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4">
  <p className="text-sm text-[#6b655f] ">
  Verification pending for <span className="font-medium">{pendingEmail}</span>. Enter the 6-digit code we sent there to finish the email change.
  </p>
@@ -229,7 +229,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialPendingE
  />
  </div>
  <div className="flex flex-wrap gap-3">
- <Button type="button" className="h-11 rounded-none px-6" disabled={isVerifyingCode} onClick={() => void onVerifyCode()}>
+ <Button type="button" className="h-11 rounded-full px-6" disabled={isVerifyingCode} onClick={() => void onVerifyCode()}>
  {isVerifyingCode ? "Verifying..." : "Verify New Email"}
  </Button>
  <p className="self-center text-xs text-muted-foreground">
@@ -261,11 +261,11 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialPendingE
  <p className="text-sm text-[#6b655f] ">Your login email will not change until you verify the new address.</p>
  ) : null}
  <div className="flex flex-wrap items-center gap-3">
- <Button type="submit" className="h-11 rounded-none px-6" disabled={isSubmitting || !hasChanges}>
+ <Button type="submit" className="h-11 rounded-full px-6" disabled={isSubmitting || !hasChanges}>
  {isSubmitting ? "Saving..." : "Save Changes"}
  </Button>
  <Link href="/orders">
- <Button type="button" variant="ghost" className="h-11 rounded-none px-6">
+ <Button type="button" variant="ghost" className="h-11 rounded-full px-6">
  View Orders
  </Button>
  </Link>
@@ -274,7 +274,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialPendingE
  </CardContent>
  </Card>
 
- <Card className="rounded-3xl border-black/10 bg-[#fbf9f4] ">
+ <Card className="rounded-3xl border-black/10 bg-white/90 shadow-sm ">
  <CardHeader className="space-y-2 border-b border-black/10 ">
  <p className="text-xs tracking-[0.24em] text-muted-foreground">SESSION</p>
  <CardTitle className="font-heading text-4xl leading-none text-[#1f1b18] ">
@@ -285,7 +285,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialPendingE
  </p>
  </CardHeader>
  <CardContent className="pt-6">
- <UserLogoutButton className="h-11 rounded-none border-black/15 bg-[#fbf9f4] px-6 " />
+ <UserLogoutButton className="h-11 rounded-full border-black/15 bg-white px-6 " />
  </CardContent>
  </Card>
  </div>

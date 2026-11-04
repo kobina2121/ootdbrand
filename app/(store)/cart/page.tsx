@@ -9,7 +9,6 @@ import { useCart } from "@/components/store/cart-provider";
 import { ProductGrid } from "@/components/store/product-grid";
 import { Button } from "@/components/ui/button";
 import { OutfitPreview } from "@/components/store/outfit-preview";
-import { PageMasthead } from "@/components/store/page-masthead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { formatPriceNgn } from "@/lib/products";
@@ -124,7 +123,7 @@ export default function CartPage() {
 
  if (!isHydrated) {
  return (
- <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
 	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Loading cart...</CardTitle>
  </CardHeader>
@@ -137,14 +136,14 @@ export default function CartPage() {
 
  if (userRole === "admin") {
  return (
- <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
 	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Admin Shopping Disabled</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground ">Admin accounts cannot place store orders or manage cart items.</p>
  <Link href="/admin/products">
- <Button className="rounded-none">Go to Admin Dashboard</Button>
+ <Button className="rounded-full">Go to Admin Dashboard</Button>
  </Link>
  </CardContent>
  </Card>
@@ -153,14 +152,14 @@ export default function CartPage() {
 
  if (items.length === 0) {
  return (
- <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
 	 <CardTitle className="font-heading text-4xl leading-none sm:text-5xl">Your cart is empty</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground ">Add products to your cart to continue checkout.</p>
  <Link href="/products">
- <Button className="rounded-none">Browse Products</Button>
+ <Button className="rounded-full">Browse Products</Button>
  </Link>
  </CardContent>
  </Card>
@@ -235,11 +234,14 @@ export default function CartPage() {
 
  return (
  <div className="space-y-6">
- <PageMasthead title="Shopping Cart" description="Review your picks and continue to secure checkout." />
+	 <section className="rounded-2xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f1ede6_100%)] p-4 shadow-sm sm:rounded-3xl sm:p-7">
+	 <h1 className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-6xl">Shopping Cart</h1>
+ <p className="section-subtitle mt-2 ">Review your picks and continue to secure checkout.</p>
+ </section>
 
  {outfits.length > 0 ? (
- <section className="space-y-4">
- <h2 className="font-heading text-4xl leading-none font-medium text-[#1d1b1a] sm:text-5xl">
+ <section className="space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
+ <h2 className="text-2xl font-semibold text-[#1f1b18]">
  {outfits.length === 1 ? "Your Outfit" : "Your Outfits"}
  </h2>
  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -262,10 +264,10 @@ export default function CartPage() {
  ) : null}
 
 	 <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)] xl:gap-6">
- <Card className="rounded-2xl border-black/10 bg-[#fbf9f4] ">
+ <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm ">
  <CardHeader className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
  <CardTitle className="">Cart Items</CardTitle>
- <Button variant="ghost" className="rounded-none " onClick={() => void handleClearCart()}>
+ <Button variant="ghost" className="rounded-full " onClick={() => void handleClearCart()}>
  Clear cart
  </Button>
  </CardHeader>
@@ -315,7 +317,7 @@ export default function CartPage() {
  <Button
  type="button"
  variant="outline"
- className="min-h-11 rounded-none border-red-200 px-5 text-red-700 hover:border-red-300 hover:bg-red-50 hover:text-red-800"
+ className="min-h-11 rounded-full border-red-200 px-5 text-red-700 hover:border-red-300 hover:bg-red-50 hover:text-red-800"
  onClick={() => void handleRemoveItem(item.sku)}
  disabled={removingSku === item.sku}
  aria-label={`Remove ${item.name} from cart`}
@@ -329,12 +331,12 @@ export default function CartPage() {
  </CardContent>
  </Card>
 
-	 <Card className="rounded-2xl border-black/10 bg-[#fbf9f4] lg:sticky lg:top-24">
+	 <Card className="rounded-2xl border-black/10 bg-white/90 shadow-sm lg:sticky lg:top-24">
  <CardHeader>
  <CardTitle className="">Summary</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
- <div className="space-y-3 rounded-xl border border-black/10 bg-[#ece6da]/50 p-3">
+ <div className="space-y-3 rounded-xl border border-black/10 bg-[#f7f5f1]/70 p-3">
  <label htmlFor="cart-coupon-code" className="text-sm font-medium text-[#1f1b18] ">
  Coupon code
  </label>
@@ -348,7 +350,7 @@ export default function CartPage() {
  />
  <Button
  type="button"
- className="rounded-none"
+ className="rounded-full"
  onClick={() => void handleApplyCoupon()}
  disabled={isApplyingCoupon || couponCodeInput.trim().length === 0}
  >
@@ -361,7 +363,7 @@ export default function CartPage() {
  <Button
  type="button"
  variant="ghost"
- className="h-auto rounded-none px-0 py-0 text-xs text-muted-foreground hover:bg-transparent"
+ className="h-auto rounded-full px-0 py-0 text-xs text-muted-foreground hover:bg-transparent"
  onClick={() => void handleClearCoupon()}
  disabled={isApplyingCoupon}
  >
@@ -390,13 +392,13 @@ export default function CartPage() {
  <span>{formatPriceNgn(total)}</span>
  </div>
  <Link href="/checkout" className="block">
- <Button className="w-full rounded-none">Proceed to Checkout</Button>
+ <Button className="w-full rounded-full">Proceed to Checkout</Button>
  </Link>
  </CardContent>
  </Card>
  </div>
 
- <section className="rounded-2xl border border-black/10 bg-[#fbf9f4] p-4 sm:p-6">
+ <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
  <div className="mb-5 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
  <h2 className="text-2xl font-semibold text-[#1f1b18] ">You May Also Like</h2>
  <Link

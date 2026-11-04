@@ -46,37 +46,6 @@
  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-body:has(.storefront) {
- --radius: 0rem;
- --background: #f6f2ea;
- --foreground: #1d1b1a;
- --card: #fbf9f4;
- --card-foreground: #1d1b1a;
- --popover: #fbf9f4;
- --popover-foreground: #1d1b1a;
- --primary: #1d1b1a;
- --primary-foreground: #f6f2ea;
- --secondary: #ece6da;
- --secondary-foreground: #1d1b1a;
- --muted: #ece6da;
- --muted-foreground: #5f5954;
- --accent: #ece6da;
- --accent-foreground: #1d1b1a;
- --border: rgb(29 27 26 / 0.18);
- --input: rgb(29 27 26 / 0.3);
- --ring: #7a1730;
-}
-
-.storefront [data-slot="card"] {
- --tw-shadow: 0 0 #0000;
-}
-
-/* Beats the small-screen radius overrides further down this file. */
-body:has(.storefront) .rounded-2xl,
-body:has(.storefront) .rounded-3xl {
- border-radius: 0;
-}
-
 :root {
  --background: oklch(1 0 0);
  --foreground: oklch(0.145 0 0);
@@ -167,7 +136,7 @@ body:has(.storefront) .rounded-3xl {
  }
 
  footer a:focus-visible {
- outline: 2px solid color-mix(in oklch, white 70%, transparent);
+ outline: 2px solid color-mix(in oklch, var(--foreground) 45%, transparent);
  outline-offset: 4px;
  border-radius: 0.75rem;
  }
@@ -183,21 +152,16 @@ body:has(.storefront) .rounded-3xl {
 	 @apply mx-auto w-full max-w-[1440px] px-3 sm:px-5 lg:px-6 xl:px-8;
 	 }
 
-	 .full-bleed {
-	 width: 100vw;
-	 margin-inline: calc(50% - 50vw);
-	 }
-
  .surface-soft {
- @apply border border-[#1d1b1a]/15 bg-[#fbf9f4];
+ @apply rounded-3xl border border-black/10 bg-white/85 shadow-sm;
  }
 
  .surface-strong {
- @apply border border-[#1d1b1a]/15 bg-[#ece6da]/50;
+ @apply rounded-3xl border border-black/10 bg-[linear-gradient(135deg,#f7f5f1_0%,#f0ece6_100%)] shadow-sm;
  }
 
  .section-card {
- @apply border border-[#1d1b1a]/15 bg-[#fbf9f4];
+ @apply rounded-3xl border border-black/10 bg-white/85 shadow-sm;
  }
 
  .section-header-label {
@@ -259,15 +223,6 @@ body:has(.storefront) .rounded-3xl {
  }
  100% {
  transform: scale(1.05);
- }
- }
-
- @keyframes marquee {
- 0% {
- transform: translateX(0);
- }
- 100% {
- transform: translateX(-50%);
  }
  }
 
@@ -337,16 +292,6 @@ body:has(.storefront) .rounded-3xl {
  animation: hero-zoom 14s ease-in-out infinite alternate;
  transform-origin: center top;
  will-change: transform;
- }
-
- .animate-marquee {
- animation: marquee 36s linear infinite;
- }
-
- @media (prefers-reduced-motion: reduce) {
- .animate-marquee {
- animation: none;
- }
  }
 
  .animate-look-carousel {

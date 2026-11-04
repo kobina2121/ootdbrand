@@ -36,14 +36,14 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
 
  if (!session) {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Sign In Required</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">Sign in to verify this payment and view your order.</p>
  <Link href="/login?next=/checkout/failed">
- <Button className="rounded-none">Sign in</Button>
+ <Button className="rounded-full">Sign in</Button>
  </Link>
  </CardContent>
  </Card>
@@ -65,14 +65,14 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
 
  if (!ownsStoreOrder && !ownsCustomOrder) {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Order Not Found</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">This payment reference is not connected to your account.</p>
  <Link href="/orders">
- <Button className="rounded-none">View Orders</Button>
+ <Button className="rounded-full">View Orders</Button>
  </Link>
  </CardContent>
  </Card>
@@ -121,7 +121,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
 
  if (state === "success") {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <PurchaseThankYouDialog
  customerName={customerName}
  orderHref={`/orders/${encodeURIComponent(reference)}`}
@@ -134,7 +134,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  <ClearCartOnSuccess shouldClear={checkoutOrderType === "store"} />
  <p className="text-sm text-muted-foreground">Your payment has been confirmed and your order is being prepared.</p>
  <Link href="/orders">
- <Button className="rounded-none">View Orders</Button>
+ <Button className="rounded-full">View Orders</Button>
  </Link>
  </CardContent>
  </Card>
@@ -143,7 +143,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
 
  if (state === "pending") {
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <ClearCartOnSuccess shouldClear={checkoutOrderType === "store"} />
  {checkoutOrderType ? (
  <PurchaseThankYouDialog
@@ -158,7 +158,7 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">We have not received final confirmation yet. Please check your orders shortly.</p>
  <Link href="/orders">
- <Button className="rounded-none">View Orders</Button>
+ <Button className="rounded-full">View Orders</Button>
  </Link>
  </CardContent>
  </Card>
@@ -166,14 +166,14 @@ export default async function OrderFailedPage({ searchParams }: FailedPageProps)
  }
 
  return (
- <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
  <CardTitle className="font-heading text-5xl leading-none ">Payment Failed</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
  <p className="text-sm text-muted-foreground">We could not confirm your transaction. Please try again.</p>
  <Link href="/checkout">
- <Button variant="outline" className="rounded-none">Return to Checkout</Button>
+ <Button variant="outline" className="rounded-full">Return to Checkout</Button>
  </Link>
  </CardContent>
  </Card>

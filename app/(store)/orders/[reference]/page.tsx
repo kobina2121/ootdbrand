@@ -50,7 +50,7 @@ export default async function CustomerOrderDetailsPage({ params }: CustomerOrder
         </section>
         <section className="surface-soft p-6">
           <Link href="/login?next=/orders">
-            <Button className="rounded-none">Sign in</Button>
+            <Button className="rounded-full">Sign in</Button>
           </Link>
         </section>
       </div>
@@ -87,7 +87,7 @@ export default async function CustomerOrderDetailsPage({ params }: CustomerOrder
         </section>
 
         <div className="grid gap-5 lg:grid-cols-[1.4fr_0.8fr]">
-          <Card className="border-black/10 bg-[#fbf9f4] ">
+          <Card className="border-black/10 bg-white/90 shadow-sm">
             <CardHeader>
               <CardTitle>Items</CardTitle>
             </CardHeader>
@@ -110,7 +110,7 @@ export default async function CustomerOrderDetailsPage({ params }: CustomerOrder
           </Card>
 
           <div className="space-y-5">
-            <Card className="border-black/10 bg-[#fbf9f4] ">
+            <Card className="border-black/10 bg-white/90 shadow-sm">
               <CardHeader>
                 <CardTitle>Payment</CardTitle>
               </CardHeader>
@@ -123,7 +123,7 @@ export default async function CustomerOrderDetailsPage({ params }: CustomerOrder
               </CardContent>
             </Card>
 
-            <Card className="border-black/10 bg-[#fbf9f4] ">
+            <Card className="border-black/10 bg-white/90 shadow-sm">
               <CardHeader>
                 <CardTitle>Delivery</CardTitle>
               </CardHeader>
@@ -161,7 +161,7 @@ export default async function CustomerOrderDetailsPage({ params }: CustomerOrder
       </section>
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_0.8fr]">
-        <Card className="border-black/10 bg-[#fbf9f4] ">
+        <Card className="border-black/10 bg-white/90 shadow-sm">
           <CardHeader>
             <CardTitle>Custom Piece</CardTitle>
           </CardHeader>
@@ -194,7 +194,7 @@ export default async function CustomerOrderDetailsPage({ params }: CustomerOrder
         </Card>
 
         <div className="space-y-5">
-          <Card className="border-black/10 bg-[#fbf9f4] ">
+          <Card className="border-black/10 bg-white/90 shadow-sm">
             <CardHeader>
               <CardTitle>Payment</CardTitle>
             </CardHeader>
@@ -207,7 +207,7 @@ export default async function CustomerOrderDetailsPage({ params }: CustomerOrder
             </CardContent>
           </Card>
 
-          <Card className="border-black/10 bg-[#fbf9f4] ">
+          <Card className="border-black/10 bg-white/90 shadow-sm">
             <CardHeader>
               <CardTitle>Delivery</CardTitle>
             </CardHeader>

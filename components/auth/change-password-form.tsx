@@ -70,7 +70,7 @@ export function ChangePasswordForm({ cardClassName }: ChangePasswordFormProps) {
 
  return (
  <Card
- className={`mx-auto w-full max-w-md rounded-3xl border-black/10 bg-[#fbf9f4] ${cardClassName ?? ""}`}
+ className={`mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ${cardClassName ?? ""}`}
  >
  <CardHeader className="space-y-2 border-b border-black/10 ">
  <p className="text-xs tracking-[0.24em] text-muted-foreground">ACCOUNT SECURITY</p>
@@ -90,7 +90,7 @@ export function ChangePasswordForm({ cardClassName }: ChangePasswordFormProps) {
  <PasswordInput name="confirmPassword" placeholder="Confirm new password" className="h-11 rounded-xl border-black/15 " required />
  {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
  {successMessage ? <p className="text-sm text-emerald-700">{successMessage}</p> : null}
- <Button className="h-11 w-full rounded-none" type="submit" disabled={isSubmitting}>
+ <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
  {isSubmitting ? "Updating..." : "Update Password"}
  </Button>
  </form>

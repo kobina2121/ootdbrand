@@ -57,7 +57,7 @@ export function ForgotPasswordForm({ lockedEmail }: { lockedEmail?: string | nul
  };
 
  return (
- <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-[#fbf9f4] ">
+ <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ">
  <CardHeader className="space-y-2 border-b border-black/10 ">
  <p className="text-xs tracking-[0.24em] text-muted-foreground">ACCOUNT RECOVERY</p>
  <CardTitle className="font-heading text-5xl leading-none ">Forgot Password</CardTitle>
@@ -84,7 +84,7 @@ export function ForgotPasswordForm({ lockedEmail }: { lockedEmail?: string | nul
  ) : null}
  {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
  {successMessage ? <p className="text-sm text-emerald-700 ">{successMessage}</p> : null}
- <Button className="h-11 w-full rounded-none" type="submit" disabled={isSubmitting}>
+ <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
  {isSubmitting ? "Please wait..." : "Send Reset Link"}
  </Button>
  </form>

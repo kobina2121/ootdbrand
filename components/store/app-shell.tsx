@@ -74,15 +74,26 @@ export function AppShell({ children, user }: AppShellProps) {
  : navLinks;
 
  return (
- <div className="storefront flex min-h-screen flex-col bg-[#f6f2ea] text-foreground transition-colors ">
- <header className="sticky top-0 z-50 border-b border-[#1d1b1a] bg-[#f6f2ea]/95 backdrop-blur ">
-	 <div className="page-container flex items-center justify-between gap-2 py-2.5 sm:gap-3 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:py-2">
- <p className="hidden text-[11px] tracking-[0.22em] text-[#5f5954] uppercase lg:block">Made in Ghana</p>
-	            <Link href="/" className="flex min-h-11 shrink-0 items-center pr-2 lg:pr-0" aria-label="theootd.brand home">
-	 <span className="block font-heading text-[1.75rem] leading-none font-medium italic tracking-[-0.02em] text-[#1d1b1a] sm:text-[2.4rem]">
+ <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f5f1_45%,_#f1eeea_100%)] text-foreground transition-colors ">
+ <header className="sticky top-0 z-50 border-b border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))] backdrop-blur ">
+	 <div className="page-container flex items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-4">
+	            <Link href="/" className="flex min-h-11 shrink-0 items-center pr-2 xl:pr-6" aria-label="theootd.brand home">
+	 <span className="block text-[1.35rem] leading-none font-semibold tracking-[-0.04em] text-[#2f1d15] sm:text-[2rem]">
 	                theootd.brand
 	 </span>
 	 </Link>
+
+ <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 lg:flex xl:gap-6 2xl:gap-8">
+ {visibleNavLinks.map((link) => (
+ <Link
+ key={link.href}
+ href={link.href}
+ className={`relative whitespace-nowrap text-[11px] tracking-[0.14em] uppercase transition xl:text-xs ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1f1b18] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:bg-[#1f1b18] " : "text-muted-foreground hover:text-foreground"}`}
+ >
+ {link.label}
+ </Link>
+ ))}
+ </nav>
 
  <div className={`ml-auto flex shrink-0 items-center gap-1.5 lg:gap-2 ${isAdminLoginView ? "xl:hidden" : ""}`}>
  {isAdminLoginView ? (
@@ -128,7 +139,7 @@ export function AppShell({ children, user }: AppShellProps) {
  ) : (
  <>
  <Link href="/signup" className="hidden xl:block">
- <Button size="sm" className="rounded-none">Sign Up</Button>
+ <Button size="sm">Sign Up</Button>
  </Link>
  </>
  )}
@@ -156,7 +167,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
 
  <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
- <DialogTrigger className="inline-flex size-11 items-center justify-center border border-[#1d1b1a]/30 lg:hidden">
+ <DialogTrigger className="inline-flex size-11 items-center justify-center rounded-full border border-black/10 bg-white/80 shadow-sm lg:hidden">
  <Menu className="h-4 w-4" />
  <span className="sr-only">Open menu</span>
  </DialogTrigger>
@@ -213,67 +224,54 @@ export function AppShell({ children, user }: AppShellProps) {
  </Dialog>
  </div>
  </div>
- <nav className="hidden border-t border-[#1d1b1a]/15 lg:block">
- <div className="page-container flex items-center justify-center gap-6 xl:gap-10">
- {visibleNavLinks.map((link) => (
- <Link
- key={link.href}
- href={link.href}
- className={`relative flex min-h-10 items-center whitespace-nowrap text-[11px] tracking-[0.18em] uppercase transition xl:text-xs ${pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "text-[#1d1b1a] after:absolute after:bottom-1.5 after:left-0 after:h-px after:w-full after:bg-[#1d1b1a] " : "text-[#5f5954] hover:text-[#1d1b1a]"}`}
- >
- {link.label}
- </Link>
- ))}
- </div>
- </nav>
  </header>
 
-	 <main className="page-container flex flex-1 flex-col py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:py-8 md:pb-16">{children}</main>
+	 <main className="page-container flex flex-1 flex-col py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:py-8 md:pb-10">{children}</main>
 
- <footer className="bg-[#1d1b1a] pb-[calc(3.5rem+env(safe-area-inset-bottom))] text-[#f6f2ea] md:pb-0">
+ <footer className="border-t border-black/10 bg-white ">
  <div className="page-container py-12 sm:py-16">
  <div className="pb-10 sm:pb-12">
- <Link href="/" aria-label="theootd.brand home" className="block">
- <span className="block font-heading text-[clamp(3.25rem,14.5vw,14rem)] leading-[0.9] font-medium italic tracking-[-0.03em] text-[#f6f2ea]">
+ <Link href="/" aria-label="theootd.brand home" className="inline-flex">
+ <span className="text-[2rem] leading-none font-semibold tracking-[-0.06em] text-[#2f1d15] sm:text-[2.5rem] lg:text-[2.9rem]">
  theootd.brand
  </span>
  </Link>
- <p className="mt-4 text-xs tracking-[0.28em] text-[#b9b1a6] ">
+ <p className="mt-4 text-xs tracking-[0.28em] text-[#5f5954] ">
  ELEVATED WOMENSWEAR FOR EVERY STORY - MADE IN GHANA
  </p>
  </div>
 
- <div className="border-t border-white/20 pt-8 sm:pt-10">
+ <div className="border-t border-black/10 pt-8 sm:pt-10">
  <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
  <div className="space-y-4">
- <p className="text-xs tracking-[0.24em] text-[#b9b1a6] ">QUICK LINKS</p>
- <div className="space-y-2 text-[#d9d2c7] ">
- <Link href="/products" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Shop All</Link>
- <Link href="/products?category=TOPS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Tops</Link>
- <Link href="/products?category=SKIRTS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Skirts</Link>
- <Link href="/products?category=PANTS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Pants</Link>
- <Link href="/products?category=CAPRIS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Capris</Link>
- <Link href="/products?category=MAXI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Maxi</Link>
- <Link href="/products?category=MIDI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Midi</Link>
- <Link href="/combo" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Build a Combo</Link>
- <Link href="/custom-order" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Custom Order</Link>
+ <p className="text-xs tracking-[0.24em] text-[#5f5954] ">QUICK LINKS</p>
+ <div className="space-y-2 text-[#4f4944] ">
+ <Link href="/products" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Shop All</Link>
+ <Link href="/products?category=TOPS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Tops</Link>
+ <Link href="/products?category=SKIRTS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Skirts</Link>
+ <Link href="/products?category=PANTS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Pants</Link>
+ <Link href="/products?category=CAPRIS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Capris</Link>
+ <Link href="/products?category=MAXI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Maxi</Link>
+ <Link href="/products?category=MIDI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Midi</Link>
+ <Link href="/combo" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Build a Combo</Link>
+ <Link href="/custom-order" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Custom Order</Link>
  </div>
  </div>
 
  <div className="space-y-4">
- <p className="text-xs tracking-[0.24em] text-[#b9b1a6] ">NEED HELP</p>
- <div className="space-y-2 text-[#d9d2c7] ">
- <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">+233 53 647 7207</a>
- <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">WhatsApp Us</a>
-                <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Instagram DM</a>
- <Link href="/orders" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Track Order</Link>
+ <p className="text-xs tracking-[0.24em] text-[#5f5954] ">NEED HELP</p>
+ <div className="space-y-2 text-[#4f4944] ">
+ <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">+233 53 647 7207</a>
+ <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp Us</a>
+                <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram DM</a>
+ <Link href="/orders" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Track Order</Link>
  </div>
  </div>
 
  <div className="space-y-4">
- <p className="text-xs tracking-[0.24em] text-[#b9b1a6] ">OUR POLICY</p>
- <div className="space-y-2 text-[#d9d2c7] ">
- <p className="text-[1.15rem] text-white ">48-Hour Returns</p>
+ <p className="text-xs tracking-[0.24em] text-[#5f5954] ">OUR POLICY</p>
+ <div className="space-y-2 text-[#4f4944] ">
+ <p className="text-[1.15rem] text-[#2b2724] ">48-Hour Returns</p>
  <p className="max-w-xs leading-relaxed">
  Not satisfied? Return within 48 hours of delivery for a full refund.
  </p>
@@ -281,28 +279,28 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
 
  <div className="space-y-4">
- <p className="text-xs tracking-[0.24em] text-[#b9b1a6] ">FOLLOW US</p>
- <div className="space-y-2 text-[#d9d2c7] ">
-                <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">Instagram →</a>
- <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">WhatsApp →</a>
-                <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-white ">TikTok @theootd.brand →</a>
+ <p className="text-xs tracking-[0.24em] text-[#5f5954] ">FOLLOW US</p>
+ <div className="space-y-2 text-[#4f4944] ">
+                <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Instagram →</a>
+ <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">WhatsApp →</a>
+                <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">TikTok @theootd.brand →</a>
  </div>
  </div>
  </div>
  </div>
 
- <div className="mt-10 grid gap-2 border-t border-white/20 pt-6 text-center text-sm text-[#b9b1a6] sm:grid-cols-3 sm:items-center sm:text-left">
+ <div className="mt-10 grid gap-2 border-t border-black/10 pt-6 text-center text-sm text-[#5f5954] sm:grid-cols-3 sm:items-center sm:text-left">
               <p>© <span suppressHydrationWarning>{new Date().getFullYear()}</span> theootd.brand. All rights reserved.</p>
  <div className="space-y-2 sm:text-center">
  <p>
- A Loo<span className="text-[#f06a9b]">prompt</span> Product
+ A Loo<span className="text-[#de3f7c]">prompt</span> Product
  </p>
  <Image
  src="/images/logo/looprompt-mark.png"
  alt="Looprompt mark"
  width={28}
  height={31}
- className="mx-auto rounded-full bg-[#f6f2ea] p-1"
+ className="mx-auto"
  />
  </div>
  <p className="sm:text-right">Designed in Ghana. Built for comfort.</p>
@@ -310,7 +308,7 @@ export function AppShell({ children, user }: AppShellProps) {
  </div>
  </footer>
 
-	 <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#1d1b1a] bg-[#f6f2ea]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+	 <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
  <ul className="mx-auto grid w-full max-w-md grid-cols-4">
  {mobileTabs.map((tab) => {
  const Icon = tab.icon;
@@ -322,7 +320,7 @@ export function AppShell({ children, user }: AppShellProps) {
  aria-label={tab.href === "/cart" && !isAdminUser && visibleItemCount > 0 ? `Cart, ${visibleItemCount} item${visibleItemCount === 1 ? "" : "s"}` : tab.label}
  className={`flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[11px] ${active ? "text-foreground" : "text-muted-foreground"}`}
  >
- <span className={`relative p-1 ${active ? "border-b border-[#1d1b1a] " : ""}`}>
+ <span className={`relative rounded-full p-1 ${active ? "bg-black/10 " : ""}`}>
  <Icon className="size-4" />
  {tab.href === "/cart" && !isAdminUser ? <CartCountBadge count={visibleItemCount} /> : null}
  </span>

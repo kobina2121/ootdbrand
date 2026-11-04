@@ -140,7 +140,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
  };
 
  return (
- <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-[#fbf9f4] ">
+ <Card className="mx-auto w-full max-w-md rounded-3xl border-black/10 bg-white/90 shadow-sm ">
  <CardHeader className="space-y-2 border-b border-black/10 ">
  <p className="text-xs tracking-[0.24em] text-muted-foreground">
  {nextPath.startsWith("/admin") ? "ADMIN ACCESS" : "WELCOME BACK"}
@@ -156,7 +156,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
  <Button
  type="button"
  variant="outline"
- className="mb-4 h-11 w-full rounded-none border-black/20 "
+ className="mb-4 h-11 w-full rounded-full border-black/20 "
  onClick={onGoogleSignIn}
  disabled={!isGoogleAvailable || isGoogleSubmitting || isSubmitting}
  >
@@ -228,7 +228,7 @@ export function LoginForm({ nextPath = "/" }: { nextPath?: string }) {
  </div>
  ) : null}
  {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
- <Button className="h-11 w-full rounded-none" type="submit" disabled={isSubmitting}>
+ <Button className="h-11 w-full rounded-full" type="submit" disabled={isSubmitting}>
  {isSubmitting ? "Signing in..." : "Login"}
  </Button>
  </form>

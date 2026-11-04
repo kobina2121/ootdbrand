@@ -5,14 +5,15 @@ import { ArrowLeft } from "lucide-react";
 
 import { ProductDetailClient } from "@/components/store/product-detail-client";
 import { ProductGrid } from "@/components/store/product-grid";
-import { SectionHeading } from "@/components/store/section-heading";
 import { ProductReviews } from "@/components/store/product-reviews";
 import { getCurrentSession } from "@/lib/auth/guards";
 import { hasSuccessfulPurchaseForProduct } from "@/lib/services/order-service";
 import { listReviewsByProductSlug } from "@/lib/services/review-service";
 import { encodeProductSlugForPath } from "@/lib/product-slug";
+import { buttonVariants } from "@/components/ui/button";
 import { getProductBySlug, listProducts } from "@/lib/services/product-service";
 import { absoluteUrl, searchLogoPath, siteName } from "@/lib/site-metadata";
+import { cn } from "@/lib/utils";
 
 type ProductDetailPageProps = {
  params: Promise<{ slug: string }>;
@@ -119,15 +120,13 @@ export default async function ProductDetailPage({
 	 }));
 
  return (
- <div className="space-y-12 sm:space-y-20">
- <div className="space-y-3">
- <Link href="/products" className="inline-flex min-h-11 items-center gap-2 text-xs tracking-[0.22em] text-[#1d1b1a] uppercase underline-offset-4 hover:underline">
+ <div className="space-y-6">
+ <Link href="/products" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "rounded-full")}>
  <ArrowLeft className="size-4" />
  Back to shop
  </Link>
 
  <ProductDetailClient product={product} />
- </div>
 
  <ProductReviews
  productSlug={product.slug}
@@ -142,10 +141,18 @@ export default async function ProductDetailPage({
  }))}
  />
 
- <section className="space-y-8 sm:space-y-12">
- <SectionHeading title="You May Also Like" href="/products" linkLabel="Browse all" />
+ <section className="rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
+ <div className="mb-5 flex items-center justify-between">
+ <h2 className="text-2xl font-semibold text-[#1f1b18] ">You May Also Like</h2>
+ <Link
+ href="/products"
+ className="text-sm text-muted-foreground transition hover:text-foreground"
+ >
+ Browse all
+ </Link>
+ </div>
  {recommendations.length > 0 ? (
- <ProductGrid products={recommendations} className="lg:grid-cols-4" />
+ <ProductGrid products={recommendations} />
  ) : (
  <p className="text-sm text-muted-foreground">More styles are coming soon.</p>
  )}

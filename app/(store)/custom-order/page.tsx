@@ -9,7 +9,6 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/store/cart-provider";
-import { PageMasthead } from "@/components/store/page-masthead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -355,13 +354,13 @@ export default function CustomOrderPage() {
 
  if (userRole === "admin") {
  return (
- <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-[#fbf9f4] text-center ">
+ <Card className="mx-auto w-full max-w-2xl rounded-3xl border-black/10 bg-white/90 text-center shadow-sm ">
  <CardHeader>
 	 <CardTitle className="font-heading text-4xl leading-none text-[#1f1b18] sm:text-5xl">Custom Orders Disabled for Admin</CardTitle>
  </CardHeader>
  <CardContent className="space-y-3">
  <p className="text-sm text-muted-foreground">Admin accounts cannot place customer custom orders.</p>
- <Button className="rounded-none" onClick={() => window.location.assign("/admin/custom-orders")}>
+ <Button className="rounded-full" onClick={() => window.location.assign("/admin/custom-orders")}>
  Go to Custom Order Admin
  </Button>
  </CardContent>
@@ -370,15 +369,9 @@ export default function CustomOrderPage() {
  }
 
  return (
-<div className="mx-auto w-full max-w-4xl space-y-6">
- <PageMasthead
- kicker="Custom Atelier"
- title="Customize From Catalog"
- description="Choose a shop product first, then customize it. Product name, price, images, and specs auto-fill from catalog."
- />
-
- <Card className="border-black/10 bg-[#ece6da]/50 ">
- <CardContent className="flex items-start gap-3 p-3 sm:p-5">
+	 <div className="mx-auto w-full max-w-4xl space-y-4">
+	 <Card className="border-black/10 bg-[#f4f3ef] shadow-sm ">
+	 <CardContent className="flex items-start gap-3 p-3 sm:p-5">
  <Clock3 className="mt-0.5 size-5 text-[#3f3a35] " />
  <div>
  <p className="text-sm font-medium text-[#1f1b18] ">Production timeline</p>
@@ -387,10 +380,17 @@ export default function CustomOrderPage() {
  </CardContent>
  </Card>
 
- <Card className="border-black/10 bg-[#fbf9f4] ">
+ <Card className="border-black/10 bg-white/90 shadow-sm ">
+ <CardHeader>
+ <p className="form-section-title">Custom Atelier</p>
+	 <CardTitle className="font-heading text-2xl text-[#1f1b18] sm:text-3xl">Customize From Catalog</CardTitle>
+ <p className="text-sm text-[#6b655f] ">
+ Choose a shop product first, then customize it. Product name, price, images, and specs auto-fill from catalog.
+ </p>
+ </CardHeader>
  <CardContent>
  <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
-	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#ece6da]/50 p-3 sm:p-5">
+	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-3 sm:p-5">
  <p className="form-section-title">Selected Product *</p>
  <div className="space-y-2">
  <label htmlFor="custom-order-category" className="text-sm font-medium text-[#1f1b18] ">
@@ -398,7 +398,7 @@ export default function CustomOrderPage() {
  </label>
  <select
  id="custom-order-category"
- className="h-10 w-full rounded-xl border border-black/15 bg-[#fbf9f4] px-3 text-sm text-[#1f1b18] "
+ className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] "
  value={selectedCategory}
  disabled={isCatalogLoading}
  onChange={(event) => handleCategoryChange(event.target.value)}
@@ -425,7 +425,7 @@ export default function CustomOrderPage() {
  </label>
  <select
  id="custom-order-product"
- className="h-10 w-full rounded-xl border border-black/15 bg-[#fbf9f4] px-3 text-sm text-[#1f1b18] "
+ className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] "
  value={selectedProductSlug}
  disabled={isCatalogLoading || !selectedCategory}
  {...getFieldErrorProps("product")}
@@ -456,7 +456,7 @@ export default function CustomOrderPage() {
  </div>
 
  {selectedProduct ? (
-	 <div className="grid gap-3 rounded-xl border border-black/10 bg-[#fbf9f4] p-3 sm:grid-cols-[minmax(7.5rem,8.75rem)_1fr]">
+	 <div className="grid gap-3 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[minmax(7.5rem,8.75rem)_1fr]">
  <Image
  src={selectedProduct.image}
  alt={selectedProduct.name}
@@ -489,7 +489,7 @@ export default function CustomOrderPage() {
  ) : null}
  </div>
 
-	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#ece6da]/50 p-3 sm:p-5">
+	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-3 sm:p-5">
  <p className="form-section-title">Customer Details</p>
  <div className="grid gap-4 sm:grid-cols-2">
  <div className="space-y-2">
@@ -560,7 +560,7 @@ export default function CustomOrderPage() {
  </div>
  </div>
 
-	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#ece6da]/50 p-3 sm:p-5">
+	 <div className="space-y-4 rounded-2xl border border-black/10 bg-[#faf9f7] p-3 sm:p-5">
  <p className="form-section-title">Customization</p>
  <div className="grid gap-4 sm:grid-cols-2">
  <div className="space-y-2">
@@ -569,7 +569,7 @@ export default function CustomOrderPage() {
  </label>
  <select
  id="custom-order-type"
- className="h-10 w-full rounded-xl border border-black/15 bg-[#fbf9f4] px-3 text-sm text-[#1f1b18] "
+ className="h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm text-[#1f1b18] "
  value={type}
  onChange={(event) => setType(event.target.value)}
  >
@@ -587,7 +587,7 @@ export default function CustomOrderPage() {
  <label htmlFor="custom-order-selected-category" className="text-sm font-medium text-[#1f1b18] ">
  Category
  </label>
- <Input id="custom-order-selected-category" value={selectedProduct?.category ?? ""} disabled className="rounded-xl border-black/15 bg-[#fbf9f4] " />
+ <Input id="custom-order-selected-category" value={selectedProduct?.category ?? ""} disabled className="rounded-xl border-black/15 bg-white " />
  </div>
  </div>
  <div className="grid gap-4 sm:grid-cols-2">
@@ -785,7 +785,7 @@ export default function CustomOrderPage() {
  </div>
  </div>
 
-	 <div className="space-y-3 rounded-2xl border border-black/10 bg-[#ece6da]/50 p-3 sm:p-5">
+	 <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-3 sm:p-5">
  <p className="inline-flex items-center gap-2 text-sm font-medium text-[#1f1b18] ">
  <MapPin className="size-4" />
  Delivery Address *
@@ -891,9 +891,9 @@ export default function CustomOrderPage() {
  />
  </div>
 
- <div className="space-y-3 rounded-2xl border border-black/10 bg-[#ece6da]/50 p-4 sm:p-5">
+ <div className="space-y-3 rounded-2xl border border-black/10 bg-[#faf9f7] p-4 sm:p-5">
  <p className="form-section-title">Payment Method</p>
- <div className="rounded-xl border border-black/10 bg-[#fbf9f4] px-3 py-2 text-sm text-[#1f1b18] ">
+ <div className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-[#1f1b18] ">
  <p className="flex items-center justify-between">
  <span>Product price</span>
  <span>{formatPriceNgn(selectedProductUnitPrice)}</span>
@@ -919,8 +919,8 @@ export default function CustomOrderPage() {
  onClick={() => setPaymentMethod("card")}
  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
  paymentMethod === "card"
- ? "border-black bg-black text-white "
- : "border-black/20 bg-[#fbf9f4] text-[#1f1b18] hover:border-black/50 "
+ ? "border-black bg-black text-white shadow-sm "
+ : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50 "
  }`}
  >
  <CreditCard className="size-4" />
@@ -933,8 +933,8 @@ export default function CustomOrderPage() {
  onClick={() => setPaymentMethod("mobile_money")}
  className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition ${
  paymentMethod === "mobile_money"
- ? "border-black bg-black text-white "
- : "border-black/20 bg-[#fbf9f4] text-[#1f1b18] hover:border-black/50 "
+ ? "border-black bg-black text-white shadow-sm "
+ : "border-black/20 bg-white text-[#1f1b18] hover:border-black/50 "
  }`}
  >
  <Smartphone className="size-4" />
@@ -947,7 +947,7 @@ export default function CustomOrderPage() {
  <p className="text-xs text-muted-foreground">
  Secure checkout via Paystack ({paymentMethod === "card" ? "Visa Card" : "Mobile Money"}).
  </p>
-	 <Button type="submit" className="min-h-11 w-full rounded-none px-5 sm:w-auto sm:px-7" disabled={isSubmitting || !selectedProduct}>
+	 <Button type="submit" className="min-h-11 w-full rounded-full px-5 sm:w-auto sm:px-7" disabled={isSubmitting || !selectedProduct}>
  {isSubmitting
  ? "Preparing Payment..."
  : paymentMethod === "card"

@@ -88,10 +88,10 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
  };
 
  return (
- <section className="space-y-6 border-t border-[#1d1b1a] pt-4">
+ <section className="space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm sm:p-6">
  <div className="flex flex-wrap items-end justify-between gap-3">
  <div>
- <h2 className="font-heading text-[clamp(2.75rem,6vw,5.5rem)] leading-[0.95] font-medium tracking-[-0.02em] text-[#1d1b1a]">Customer Reviews</h2>
+ <h2 className="text-2xl font-semibold text-[#1f1b18] ">Customer Reviews</h2>
  <p className="mt-1 text-sm text-muted-foreground">
  {reviews.length > 0
  ? `${averageRating.toFixed(1)} / 5 from ${reviews.length} review${reviews.length > 1 ? "s" : ""}`
@@ -101,7 +101,7 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
  </div>
 
  {reviewEligibility === "can_review" ? (
- <Card className="border-black/10 bg-[#ece6da]/50 ">
+ <Card className="border-black/10 bg-[#faf9f7] ">
  <CardHeader>
  <CardTitle className="text-lg text-[#1f1b18] ">Leave a Review</CardTitle>
  </CardHeader>
@@ -114,7 +114,7 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
  type="button"
  variant={rating === entry ? "default" : "outline"}
  size="sm"
- className="rounded-none"
+ className="rounded-full"
  onClick={() => setRating(entry)}
  >
  {renderStars(entry)}
@@ -127,7 +127,7 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
  placeholder="Tell us about quality, fit, and how it feels."
  rows={4}
  />
- <Button type="submit" disabled={isSubmitting} className="rounded-none">
+ <Button type="submit" disabled={isSubmitting} className="rounded-full">
  {isSubmitting ? "Submitting..." : "Submit Review"}
  </Button>
  </form>
@@ -153,7 +153,7 @@ export function ProductReviews({ productSlug, reviews: initialReviews, reviewEli
  <p className="text-sm text-muted-foreground">No reviews yet.</p>
  ) : (
  reviews.map((review) => (
- <article key={review.id} className="rounded-xl border border-black/10 bg-[#fbf9f4] p-4 ">
+ <article key={review.id} className="rounded-xl border border-black/10 bg-white p-4 ">
  <div className="flex flex-wrap items-center justify-between gap-2">
  <p className="text-sm font-medium text-foreground">{review.userName}</p>
  <p className="text-xs text-muted-foreground">

@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
-import { PageMasthead } from "@/components/store/page-masthead";
 import { Button } from "@/components/ui/button";
 import { ClickableContainer } from "@/components/ui/clickable-container";
 import { PaymentStatusVerifier } from "@/components/store/payment-status-verifier";
@@ -53,10 +52,14 @@ export default async function AccountOrdersPage() {
  if (!session) {
  return (
  <div className="space-y-6">
- <PageMasthead kicker="Account" title="My Orders" description="Sign in to view your order history and delivery updates." />
+ <section className="surface-strong p-5 sm:p-7">
+ <p className="heading-kicker">ACCOUNT</p>
+ <h1 className="mt-2 font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">My Orders</h1>
+ <p className="mt-2 text-sm text-[#6d6660] sm:text-base">Sign in to view your order history and delivery updates.</p>
+ </section>
  <section className="surface-soft p-6">
  <Link href="/login?next=/orders">
- <Button className="rounded-none">Sign in</Button>
+ <Button className="rounded-full">Sign in</Button>
  </Link>
  </section>
  </div>
@@ -75,18 +78,24 @@ export default async function AccountOrdersPage() {
  return (
  <div className="space-y-6">
  <PaymentStatusVerifier references={pendingPaymentReferences} clearCartOnSuccess />
- <PageMasthead kicker="Account" title="My Orders" description="Track your store purchases and custom orders from one centralized page." />
+ <section className="surface-strong p-5 sm:p-7">
+ <p className="heading-kicker">ACCOUNT</p>
+ <h1 className="mt-2 font-heading text-5xl leading-none text-[#1f1b18] sm:text-6xl">My Orders</h1>
+ <p className="mt-2 text-sm text-[#6d6660] sm:text-base">
+ Track your store purchases and custom orders from one centralized page.
+ </p>
+ </section>
 
  <section className="surface-soft p-5 sm:p-6">
  <div className="mb-4 flex items-center justify-between">
  <h2 className="font-heading text-3xl leading-none text-[#1f1b18] sm:text-4xl">Store Orders</h2>
- <Badge variant="outline" className="rounded-none border-black/20 px-3 py-1 text-xs ">
+ <Badge variant="outline" className="rounded-full border-black/20 px-3 py-1 text-xs ">
  {orders.length} order(s)
  </Badge>
  </div>
  <div className="space-y-4">
  {orders.length === 0 ? (
- <p className="rounded-xl border border-black/10 bg-[#fbf9f4] p-4 text-sm text-muted-foreground ">
+ <p className="rounded-xl border border-black/10 bg-white/70 p-4 text-sm text-muted-foreground ">
  No store purchases yet.
  </p>
  ) : (
@@ -94,7 +103,7 @@ export default async function AccountOrdersPage() {
  const orderHref = `/orders/${encodeURIComponent(order.paymentReference)}`;
 
  return (
- <ClickableContainer key={order.id} href={orderHref} className="group space-y-4 rounded-2xl border border-black/10 bg-[#fbf9f4] p-4 transition hover:-translate-y-0.5 hover:border-black/20 sm:p-5">
+ <ClickableContainer key={order.id} href={orderHref} className="group space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md sm:p-5">
  <header className="flex flex-wrap items-start justify-between gap-3">
  <div>
  <p className="text-xs tracking-[0.15em] text-muted-foreground ">Order Ref</p>
@@ -133,7 +142,7 @@ export default async function AccountOrdersPage() {
  ))}
  </div>
 
- <div className="grid gap-3 rounded-xl border border-black/10 bg-[#ece6da]/50 p-3 text-sm sm:grid-cols-2">
+ <div className="grid gap-3 rounded-xl border border-black/10 bg-[#f7f5f1]/80 p-3 text-sm sm:grid-cols-2">
  <p><span className="text-muted-foreground ">Subtotal:</span> {formatPriceNgn(order.amountSubtotal)}</p>
  {order.discountAmount > 0 ? (
  <p><span className="text-muted-foreground ">Discount{order.discountCode ? ` (${order.discountCode})` : ""}:</span> -{formatPriceNgn(order.discountAmount)}</p>
@@ -152,7 +161,7 @@ export default async function AccountOrdersPage() {
  </Link>
  ) : null}
 
- <p className="rounded-lg border border-black/10 bg-[#fbf9f4] px-3 py-2 text-sm ">
+ <p className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm ">
  <span className="text-muted-foreground ">Admin update:</span> {order.adminUpdate || "No update yet."}
  </p>
  </ClickableContainer>
@@ -165,13 +174,13 @@ export default async function AccountOrdersPage() {
  <section className="surface-soft p-5 sm:p-6">
  <div className="mb-4 flex items-center justify-between">
  <h2 className="font-heading text-3xl leading-none text-[#1f1b18] sm:text-4xl">Custom Orders</h2>
- <Badge variant="outline" className="rounded-none border-black/20 px-3 py-1 text-xs ">
+ <Badge variant="outline" className="rounded-full border-black/20 px-3 py-1 text-xs ">
  {customOrders.length} order(s)
  </Badge>
  </div>
  <div className="space-y-4">
  {customOrders.length === 0 ? (
- <p className="rounded-xl border border-black/10 bg-[#fbf9f4] p-4 text-sm text-muted-foreground ">
+ <p className="rounded-xl border border-black/10 bg-white/70 p-4 text-sm text-muted-foreground ">
  No custom orders yet.
  </p>
  ) : (
@@ -184,7 +193,7 @@ export default async function AccountOrdersPage() {
  const orderHref = `/orders/${encodeURIComponent(order.paymentReference)}`;
 
  return (
- <ClickableContainer key={order.id} href={orderHref} className="group space-y-4 rounded-2xl border border-black/10 bg-[#fbf9f4] p-4 transition hover:-translate-y-0.5 hover:border-black/20 sm:p-5">
+ <ClickableContainer key={order.id} href={orderHref} className="group space-y-4 rounded-2xl border border-black/10 bg-white/85 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md sm:p-5">
  <header className="flex flex-wrap items-start justify-between gap-3">
  <div>
  <p className="text-xs tracking-[0.15em] text-muted-foreground ">Custom Ref</p>
@@ -241,7 +250,7 @@ export default async function AccountOrdersPage() {
  </div>
  </div>
 
- <div className="grid gap-3 rounded-xl border border-black/10 bg-[#ece6da]/50 p-3 text-sm sm:grid-cols-2">
+ <div className="grid gap-3 rounded-xl border border-black/10 bg-[#f7f5f1]/80 p-3 text-sm sm:grid-cols-2">
  <p><span className="text-muted-foreground ">Transaction fee:</span> {formatPriceNgn(order.transactionFee ?? 0)}</p>
  <p><span className="text-muted-foreground ">Total:</span> {formatPriceNgn(order.amountTotal)}</p>
  <p><span className="text-muted-foreground ">Tracking:</span> {order.trackingNumber || "Pending assignment"}</p>
@@ -252,7 +261,7 @@ export default async function AccountOrdersPage() {
  </div>
 
  {order.notes ? (
- <p className="rounded-lg border border-black/10 bg-[#fbf9f4] px-3 py-2 text-sm ">
+ <p className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm ">
  <span className="text-muted-foreground ">Your notes:</span> {order.notes}
  </p>
  ) : null}
@@ -262,7 +271,7 @@ export default async function AccountOrdersPage() {
  </Link>
  ) : null}
 
- <p className="rounded-lg border border-black/10 bg-[#fbf9f4] px-3 py-2 text-sm ">
+ <p className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm ">
  <span className="text-muted-foreground ">Admin update:</span> {order.adminUpdate || "No update yet."}
  </p>
  </ClickableContainer>
