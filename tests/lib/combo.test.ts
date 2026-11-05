@@ -23,7 +23,7 @@ describe("combo categories", () => {
 
 describe("calculateComboDiscount", () => {
   it.each(["SKIRTS", "PANTS", "CAPRIS"])("gives one saving for a top and %s", (bottom) => {
-    expect(calculateComboDiscount([{ category: "TOPS", quantity: 1 }, { category: bottom, quantity: 1 }])).toBe(20);
+    expect(calculateComboDiscount([{ category: "TOPS", quantity: 1 }, { category: bottom, quantity: 1 }])).toBe(10);
   });
 
   it("counts different bottoms towards pairs", () => {
@@ -33,7 +33,7 @@ describe("calculateComboDiscount", () => {
         { category: "PANTS", quantity: 1 },
         { category: "CAPRIS", quantity: 1 },
       ]),
-    ).toBe(40);
+    ).toBe(20);
   });
 
   it("does not pair two bottoms together", () => {
@@ -41,7 +41,7 @@ describe("calculateComboDiscount", () => {
   });
 
   it("counts only complete pairs", () => {
-    expect(calculateComboDiscount([{ category: "TOPS", quantity: 3 }, { category: "SKIRTS", quantity: 2 }])).toBe(40);
+    expect(calculateComboDiscount([{ category: "TOPS", quantity: 3 }, { category: "SKIRTS", quantity: 2 }])).toBe(20);
   });
 
   it("adds up separate tops and skirts", () => {
@@ -52,7 +52,7 @@ describe("calculateComboDiscount", () => {
         { category: "SKIRTS", quantity: 1 },
         { category: "SKIRTS", quantity: 1 },
       ]),
-    ).toBe(40);
+    ).toBe(20);
   });
 
   it("gives nothing without both pieces", () => {

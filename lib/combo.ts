@@ -1,4 +1,4 @@
-export const COMBO_DISCOUNT_GHS = 20;
+export const COMBO_DISCOUNT_GHS = 10;
 export const COMBO_DISCOUNT_LABEL = "COMBO";
 
 const TOP_CATEGORIES = new Set(["TOP", "TOPS"]);

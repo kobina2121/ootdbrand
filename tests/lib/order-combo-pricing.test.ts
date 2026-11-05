@@ -40,9 +40,9 @@ describe("createPendingOrder combo pricing", () => {
 
     const order = await createPendingOrder(input);
 
-    expect(order).toMatchObject({ amountSubtotal: 350, discountAmount: 20, discountCode: "COMBO", amountTotal: 334 });
+    expect(order).toMatchObject({ amountSubtotal: 350, discountAmount: 10, discountCode: "COMBO", amountTotal: 344 });
     expect(mockOrderCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ discountAmount: 20, discountCode: "COMBO", amountTotal: 334 }),
+      expect.objectContaining({ discountAmount: 10, discountCode: "COMBO", amountTotal: 344 }),
     );
   });
 
@@ -60,7 +60,7 @@ describe("createPendingOrder combo pricing", () => {
 
     const order = await createPendingOrder({ ...input, discountCode: "OOTD" });
 
-    expect(order).toMatchObject({ discountAmount: 20, discountCode: "COMBO" });
+    expect(order).toMatchObject({ discountAmount: 10, discountCode: "COMBO" });
   });
 
   it("still rejects an invalid coupon", async () => {

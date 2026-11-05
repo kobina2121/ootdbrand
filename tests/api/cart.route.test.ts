@@ -91,12 +91,12 @@ describe("POST /api/cart", () => {
 
     expect(response.status).toBe(200);
     expect(json.data.discount).toMatchObject({
-      amount: 20,
+      amount: 10,
       comboApplied: true,
       appliedCode: null,
       comboPairs: [{ topSku: "TOP-M", bottomSku: "SKIRT-M", quantity: 1 }],
     });
-    expect(json.data.totals).toMatchObject({ subtotal: 350, discount: 20, discountedSubtotal: 330 });
+    expect(json.data.totals).toMatchObject({ subtotal: 350, discount: 10, discountedSubtotal: 340 });
   });
 
   it("uses the bigger coupon instead of the combo saving", async () => {
