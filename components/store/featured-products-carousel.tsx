@@ -222,7 +222,7 @@ function FeaturedProductCard({
  variants.find((variant) => variant.color === selectedColor)
  : undefined;
  const previewVariant = selectedVariant ?? selectedColorVariant;
- const previewImage = previewVariant?.image ?? product.image;
+ const previewImage = previewVariant?.image || product.image;
  const selectedVariantInStock = Boolean(selectedVariant && selectedVariant.stock > 0);
  const showQuickAdd = Boolean(selectedColor && selectedSize && selectedVariant);
  const cartItem = selectedVariant ? items.find((item) => item.sku === selectedVariant.sku) : undefined;
