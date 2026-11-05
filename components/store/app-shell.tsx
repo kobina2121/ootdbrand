@@ -251,6 +251,7 @@ export function AppShell({ children, user }: AppShellProps) {
  <Link href="/products?category=SKIRTS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Skirts</Link>
  <Link href="/products?category=PANTS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Pants</Link>
  <Link href="/products?category=CAPRIS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Capris</Link>
+ <Link href="/products?category=SETS" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Sets</Link>
  <Link href="/products?category=MAXI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Maxi</Link>
  <Link href="/products?category=MIDI" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Midi</Link>
  <Link href="/combo" className="flex min-h-11 items-center transition hover:translate-x-1 hover:text-[#1d1b1a] ">Build a Combo</Link>
