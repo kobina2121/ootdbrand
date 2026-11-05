@@ -96,6 +96,7 @@ function ProductCard({ product }: { product: Product }) {
  const showQuickAdd = Boolean(selectedColor && selectedSize && selectedVariant);
  const cartItem = selectedVariant ? items.find((item) => item.sku === selectedVariant.sku) : undefined;
  const isSelectedVariantInCart = Boolean(cartItem);
+ const productHref = buildProductHref(product.slug, { color: selectedColor, size: selectedSize });
 
  const handleQuickAdd = async () => {
  if (isAdding) {
@@ -153,6 +154,7 @@ function ProductCard({ product }: { product: Product }) {
  <Card className="group hover-lift flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border-black/10 bg-white/95 shadow-[0_16px_40px_rgba(15,12,10,0.06)]">
  <CardHeader className="p-2.5 sm:p-3">
  <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-[#f5f0ea] ">
+ <Link href={productHref} className="block h-full w-full">
  <Image
  src={previewImage}
  alt={selectedColor ? `${product.name} in ${selectedColor}` : product.name}
@@ -161,6 +163,7 @@ function ProductCard({ product }: { product: Product }) {
  sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw"
  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
  />
+ </Link>
  </div>
  </CardHeader>
 
@@ -175,7 +178,11 @@ function ProductCard({ product }: { product: Product }) {
  </div>
 
  <div className="mt-2">
- <CardTitle className="text-base leading-tight text-[#1f1b18] sm:text-lg">{product.name}</CardTitle>
+ <CardTitle className="text-base leading-tight text-[#1f1b18] sm:text-lg">
+ <Link href={productHref} className="hover:underline">
+ {product.name}
+ </Link>
+ </CardTitle>
  </div>
 
  <div className="mt-2 flex flex-col items-center gap-0.5">
@@ -268,7 +275,7 @@ function ProductCard({ product }: { product: Product }) {
  </CardContent>
 
  <CardFooter className="mt-auto flex flex-wrap items-center justify-center gap-1.5 p-2.5 pt-0 sm:p-3 sm:pt-0">
- <Link href={buildProductHref(product.slug, { color: selectedColor, size: selectedSize })} className="min-w-[5.75rem] flex-1">
+ <Link href={productHref} className="min-w-[5.75rem] flex-1">
  <Button className="w-full rounded-full px-1 text-xs sm:px-2 sm:text-sm">View Product</Button>
  </Link>
  {showQuickAdd ? (
