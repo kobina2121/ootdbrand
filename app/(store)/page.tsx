@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { FeaturedProductsCarousel } from "@/components/store/featured-products-carousel";
-import { HeroLookCarousel } from "@/components/store/hero-look-carousel";
+import { HeroSlideshow } from "@/components/store/hero-slideshow";
 import { LazyShowcaseVideo } from "@/components/store/lazy-showcase-video";
 import { TopSellingCarousel } from "@/components/store/top-selling-carousel";
 import { buttonVariants } from "@/components/ui/button";
@@ -10,26 +10,26 @@ import { formatPriceNgn, type Product } from "@/lib/products";
 import { listProducts } from "@/lib/services/product-service";
 import { cn } from "@/lib/utils";
 
-const looks = [
+const heroSlides = [
  {
  src: "/images/hero/look-pink-dress.jpg",
  alt: "Model in a pink one-shoulder mini dress on a lawn",
- position: "center 25%",
+ position: "center 15%",
  },
  {
  src: "/images/hero/look-solo-blue-skirt.jpg",
  alt: "Model in a black halter top and blue handkerchief skirt",
- position: "center 45%",
+ position: "center 30%",
  },
  {
  src: "/images/hero/look-yellow-dress.jpg",
  alt: "Model in a yellow maxi dress on a sunlit lawn",
- position: "center 85%",
+ position: "center 42%",
  },
  {
  src: "/images/hero/look-white-top.jpg",
  alt: "Model in a white one-shoulder top and coral skirt",
- position: "center 40%",
+ position: "center 49%",
  },
 ] as const;
 
@@ -134,7 +134,7 @@ export default async function HomePage() {
  <div className="pointer-events-none absolute -right-16 top-[28rem] hidden h-64 w-64 rounded-full bg-[#d8c8ba]/35 blur-3xl md:block animate-drift-x-reverse" />
 
 	 <section className="animate-fade-up relative h-[58svh] min-h-[360px] overflow-hidden rounded-2xl border border-black/10 bg-[#d9d6cf] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] sm:h-[75svh] sm:min-h-[540px] sm:rounded-3xl lg:h-[88svh] lg:min-h-[760px]">
- <HeroLookCarousel looks={looks} />
+ <HeroSlideshow slides={heroSlides} />
  <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/70 lg:from-black/25 lg:via-black/5 lg:to-black/60" />
  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.18),transparent_38%)]" />
 

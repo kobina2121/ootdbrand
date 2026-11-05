@@ -226,28 +226,6 @@
  }
  }
 
- @keyframes look-carousel-slide {
- 0%,
- 20% {
- transform: translateX(0);
- }
- 25%,
- 45% {
- transform: translateX(-12.5%);
- }
- 50%,
- 70% {
- transform: translateX(-25%);
- }
- 75%,
- 95% {
- transform: translateX(-37.5%);
- }
- 100% {
- transform: translateX(-50%);
- }
- }
-
  @keyframes drift-horizontal {
  0%,
  100% {
@@ -292,21 +270,6 @@
  animation: hero-zoom 14s ease-in-out infinite alternate;
  transform-origin: center top;
  will-change: transform;
- }
-
- .animate-look-carousel {
- animation: look-carousel-slide 28s ease-in-out infinite;
- will-change: transform;
- }
-
- .animate-look-carousel:hover {
- animation-play-state: paused;
- }
-
- @media (prefers-reduced-motion: reduce) {
- .animate-look-carousel {
- animation: none !important;
- }
  }
 
  .animate-drift-x {
