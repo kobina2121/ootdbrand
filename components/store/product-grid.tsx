@@ -42,7 +42,7 @@ type Product = {
 
 export function ProductGrid({ products }: { products: Product[] }) {
  return (
- <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-4 lg:gap-5">
+ <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 lg:gap-4 xl:grid-cols-5">
  {products.map((product) => (
  <ProductCard key={product.slug} product={product} />
  ))}
@@ -150,36 +150,36 @@ function ProductCard({ product }: { product: Product }) {
  };
 
  return (
- <Card className="group hover-lift flex h-full flex-col overflow-hidden rounded-2xl border-black/10 bg-white/95 shadow-[0_16px_40px_rgba(15,12,10,0.06)] sm:rounded-3xl">
- <CardHeader className="space-y-4 p-3 sm:p-5">
- <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#f5f0ea] ">
+ <Card className="group hover-lift flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border-black/10 bg-white/95 shadow-[0_16px_40px_rgba(15,12,10,0.06)]">
+ <CardHeader className="p-2.5 sm:p-3">
+ <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-[#f5f0ea] ">
  <Image
  src={previewImage}
  alt={selectedColor ? `${product.name} in ${selectedColor}` : product.name}
  width={900}
  height={900}
- sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(50vw - 2rem), 33vw"
+ sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw"
  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
  />
  </div>
  </CardHeader>
 
- <CardContent className="flex flex-1 flex-col items-center px-3 pb-4 text-center sm:px-5">
+ <CardContent className="flex flex-1 flex-col items-center px-2.5 pb-3 text-center sm:px-3">
  <div className="flex flex-wrap items-center justify-center gap-2">
  <Badge
  variant="secondary"
- className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-xs uppercase tracking-[0.16em] text-[#4f4944] "
+ className="rounded-full border border-black/10 bg-black/5 px-2 py-0.5 text-[0.625rem] uppercase tracking-[0.12em] text-[#4f4944] "
  >
  {product.category}
  </Badge>
  </div>
 
- <div className="mt-4 space-y-2">
- <CardTitle className="text-[1.55rem] leading-none text-[#1f1b18] sm:text-2xl">{product.name}</CardTitle>
+ <div className="mt-2">
+ <CardTitle className="text-base leading-tight text-[#1f1b18] sm:text-lg">{product.name}</CardTitle>
  </div>
 
- <div className="mt-4 flex flex-col items-center gap-1">
- <p className="text-sm tracking-wide text-[#a47531] ">
+ <div className="mt-2 flex flex-col items-center gap-0.5">
+ <p className="text-xs tracking-wide text-[#a47531] ">
  {reviewCount > 0 ? (
  <>
  {"★★★★★"} <span className="font-medium">({rating.toFixed(1)})</span>
@@ -188,19 +188,19 @@ function ProductCard({ product }: { product: Product }) {
  <span className="text-[#7c736b]">No ratings yet</span>
  )}
  </p>
- <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">
+ <p className="text-[0.625rem] uppercase tracking-[0.12em] text-[#5f5954] ">
  {reviewCount} review{reviewCount === 1 ? "" : "s"}
  </p>
  </div>
 
- <div className="mt-5 space-y-3">
- <p className="text-2xl font-semibold tracking-tight text-[#1f1b18] sm:text-3xl">
+ <div className="mt-3 space-y-2">
+ <p className="text-lg font-semibold tracking-tight text-[#1f1b18] sm:text-xl">
  {formatPriceNgn(product.price)}
  </p>
  {colorOptions.length > 0 ? (
- <div className="space-y-2">
- <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">Available colors</p>
- <div className="flex flex-wrap items-center justify-center gap-2">
+ <div className="space-y-1.5">
+ <p className="text-[0.625rem] uppercase tracking-[0.12em] text-[#5f5954] ">Available colors</p>
+ <div className="flex flex-wrap items-center justify-center gap-1.5">
  {colorOptions.map((color) => {
  const isSelected = selectedColor === color.name;
 
@@ -231,13 +231,13 @@ function ProductCard({ product }: { product: Product }) {
  })}
  </div>
  {selectedColor ? (
- <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#1f1b18]">Selected: {selectedColor}</p>
+ <p className="text-[0.625rem] font-medium uppercase tracking-[0.12em] text-[#1f1b18]">Selected: {selectedColor}</p>
  ) : null}
  </div>
  ) : null}
- <p className="text-[0.8rem] uppercase tracking-[0.16em] text-[#5f5954] ">Available sizes</p>
+ <p className="text-[0.625rem] uppercase tracking-[0.12em] text-[#5f5954] ">Available sizes</p>
  {availableSizes.length > 0 ? (
- <div className="flex flex-wrap items-center justify-center gap-2">
+ <div className="flex flex-wrap items-center justify-center gap-1.5">
  {availableSizes.map(({ size, inStock }) => {
  const isSelected = selectedSize === size;
 
@@ -248,7 +248,7 @@ function ProductCard({ product }: { product: Product }) {
  onClick={() => setSelectedSize(size)}
  disabled={Boolean(selectedColor) && !inStock}
  aria-pressed={isSelected}
- className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border px-3 py-2 text-xs font-medium transition ${
+ className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border px-2 py-2 text-xs font-medium transition ${
  isSelected
  ? "border-black bg-black text-white"
  : Boolean(selectedColor) && !inStock
@@ -262,14 +262,14 @@ function ProductCard({ product }: { product: Product }) {
  })}
  </div>
  ) : (
- <p className="text-sm text-[#7c736b] ">One tailored size set is available.</p>
+ <p className="text-xs text-[#7c736b] ">One tailored size set is available.</p>
  )}
  </div>
  </CardContent>
 
- <CardFooter className="mt-auto grid grid-cols-[1fr_auto] gap-2 p-4 pt-0 sm:p-5 sm:pt-0">
- <Link href={buildProductHref(product.slug, { color: selectedColor, size: selectedSize })} className="w-full">
- <Button className="w-full rounded-full">View Product</Button>
+ <CardFooter className="mt-auto flex flex-wrap items-center justify-center gap-1.5 p-2.5 pt-0 sm:p-3 sm:pt-0">
+ <Link href={buildProductHref(product.slug, { color: selectedColor, size: selectedSize })} className="min-w-[5.75rem] flex-1">
+ <Button className="w-full rounded-full px-1 text-xs sm:px-2 sm:text-sm">View Product</Button>
  </Link>
  {showQuickAdd ? (
  <Button
@@ -294,7 +294,7 @@ function ProductCard({ product }: { product: Product }) {
  </Button>
  ) : null}
  {isSelectedVariantInCart ? (
- <p className="col-span-2 text-center text-xs font-medium uppercase tracking-[0.14em] text-emerald-700">
+ <p className="w-full text-center text-[0.625rem] font-medium uppercase tracking-[0.12em] text-emerald-700">
  In cart · {cartItem?.quantity ?? 1}
  </p>
  ) : null}

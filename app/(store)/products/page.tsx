@@ -42,7 +42,7 @@ export default async function ProductListPage({ searchParams }: PageProps) {
  const q = typeof params.q === "string" ? params.q.trim() : "";
  const pageParam = typeof params.page === "string" ? Number.parseInt(params.page, 10) : 1;
  const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
- const pageSize = 9;
+ const pageSize = 10;
 
  const allProducts = await listProducts({ activeOnly: true, sort: "latest" });
 
